@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajax Test</title>
+</head>
+<body>
+
+</body>
+<script>
+    (function () {
+        var ajax = new XMLHttpRequest();
+        ajax.open('POST', 'http://localhost:10001');
+        ajax.send("name=张三");
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState == 4) {
+                if (ajax.status == 200) {
+                    alert(ajax.responseText)
+                }
+            }
+        }
+    })();
+</script>
+</html>

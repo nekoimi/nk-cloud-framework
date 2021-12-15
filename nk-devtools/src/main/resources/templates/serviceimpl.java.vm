@@ -1,0 +1,23 @@
+package ${package.ServiceImpl};
+
+import ${superServiceImplClassPackage};
+import ${package.Entity}.${entity};
+import ${package.Mapper}.${table.mapperName};
+import ${package.Service}.${table.serviceName};
+#if(${entity} == 'Service')
+#else
+import org.springframework.stereotype.Service;
+#end
+
+/**
+ * ${entity} Service
+ *
+ * nekoimi  ${date}
+ */
+#if(${entity} == 'Service')
+@org.springframework.stereotype.Service
+#else
+@Service
+#end
+public class ${table.serviceImplName} extends ${superServiceImplClass}<${table.mapperName}, ${entity}> implements ${table.serviceName} {
+}

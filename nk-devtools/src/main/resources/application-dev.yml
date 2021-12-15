@@ -1,0 +1,52 @@
+#  platform: mysql
+#  driver-class-name: com.mysql.cj.jdbc.Driver
+#  type: com.zaxxer.hikari.HikariDataSource
+#  url: jdbc:mysql://db.youpin-k8s.net:3306/test_example?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+#  username: root
+#  password: 123456
+#  # schema: classpath:sql/init-schema.sql
+#  # data: classpath:sql/init-data.sql
+#  initialization-mode: always
+#  continue-on-error: false
+#  hikari:
+#    pool-name: HikariCP
+#    auto-commit: true
+#    minimum-idle: 5
+#    maximum-pool-size: 15
+#    max-lifetime: 1800000
+#    idle-timeout: 30000
+#    connection-timeout: 30000
+#    connection-test-query: SELECT 1
+#  redis:
+#    database: 0
+#    port: 6379
+#    timeout: 300
+#    jedis:
+#      pool:
+#        max-active: 8  # 最大连接数
+#        max-wait: -1   # 最大阻塞等待时间
+#        max-idle: 8    # 最大空闲时间
+#        min-idle: 0    # 最小空闲时间
+
+mybatis-plus:
+  global-config:
+    banner: false
+
+app:
+  id-gen:
+    worker-id: 0
+    data-center-id: 0
+  cors:
+    path-pattern: /**
+    allowed-origins:
+      - "*"
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+    allowed-headers:
+      - Authorization
+    exposed-headers:
+    allow-credentials: true
+    max-age: 3600

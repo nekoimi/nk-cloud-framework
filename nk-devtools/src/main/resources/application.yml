@@ -1,0 +1,77 @@
+debug: ${debug}
+server:
+  port: 10000
+  address: 0.0.0.0
+  http2:
+    enabled: true
+  shutdown: graceful
+  error:
+    include-binding-errors: always
+    include-message: always
+    include-stacktrace: always
+    include-exception: true
+    whitelabel:
+      enabled: false
+spring:
+  profiles:
+    active: ${profile.name}
+  main:
+    banner-mode: off
+    web-application-type: reactive
+  application:
+    name: ${artifactId}
+  datasource:
+    initialization-mode: always
+    continue-on-error: false
+    platform: mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    url: ${db.url}
+    username: ${db.username}
+    password: ${db.password}
+    hikari:
+      pool-name: ${spring.application.name}-hikari-cp-pool
+      auto-commit: true
+      minimum-idle: 5
+      maximum-pool-size: 10
+      max-lifetime: 1800000
+      idle-timeout: 30000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+  redis:
+    host: ${db.redis.host}
+    port: ${db.redis.port}
+    password: ${db.redis.password}
+    database: ${db.redis.database}
+    timeout: 300
+    jedis:
+      pool:
+        max-active: 8  # 最大连接数
+        max-wait: -1   # 最大阻塞等待时间
+        max-idle: 8    # 最大空闲时间
+        min-idle: 0    # 最小空闲时间
+    lettuce:
+      pool:
+        max-active: 8  # 最大连接数
+        max-wait: -1   # 最大阻塞等待时间
+        max-idle: 8    # 最大空闲时间
+        min-idle: 0    # 最小空闲时间
+
+app:
+  id-gen:
+    worker-id: 0
+    data-center-id: 0
+  cors:
+    path-pattern: /**
+    allowed-origins:
+      - "*"
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+    allowed-headers:
+      - Authorization
+    exposed-headers:
+    allow-credentials: true
+    max-age: 3600

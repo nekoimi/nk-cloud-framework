@@ -1,0 +1,140 @@
+package ${package.Controller};
+
+#if(${controllerMappingHyphenStyle})
+    #set($routePathName = ${controllerMappingHyphen})
+#else
+    #set($routePathName = ${table.entityPath})
+#end
+
+#if(${cfg.routePrefix} != "")
+    #set($routePrefix = ${cfg.routePrefix} + "/")
+#else
+    #set($routePrefix = "")
+#end
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.yoyohr.boot.framework.mybatis.entity.BaseEntity;
+import com.yoyohr.boot.common.annotaction.LoginRequired;
+import com.yoyohr.boot.framework.http.PageResult;
+import ${package.Entity}.${entity};
+import ${package.Service}.${table.serviceName};
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+#if(${superControllerClassPackage})
+import ${superControllerClassPackage};
+#end
+
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * ${entity} Controller
+ *
+ * nekoimi  ${date}
+ */
+@RestController
+#if(${superControllerClass})
+public class ${table.controllerName} extends ${superControllerClass} {
+#else
+public class ${table.controllerName} {
+#end
+
+    @Autowired
+    private ${table.serviceName} targetService;
+
+    /**
+     * 获取分页列表
+     *
+     * @return
+     */
+    @LoginRequired
+    @GetMapping("${routePrefix}api/${cfg.routeVersion}/${cfg.routeName}/list")
+    public PageResult<${entity}> list() {
+        LambdaQueryWrapper<${entity}> wrapper = new LambdaQueryWrapper<>();
+        wrapper.orderByDesc(BaseEntity::getCreatedAt);
+        PageResult<${entity}> result = targetService.listPaginator(page(), pageSize(), wrapper);
+        return result;
+    }
+
+    /**
+    * 获取下拉列表
+    *
+    * @return
+    */
+    @LoginRequired
+    @GetMapping("${routePrefix}api/${cfg.routeVersion}/${cfg.routeName}/down")
+    public Map down() {
+        LambdaQueryWrapper<${entity}> wrapper = new LambdaQueryWrapper<>();
+        wrapper.orderByDesc(BaseEntity::getCreatedAt);
+        List<${entity}> list = targetService.findAll(wrapper);
+        return Map.of("list", list);
+    }
+
+    /**
+     * 根据id获取数据
+     *
+     * @param id
+     * @return
+     */
+    @LoginRequired
+    @GetMapping("${routePrefix}api/${cfg.routeVersion}/${cfg.routeName}/{id}")
+    public ${entity} get(@PathVariable("id") Serializable id) {
+        ${entity} result = targetService.getByOrFail(id);
+        return result;
+    }
+
+    /**
+     * 添加数据
+     *
+     * @return
+     */
+    @LoginRequired
+    @PostMapping("${routePrefix}api/${cfg.routeVersion}/${cfg.routeName}")
+    public ${entity} create(@RequestBody Map<String, Object> map) {
+        Serializable id = targetService.create(map);
+        ${entity} result = targetService.getBy(id);
+        return result;
+    }
+
+    /**
+     * 根据id更新数据
+     *
+     * @param map
+     * @return
+     */
+    @LoginRequired
+    @PutMapping("${routePrefix}api/${cfg.routeVersion}/${cfg.routeName}/{id}")
+    public void update(@PathVariable("id") String id, @RequestBody Map<String, Object> map) {
+        targetService.update(id, map);
+    }
+
+    /**
+     * 根据id删除数据
+     *
+     * @param id
+     * @return
+     */
+    @LoginRequired
+    @DeleteMapping("${routePrefix}api/${cfg.routeVersion}/${cfg.routeName}/{id}")
+    public void remove(@PathVariable("id") String id) {
+        targetService.removeBy(id);
+    }
+
+    /**
+     * 批量删除数据
+     *
+     * @return
+     */
+    @LoginRequired
+    @DeleteMapping("${routePrefix}api/${cfg.routeVersion}/${cfg.routeName}/batch")
+    public void removeBatch(@RequestParam(value = "ids", required = false) String ids) {
+        if (ids == null || ids.trim().length() <= 0) {
+            return; // Ignore.
+        }
+        List<String> list = Arrays.asList(ids.trim().split("[,]"));
+        targetService.removeBy(list);
+    }
+
+}
