@@ -44,6 +44,9 @@
     </appender>
 
     <logger name="com.nekoimi.nk" level="debug"/>
+    <logger name="org.springframework.http" level="debug"/>
+    <logger name="com.baomidou.mybatisplus" level="debug"/>
+
     <logger name="org.springframework.boot" level="info"/>
     <logger name="org.springframework.beans" level="info"/>
     <logger name="org.springframework.core" level="info"/>
@@ -51,9 +54,7 @@
     <logger name="org.springframework.context" level="info"/>
     <logger name="org.springframework.cloud" level="info"/>
     <logger name="org.springframework.web" level="info"/>
-    <logger name="org.springframework.http" level="debug"/>
     <logger name="org.springframework.jmx" level="info"/>
-    <logger name="com.baomidou.mybatisplus" level="info"/>
     <logger name="org.hibernate.validator" level="info"/>
     <logger name="org.jboss" level="info"/>
     <logger name="org.mybatis" level="info"/>

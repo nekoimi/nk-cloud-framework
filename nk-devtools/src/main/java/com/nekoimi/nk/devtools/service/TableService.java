@@ -22,7 +22,7 @@ public class TableService {
      */
     public List<Map<String, Object>> getAllTables() {
         String schema = StrUtils.parseSchema(datasourceUrl);
-        String sql = "select TABLE_NAME as tableName,TABLE_COMMENT as tableComment from information_schema.`TABLES` where TABLE_SCHEMA = '" + schema + "'";
+        String sql = "select TABLE_NAME as name,TABLE_COMMENT as comment, TABLE_COLLATION as collation from information_schema.`TABLES` where TABLE_SCHEMA = '" + schema + "'";
         return SqlRunner.db().selectList(sql);
     }
 }

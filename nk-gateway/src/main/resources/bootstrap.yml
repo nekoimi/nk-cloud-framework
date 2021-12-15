@@ -1,11 +1,4 @@
 spring:
-  profiles:
-    active: dev
-  main:
-    banner-mode: off
-    web-application-type: reactive
-  application:
-    name: ${artifactId:nk-gateway}
   cloud:
     gateway:
       enabled: true

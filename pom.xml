@@ -17,10 +17,6 @@
     <version>1.0</version>
 
     <properties>
-        <contact.name>nekoimi</contact.name>
-        <contact.url>https://nekoimi.com</contact.url>
-        <contact.email>nekoimime@gmail.com</contact.email>
-        
         <nk.version>${version}</nk.version>
         <java.version>11</java.version>
         <maven.compiler.source>11</maven.compiler.source>

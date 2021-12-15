@@ -44,18 +44,23 @@ spring:
     password: ${db.redis.password}
     database: ${db.redis.database}
     timeout: 300
-    jedis:
-      pool:
-        max-active: 8  # 最大连接数
-        max-wait: -1   # 最大阻塞等待时间
-        max-idle: 8    # 最大空闲时间
-        min-idle: 0    # 最小空闲时间
     lettuce:
       pool:
         max-active: 8  # 最大连接数
         max-wait: -1   # 最大阻塞等待时间
         max-idle: 8    # 最大空闲时间
         min-idle: 0    # 最小空闲时间
+
+mybatis-plus:
+  check-config-location: true
+  global-config:
+    banner: false
+    enable-sql-runner: true
+    db-config:
+      logic-delete-value: CURRENT_TIMESTAMP()
+      logic-not-delete-value: NULL
+  configuration:
+    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
 
 app:
   id-gen:

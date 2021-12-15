@@ -1,5 +1,7 @@
 package com.nekoimi.nk.framework.base.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,8 +17,14 @@ public class StrUtils {
         if (!matcher.find()) {
             return null;
         }
-
-        System.out.println(matcher.group());
-        return matcher.group();
+        String result = matcher.group(1);
+        if (StringUtils.isNotBlank(result)) {
+            if (result.contains("?")) {
+                String[] strings = result.split("[?]");
+                return strings[0];
+            }
+            return result;
+        }
+        return null;
     }
 }

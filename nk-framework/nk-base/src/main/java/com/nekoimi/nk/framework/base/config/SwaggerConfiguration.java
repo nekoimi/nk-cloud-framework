@@ -1,10 +1,14 @@
 package com.nekoimi.nk.framework.base.config;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.context.request.async.DeferredResult;
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
@@ -16,17 +20,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebFlux;
  */
 @Configuration
 @EnableSwagger2WebFlux
+@Profile({"dev"})
 public class SwaggerConfiguration {
     @Value("${spring.application.name}")
     private String name;
-    @Value("@version@")
-    private String version;
-    @Value("@contact.name@")
-    private String contactName;
-    @Value("@contact.url@")
-    private String contactUrl;
-    @Value("@contact.email@")
-    private String contactEmail;
 
     @Bean
     public Docket docket() {
@@ -37,16 +34,19 @@ public class SwaggerConfiguration {
                 .forCodeGeneration(true)
                 .pathMapping("/")
                 .select()
+                .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
+                .apis(RequestHandlerSelectors.any())
+                .paths(PathSelectors.any())
                 .build()
                 .apiInfo(apiInfo());
     }
 
     private ApiInfo apiInfo() {
-        Contact contact = new Contact(contactName, contactUrl, contactEmail);
+        Contact contact = new Contact("nekoimi", "https://nekoimi.com", "nekoimime@gmail.com");
         return new ApiInfoBuilder()
                 .title(name + " - API接口文档")
-                .description(name + "API接口文档")
-                .version(version)
+                .description(name + " API接口文档")
+                .version("1.0")
                 .license("APACHE LICENSE, VERSION 2.0")
                 .licenseUrl("https://www.apache.org/licenses/LICENSE-2.0")
                 .contact(contact)
