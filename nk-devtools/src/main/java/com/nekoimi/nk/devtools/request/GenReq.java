@@ -9,15 +9,17 @@ import lombok.Setter;
 @Getter
 @Setter
 public class GenReq {
-    private Boolean onlyGenEntity;
     private String location;
     private String author;
+    private String packageName;
+    private String moduleName;
+
     private String tableName;
     private String tablePrefix;
     private String fieldPrefix;
-    private String packageName;
-    private String moduleName;
     private String entityName;
+    private Boolean onlyGenEntity;
+
     private Router router;
 
     @Getter
@@ -25,6 +27,6 @@ public class GenReq {
     public static class Router {
         private String prefix;
         private String name;
-        private String Version;
+        private String version;
     }
 }
