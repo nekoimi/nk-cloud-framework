@@ -10,7 +10,7 @@
 <script>
     (function () {
         var ajax = new XMLHttpRequest();
-        ajax.open('POST', 'http://localhost:10001');
+        ajax.open('POST', 'http://localhost:10000');
         ajax.send("name=张三");
         ajax.onreadystatechange = function () {
             if (ajax.readyState == 4) {
