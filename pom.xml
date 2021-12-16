@@ -14,6 +14,7 @@
         <module>nk-services</module>
         <module>nk-devtools</module>
         <module>nk-auth</module>
+        <module>nk-platform</module>
     </modules>
     <version>1.0</version>
 
@@ -139,6 +140,11 @@
             <dependency>
                 <groupId>com.nekoimi.nk</groupId>
                 <artifactId>nk-security</artifactId>
+                <version>${nk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nekoimi.nk</groupId>
+                <artifactId>nk-oauth2</artifactId>
                 <version>${nk.version}</version>
             </dependency>
         </dependencies>
