@@ -1,10 +1,10 @@
 package com.nekoimi.nk.framework.base.error;
 
-import com.nekoimi.nk.framework.base.error.enums.BaseErrors;
-import com.nekoimi.nk.framework.base.util.ErrorUtils;
-import com.nekoimi.nk.framework.core.error.ErrorContract;
-import com.nekoimi.nk.framework.core.error.ErrorExceptionHandler;
-import com.nekoimi.nk.framework.core.protocol.ErrorBody;
+import com.nekoimi.nk.framework.core.error.BaseErrors;
+import com.nekoimi.nk.framework.core.utils.ErrorUtils;
+import com.nekoimi.nk.framework.core.contract.error.ErrorDetails;
+import com.nekoimi.nk.framework.base.contract.error.ErrorExceptionHandler;
+import com.nekoimi.nk.framework.core.protocol.ErrorDetailsImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 public class RootExceptionHandler implements ErrorExceptionHandler<Exception> {
-    private static final ErrorContract error = BaseErrors.DEFAULT_SERVER_ERROR;
+    private static final ErrorDetails error = BaseErrors.DEFAULT_SERVER_ERROR;
 
     @Override
     public Class<Exception> getType() {
@@ -25,13 +25,13 @@ public class RootExceptionHandler implements ErrorExceptionHandler<Exception> {
     }
 
     @Override
-    public Mono<? extends ErrorContract> handle(ServerWebExchange exchange, Exception e) {
+    public Mono<? extends ErrorDetails> handle(ServerWebExchange exchange, Exception e) {
         log.warn("root exception handler -- \n");
         log.error(e.getMessage(), e);
         if (log.isDebugEnabled()) {
             e.printStackTrace();
         }
-        return Mono.fromCallable(() -> ErrorBody.of(error.code(), error.message(),
+        return Mono.fromCallable(() -> ErrorDetailsImpl.of(error.code(), error.message(),
                 ErrorUtils.getStackTrace(e), ClassUtils.getName(e))
         );
     }

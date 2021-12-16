@@ -1,9 +1,9 @@
 package com.nekoimi.nk.framework.base.error;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nekoimi.nk.framework.core.error.ErrorContract;
-import com.nekoimi.nk.framework.core.error.ErrorExceptionResultWriter;
-import com.nekoimi.nk.framework.core.error.ErrorExceptionWriter;
+import com.nekoimi.nk.framework.core.contract.error.ErrorDetails;
+import com.nekoimi.nk.framework.base.contract.error.ErrorExceptionResultWriter;
+import com.nekoimi.nk.framework.base.contract.error.ErrorExceptionWriter;
 import com.nekoimi.nk.framework.core.protocol.JsonResp;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,14 +35,14 @@ public class DefaultErrorExceptionResultWriter implements ErrorExceptionResultWr
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
     }
 
-    private void doWriter(ServerWebExchange exchange, ErrorContract error) {
+    private void doWriter(ServerWebExchange exchange, ErrorDetails error) {
         writers.forEach(writer -> {
             log.debug("result writer do writer -- {}", ClassUtils.getName(writer));
             writer.writer(exchange, error);
         });
     }
 
-    public Mono<Void> httpWriter(ServerWebExchange exchange, ErrorContract error) {
+    public Mono<Void> httpWriter(ServerWebExchange exchange, ErrorDetails error) {
         return Mono.defer(() -> {
             ServerHttpResponse response = exchange.getResponse();
             preHttpWriter(response);
@@ -62,7 +62,7 @@ public class DefaultErrorExceptionResultWriter implements ErrorExceptionResultWr
     }
 
     @Override
-    public Mono<Void> writer(ServerWebExchange exchange, ErrorContract error) {
+    public Mono<Void> writer(ServerWebExchange exchange, ErrorDetails error) {
         doWriter(exchange, error);
         return httpWriter(exchange, error);
     }

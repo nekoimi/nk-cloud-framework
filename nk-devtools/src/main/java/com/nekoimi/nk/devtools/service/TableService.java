@@ -1,7 +1,7 @@
 package com.nekoimi.nk.devtools.service;
 
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
-import com.nekoimi.nk.framework.base.util.StrUtils;
+import com.nekoimi.nk.framework.core.utils.StrUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

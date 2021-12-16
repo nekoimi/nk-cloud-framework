@@ -1,7 +1,7 @@
 package com.nekoimi.nk.framework.base.error;
 
-import com.nekoimi.nk.framework.core.error.ErrorExceptionHandler;
-import com.nekoimi.nk.framework.core.error.ErrorExceptionHandlerResolver;
+import com.nekoimi.nk.framework.base.contract.error.ErrorExceptionHandler;
+import com.nekoimi.nk.framework.base.contract.error.ErrorExceptionHandlerResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;

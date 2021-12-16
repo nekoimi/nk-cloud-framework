@@ -1,10 +1,10 @@
 package com.nekoimi.nk.framework.base.error.handler;
 
-import com.nekoimi.nk.framework.base.error.enums.BaseErrors;
-import com.nekoimi.nk.framework.base.util.ErrorUtils;
-import com.nekoimi.nk.framework.core.error.ErrorContract;
-import com.nekoimi.nk.framework.core.error.ErrorExceptionHandler;
-import com.nekoimi.nk.framework.core.protocol.ErrorBody;
+import com.nekoimi.nk.framework.core.error.BaseErrors;
+import com.nekoimi.nk.framework.core.utils.ErrorUtils;
+import com.nekoimi.nk.framework.core.contract.error.ErrorDetails;
+import com.nekoimi.nk.framework.base.contract.error.ErrorExceptionHandler;
+import com.nekoimi.nk.framework.core.protocol.ErrorDetailsImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ public class ResponseStatusErrorExceptionHandler implements ErrorExceptionHandle
     }
 
     @Override
-    public Mono<? extends ErrorContract> handle(ServerWebExchange exchange, ResponseStatusException e) {
+    public Mono<? extends ErrorDetails> handle(ServerWebExchange exchange, ResponseStatusException e) {
         HttpStatus status = e.getStatus();
         return Mono.fromCallable(() -> {
             var error = BaseErrors.DEFAULT_SERVER_ERROR;
@@ -36,7 +36,7 @@ public class ResponseStatusErrorExceptionHandler implements ErrorExceptionHandle
             } else if (status.is5xxServerError()) {
                 error = buildHttpStatusServerError(status);
             }
-            return ErrorBody.of(error.code(), error.message(), ErrorUtils.getStackTrace(e), ClassUtils.getName(e));
+            return ErrorDetailsImpl.of(error.code(), error.message(), ErrorUtils.getStackTrace(e), ClassUtils.getName(e));
         });
     }
 
