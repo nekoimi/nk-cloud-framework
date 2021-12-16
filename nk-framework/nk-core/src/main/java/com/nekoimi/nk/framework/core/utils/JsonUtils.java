@@ -19,6 +19,15 @@ public class JsonUtils {
         }
     }
 
+    public static byte[] writeAsBytes(Object src) {
+        try {
+            return ObjectMapperHolder.getInstance().writeValueAsBytes(src);
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage(), e);
+            return new byte[0];
+        }
+    }
+
     public static <T> T read(String json, Class<T> resultType) {
         try {
             return ObjectMapperHolder.getInstance().readValue(json, resultType);

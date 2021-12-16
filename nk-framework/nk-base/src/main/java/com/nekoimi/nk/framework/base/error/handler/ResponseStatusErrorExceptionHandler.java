@@ -1,12 +1,11 @@
 package com.nekoimi.nk.framework.base.error.handler;
 
-import com.nekoimi.nk.framework.core.error.BaseErrors;
-import com.nekoimi.nk.framework.core.utils.ErrorUtils;
-import com.nekoimi.nk.framework.core.contract.error.ErrorDetails;
 import com.nekoimi.nk.framework.base.contract.error.ErrorExceptionHandler;
+import com.nekoimi.nk.framework.core.contract.error.ErrorDetails;
+import com.nekoimi.nk.framework.core.error.BaseErrors;
 import com.nekoimi.nk.framework.core.protocol.ErrorDetailsImpl;
+import com.nekoimi.nk.framework.core.utils.ErrorUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ClassUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -15,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 /**
  * nekoimi  2021/7/21 下午3:34
- *
+ * <p>
  * HTTP的异常处理
  */
 @Slf4j
@@ -36,7 +35,7 @@ public class ResponseStatusErrorExceptionHandler implements ErrorExceptionHandle
             } else if (status.is5xxServerError()) {
                 error = buildHttpStatusServerError(status);
             }
-            return ErrorDetailsImpl.of(error.code(), error.message(), ErrorUtils.getStackTrace(e), ClassUtils.getName(e));
+            return ErrorDetailsImpl.of(error.code(), error.message(), "", ErrorUtils.getStackTrace(e));
         });
     }
 

@@ -12,6 +12,10 @@ public enum BaseErrors implements ErrorDetails {
     HTTP_STATUS_NOT_FOUND(10404, "Not found"),
     HTTP_STATUS_METHOD_NOT_ALLOWED(10405, "Method not allowed"),
 
+    AUTHENTICATION_EXCEPTION(10500, "Authentication error"),
+    ACCESS_DENIED_EXCEPTION(10501, "Access is denied"),
+    RESULT_CONVERTER_SUPPORTS_EXCEPTION(10502, "Authentication result converter support error"),
+
     SYSTEM_CLOCK_EXCEPTION(50000, "System clock error"),
     // 客户端请求异常
     DEFAULT_CLIENT_ERROR(99400, "无效的请求！"),

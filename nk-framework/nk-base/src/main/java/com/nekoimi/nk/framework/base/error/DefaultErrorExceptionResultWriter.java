@@ -46,7 +46,7 @@ public class DefaultErrorExceptionResultWriter implements ErrorExceptionResultWr
         return Mono.defer(() -> {
             ServerHttpResponse response = exchange.getResponse();
             preHttpWriter(response);
-            JsonResp resp = JsonResp.error(error.code(), error.message());
+            JsonResp resp = JsonResp.error(error.code(), error.message() + " " + error.exception());
             try {
                 byte[] valueAsBytes = objectMapper.writeValueAsBytes(resp);
                 DataBuffer buffer = response.bufferFactory().wrap(valueAsBytes);

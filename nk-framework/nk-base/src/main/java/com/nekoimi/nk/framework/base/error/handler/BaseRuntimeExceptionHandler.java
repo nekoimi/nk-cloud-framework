@@ -1,12 +1,11 @@
 package com.nekoimi.nk.framework.base.error.handler;
 
-import com.nekoimi.nk.framework.core.utils.ErrorUtils;
-import com.nekoimi.nk.framework.core.contract.error.ErrorDetails;
 import com.nekoimi.nk.framework.base.contract.error.ErrorExceptionHandler;
+import com.nekoimi.nk.framework.core.contract.error.ErrorDetails;
 import com.nekoimi.nk.framework.core.exception.BaseRuntimeException;
 import com.nekoimi.nk.framework.core.protocol.ErrorDetailsImpl;
+import com.nekoimi.nk.framework.core.utils.ErrorUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ClassUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -27,8 +26,7 @@ public class BaseRuntimeExceptionHandler implements ErrorExceptionHandler<BaseRu
     @Override
     public Mono<? extends ErrorDetails> handle(ServerWebExchange exchange, BaseRuntimeException e) {
         var error = e.getError();
-        return Mono.fromCallable(() -> ErrorDetailsImpl.of(error.code(), error.message(),
-                ErrorUtils.getStackTrace(e), ClassUtils.getName(e))
+        return Mono.fromCallable(() -> ErrorDetailsImpl.of(error.code(), error.message(), e.getMessage(), ErrorUtils.getStackTrace(e))
         );
     }
 
