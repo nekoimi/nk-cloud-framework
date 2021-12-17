@@ -26,7 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @Slf4j
 @Component
-public class RequestToAuthenticationTokenConverterManager implements ServerAuthenticationConverter, BeanPostProcessor {
+public class IntegratedToAuthenticationTokenConverterManager implements ServerAuthenticationConverter, BeanPostProcessor {
     private final static List<RequestToAuthenticationTokenConverter> converters = new CopyOnWriteArrayList<>();
 
     static {

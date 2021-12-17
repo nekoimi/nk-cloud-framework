@@ -1,23 +1,17 @@
 package com.nekoimi.nk.framework.security.config;
 
 import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
-import com.nekoimi.nk.framework.security.converter.RequestToAuthenticationTokenConverterManager;
 import com.nekoimi.nk.framework.security.filter.BeforeRequestFilter;
 import com.nekoimi.nk.framework.security.filter.RequestParseAuthTypeFilter;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -26,16 +20,16 @@ import org.springframework.security.oauth2.client.registration.ReactiveClientReg
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtReactiveAuthenticationManager;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
+import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
 import org.springframework.security.web.server.authentication.ServerAuthenticationFailureHandler;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
 import org.springframework.security.web.server.authorization.ServerAccessDeniedHandler;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
+import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
@@ -49,7 +43,6 @@ import java.util.UUID;
 @Configuration
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
-@AllArgsConstructor
 public class SecurityConfiguration {
     private final SecurityProperties properties;
     private final ServerAccessDeniedHandler accessDeniedHandler;
@@ -57,16 +50,25 @@ public class SecurityConfiguration {
     private final ServerAuthenticationSuccessHandler authenticationSuccessHandler;
     private final ServerAuthenticationFailureHandler authenticationFailureHandler;
     private final ServerLogoutSuccessHandler logoutSuccessHandler;
-    private final RequestToAuthenticationTokenConverterManager requestToAuthenticationTokenConverterManager;
+    private final ReactiveAuthenticationManager integratedAuthenticationManager;
+    private final ServerAuthenticationConverter integratedToAuthenticationTokenConverterManager;
 
-    @Bean
-    public ReactiveUserDetailsService demoUserDetailsService() {
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("password")
-                .roles("USER")
-                .build();
-        return new MapReactiveUserDetailsService(user);
+    public SecurityConfiguration(SecurityProperties properties,
+                                 ServerAccessDeniedHandler accessDeniedHandler,
+                                 ServerAuthenticationEntryPoint authenticationExceptionHandler,
+                                 ServerAuthenticationSuccessHandler authenticationSuccessHandler,
+                                 ServerAuthenticationFailureHandler authenticationFailureHandler,
+                                 ServerLogoutSuccessHandler logoutSuccessHandler,
+                                 ReactiveAuthenticationManager integratedAuthenticationManager,
+                                 ServerAuthenticationConverter integratedToAuthenticationTokenConverterManager) {
+        this.properties = properties;
+        this.accessDeniedHandler = accessDeniedHandler;
+        this.authenticationExceptionHandler = authenticationExceptionHandler;
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
+        this.authenticationFailureHandler = authenticationFailureHandler;
+        this.logoutSuccessHandler = logoutSuccessHandler;
+        this.integratedAuthenticationManager = integratedAuthenticationManager;
+        this.integratedToAuthenticationTokenConverterManager = integratedToAuthenticationTokenConverterManager;
     }
 
     @Bean
@@ -74,6 +76,10 @@ public class SecurityConfiguration {
         return new BCryptPasswordEncoder(30);
     }
 
+    @Bean
+    public ServerSecurityContextRepository securityContextRepository() {
+        return new WebSessionServerSecurityContextRepository();
+    }
 
     @Bean
     public ReactiveClientRegistrationRepository clientRegistrationRepository() {
@@ -111,7 +117,7 @@ public class SecurityConfiguration {
                 .formLogin(login -> login.requiresAuthenticationMatcher(loginExchangeMatcher)
                         .authenticationSuccessHandler(authenticationSuccessHandler)
                         .authenticationFailureHandler(authenticationFailureHandler)
-                        .authenticationManager(new UserDetailsRepositoryReactiveAuthenticationManager(demoUserDetailsService()))
+                        .authenticationManager(integratedAuthenticationManager)
                         .securityContextRepository(securityContextRepository))
                 // 注销认证
                 .logout(logout -> logout.requiresLogout(logoutExchangeMatcher)
@@ -160,11 +166,11 @@ public class SecurityConfiguration {
                 // build
                 .build();
 
-        // TODO 综合认证管理器
+        // TODO 综合认证Token解析器
         filterChain.getWebFilters()
                 .filter(webFilter -> webFilter instanceof AuthenticationWebFilter)
                 .cast(AuthenticationWebFilter.class)
-                .subscribe(filter -> filter.setServerAuthenticationConverter(requestToAuthenticationTokenConverterManager));
+                .subscribe(filter -> filter.setServerAuthenticationConverter(integratedToAuthenticationTokenConverterManager));
 
         return filterChain;
     }
