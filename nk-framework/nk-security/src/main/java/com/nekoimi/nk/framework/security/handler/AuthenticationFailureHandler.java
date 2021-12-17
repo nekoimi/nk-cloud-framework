@@ -17,6 +17,6 @@ public class AuthenticationFailureHandler implements ServerAuthenticationFailure
     @Override
     public Mono<Void> onAuthenticationFailure(WebFilterExchange filterExchange, AuthenticationException e) {
         log.error("认证失败: {}", e.getMessage());
-        return Mono.error(new RequestAuthenticationException());
+        return Mono.error(new RequestAuthenticationException(e.getMessage()));
     }
 }
