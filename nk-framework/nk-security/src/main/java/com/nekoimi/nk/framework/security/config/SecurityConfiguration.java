@@ -123,7 +123,7 @@ public class SecurityConfiguration {
                 .logout(logout -> logout.requiresLogout(logoutExchangeMatcher)
                         .logoutSuccessHandler(logoutSuccessHandler))
                 // oauth2
-                .oauth2Login().and()
+//                .oauth2Login().and()
 //                .oauth2Client().and()
 //                .oauth2ResourceServer(ServerHttpSecurity.OAuth2ResourceServerSpec::jwt)
                 // 关闭csrf
