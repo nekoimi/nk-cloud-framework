@@ -11,7 +11,7 @@ server:
     include-stacktrace: always
     include-exception: true
     whitelabel:
-      enabled: false
+      enabled: true
 spring:
   profiles:
     active: ${profile.name}

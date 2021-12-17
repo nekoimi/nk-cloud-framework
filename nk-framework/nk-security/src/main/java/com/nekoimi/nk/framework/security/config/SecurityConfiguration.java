@@ -1,17 +1,18 @@
 package com.nekoimi.nk.framework.security.config;
 
 import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
-import com.nekoimi.nk.framework.security.contract.AuthenticationTokenToResultConverter;
-import com.nekoimi.nk.framework.security.converter.ServerAllAuthenticationConverterManager;
-import com.nekoimi.nk.framework.security.handler.*;
+import com.nekoimi.nk.framework.security.converter.RequestToAuthenticationTokenConverterManager;
+import com.nekoimi.nk.framework.security.filter.BeforeRequestFilter;
+import com.nekoimi.nk.framework.security.filter.RequestParseAuthTypeFilter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.ReactiveAuthenticationManagerResolver;
+import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
@@ -25,6 +26,8 @@ import org.springframework.security.oauth2.client.registration.ReactiveClientReg
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtReactiveAuthenticationManager;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
@@ -36,11 +39,7 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
-import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.server.WebFilter;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -58,8 +57,7 @@ public class SecurityConfiguration {
     private final ServerAuthenticationSuccessHandler authenticationSuccessHandler;
     private final ServerAuthenticationFailureHandler authenticationFailureHandler;
     private final ServerLogoutSuccessHandler logoutSuccessHandler;
-    private final ServerAllAuthenticationConverterManager allAuthenticationConverter;
-    private final ReactiveAuthenticationManagerResolver<ServerWebExchange> allAuthenticationResolverManager;
+    private final RequestToAuthenticationTokenConverterManager requestToAuthenticationTokenConverterManager;
 
     @Bean
     public ReactiveUserDetailsService demoUserDetailsService() {
@@ -74,31 +72,6 @@ public class SecurityConfiguration {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(30);
-    }
-
-    @Bean
-    public ServerAccessDeniedHandler accessDeniedExceptionHandler() {
-        return new AccessDeniedExceptionHandler();
-    }
-
-    @Bean
-    public ServerAuthenticationEntryPoint authenticationExceptionHandler() {
-        return new AuthenticationExceptionHandler();
-    }
-
-    @Bean
-    public ServerAuthenticationSuccessHandler authenticationSuccessHandler(List<AuthenticationTokenToResultConverter> converters) {
-        return new AuthenticationSuccessHandler(converters);
-    }
-
-    @Bean
-    public ServerAuthenticationFailureHandler authenticationFailureHandler() {
-        return new AuthenticationFailureHandler();
-    }
-
-    @Bean
-    public ServerLogoutSuccessHandler logoutSuccessHandler() {
-        return new LogoutSuccessHandler();
     }
 
 
@@ -130,32 +103,23 @@ public class SecurityConfiguration {
     @Bean
     public SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http,
                                                        CorsConfigurationSource corsConfigurationSource,
-                                                       ReactiveClientRegistrationRepository clientRegistrationRepository,
                                                        ServerSecurityContextRepository securityContextRepository) {
         ServerWebExchangeMatcher loginExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, properties.getLoginUrl());
+        ServerWebExchangeMatcher logoutExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, properties.getLogoutUrl());
         SecurityWebFilterChain filterChain = http
                 // 登录认证
                 .formLogin(login -> login.requiresAuthenticationMatcher(loginExchangeMatcher)
                         .authenticationSuccessHandler(authenticationSuccessHandler)
                         .authenticationFailureHandler(authenticationFailureHandler)
-//                        .authenticationManager(new JwtReactiveAuthenticationManager(jwtDecoder))
+                        .authenticationManager(new UserDetailsRepositoryReactiveAuthenticationManager(demoUserDetailsService()))
                         .securityContextRepository(securityContextRepository))
                 // 注销认证
-                .logout(logout -> {
-                    logout.requiresLogout(ServerWebExchangeMatchers
-                            .pathMatchers(HttpMethod.POST, properties.getLogoutUrl()))
-                            .logoutSuccessHandler(logoutSuccessHandler);
-                })
+                .logout(logout -> logout.requiresLogout(logoutExchangeMatcher)
+                        .logoutSuccessHandler(logoutSuccessHandler))
                 // oauth2
-                .oauth2Login(oauth2Login -> {
-                    oauth2Login.clientRegistrationRepository(clientRegistrationRepository);
-                })
-                .oauth2Client(oauth2Client -> {
-                    oauth2Client.clientRegistrationRepository(clientRegistrationRepository);
-                })
-                .oauth2ResourceServer(oauth2Server -> {
-                    oauth2Server.jwt();
-                })
+//                .oauth2Login()
+//                .oauth2Client()
+//                .oauth2ResourceServer()
                 // 关闭csrf
                 .csrf().disable()
                 // 关闭匿名用户
@@ -178,34 +142,29 @@ public class SecurityConfiguration {
                             .pathMatchers("/doc.html").permitAll()
                             .pathMatchers("/webjars/**").permitAll()
                             .pathMatchers("/v2/api-docs").permitAll()
-                            .pathMatchers(properties.getMatcher().getPermitAll().toArray(new String[0])).permitAll()
-                            .pathMatchers(properties.getMatcher().getAuthenticated().toArray(new String[0]))
-                            .authenticated();
+                            .pathMatchers("/swagger-resources").permitAll()
+                            .pathMatchers(properties.getLoginUrl()).permitAll()
+                            .pathMatchers(properties.getLogoutUrl()).permitAll();
+                    SecurityProperties.PathMatcher pathMatcher = properties.getMatcher();
+                    if (!pathMatcher.getPermitAll().isEmpty()) {
+                        pathMatcher.getPermitAll().forEach(path -> exchange.pathMatchers(path).permitAll());
+                    }
+                    if (!pathMatcher.getAuthenticated().isEmpty()) {
+                        pathMatcher.getAuthenticated().forEach(path -> exchange.pathMatchers(path).authenticated());
+                    }
                 })
-                // 插入filter
-//                .addFilterBefore(new BeforeRequestFilter(), SecurityWebFiltersOrder.CSRF)
+                // 插入全局预处理filter
+                .addFilterBefore(new BeforeRequestFilter(), SecurityWebFiltersOrder.CSRF)
+                // 插入认证类型解析filter
+                .addFilterBefore(new RequestParseAuthTypeFilter(loginExchangeMatcher), SecurityWebFiltersOrder.HTTP_BASIC)
                 // build
                 .build();
 
-        filterChain.getWebFilters().filter(webFilter -> webFilter instanceof AuthenticationWebFilter)
-                .subscribe(webFilter -> log.debug(webFilter.toString()));
-
         // TODO 综合认证管理器
-        Iterator<WebFilter> iterator = filterChain.getWebFilters().toIterable().iterator();
-        while (iterator.hasNext()) {
-            WebFilter webFilter = iterator.next();
-            if (webFilter instanceof AuthenticationWebFilter) {
-                webFilter = new AuthenticationWebFilter(allAuthenticationResolverManager);
-                ((AuthenticationWebFilter) webFilter).setRequiresAuthenticationMatcher(loginExchangeMatcher);
-                ((AuthenticationWebFilter) webFilter).setAuthenticationFailureHandler(authenticationFailureHandler);
-                ((AuthenticationWebFilter) webFilter).setServerAuthenticationConverter(allAuthenticationConverter);
-                ((AuthenticationWebFilter) webFilter).setAuthenticationSuccessHandler(authenticationSuccessHandler);
-                ((AuthenticationWebFilter) webFilter).setSecurityContextRepository(securityContextRepository);
-            }
-        }
-
-        filterChain.getWebFilters().filter(webFilter -> webFilter instanceof AuthenticationWebFilter)
-                .subscribe(webFilter -> log.debug(webFilter.toString()));
+        filterChain.getWebFilters()
+                .filter(webFilter -> webFilter instanceof AuthenticationWebFilter)
+                .cast(AuthenticationWebFilter.class)
+                .subscribe(filter -> filter.setServerAuthenticationConverter(requestToAuthenticationTokenConverterManager));
 
         return filterChain;
     }

@@ -16,4 +16,9 @@ public interface SystemConstants {
     DateTimeFormatter DEFAULT_DATE_FORMATTER = DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT);
     DateTimeFormatter DEFAULT_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT);
     TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone(ZoneId.of("Asia/Shanghai"));
+
+    /**
+     * 默认请求方式header头
+     */
+    String AUTH_TYPE_REQUEST_HEADER = "X-Auth-Type";
 }

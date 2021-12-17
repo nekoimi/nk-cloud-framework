@@ -16,7 +16,6 @@ import lombok.Setter;
 public class ErrorDetailsImpl implements ErrorDetails {
     private Integer code;
     private String message;
-    private String exception;
     private String trace;
 
     @Override
@@ -32,10 +31,5 @@ public class ErrorDetailsImpl implements ErrorDetails {
     @Override
     public String trace() {
         return trace;
-    }
-
-    @Override
-    public String exception() {
-        return exception;
     }
 }

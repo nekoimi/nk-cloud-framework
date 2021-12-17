@@ -15,7 +15,7 @@ public class BaseRuntimeException extends RuntimeException {
     }
 
     public BaseRuntimeException(ErrorDetails error, String message, Object... args) {
-        super(error.message() + (StringUtils.isNotBlank(message) ? String.format(", " + message, args) : ""));
+        super((StringUtils.isNotBlank(message) ? String.format(message, args) : error.message()));
         this.error = error;
     }
 

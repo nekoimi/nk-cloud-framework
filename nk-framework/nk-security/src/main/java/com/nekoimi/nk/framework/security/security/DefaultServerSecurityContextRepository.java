@@ -15,11 +15,11 @@ import reactor.core.publisher.Mono;
 public class DefaultServerSecurityContextRepository implements ServerSecurityContextRepository {
     @Override
     public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {
-        return null;
+        return Mono.empty();
     }
 
     @Override
     public Mono<SecurityContext> load(ServerWebExchange exchange) {
-        return null;
+        return Mono.empty();
     }
 }

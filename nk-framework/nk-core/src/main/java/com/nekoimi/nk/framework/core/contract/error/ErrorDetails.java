@@ -9,5 +9,4 @@ public interface ErrorDetails {
     Integer code();
     String message();
     String trace();
-    String exception();
 }

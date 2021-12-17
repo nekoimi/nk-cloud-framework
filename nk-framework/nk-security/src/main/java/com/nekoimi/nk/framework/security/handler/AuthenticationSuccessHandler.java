@@ -2,7 +2,7 @@ package com.nekoimi.nk.framework.security.handler;
 
 import com.nekoimi.nk.framework.core.protocol.JsonResp;
 import com.nekoimi.nk.framework.core.utils.JsonUtils;
-import com.nekoimi.nk.framework.security.contract.AuthenticationTokenToResultConverter;
+import com.nekoimi.nk.framework.security.contract.AuthenticationTokenToResultTransformer;
 import com.nekoimi.nk.framework.security.exception.ResultConverterSupportsException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -10,6 +10,7 @@ import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
@@ -27,16 +28,16 @@ import java.util.List;
 @Slf4j
 @Component
 public class AuthenticationSuccessHandler implements ServerAuthenticationSuccessHandler {
-    private final List<AuthenticationTokenToResultConverter> converters;
+    private final List<AuthenticationTokenToResultTransformer> converters;
 
-    public AuthenticationSuccessHandler(List<AuthenticationTokenToResultConverter> converters) {
+    public AuthenticationSuccessHandler(List<AuthenticationTokenToResultTransformer> converters) {
         this.converters = converters;
     }
 
     @Override
-    public Mono<Void> onAuthenticationSuccess(WebFilterExchange filterExchange, Authentication authentication) {
-        log.error("登录成功 -- \n {}", JsonUtils.write(authentication));
-        return Mono.defer(() -> Mono.just(filterExchange.getExchange().getResponse()))
+    public Mono<Void> onAuthenticationSuccess(WebFilterExchange exchange, Authentication authentication) {
+        log.debug("登录成功 -- \n {}", JsonUtils.write(authentication));
+        return Mono.just(exchange.getExchange().getResponse())
                 .flatMap(response -> Flux.fromIterable(converters)
                         .filter(c -> c.support(authentication))
                         .switchIfEmpty(Flux.error(new ResultConverterSupportsException()))

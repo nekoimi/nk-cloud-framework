@@ -12,7 +12,7 @@ public enum BaseErrors implements ErrorDetails {
     HTTP_STATUS_NOT_FOUND(10404, "Not found"),
     HTTP_STATUS_METHOD_NOT_ALLOWED(10405, "Method not allowed"),
 
-    AUTHENTICATION_EXCEPTION(10500, "Authentication error"),
+    AUTHENTICATION_EXCEPTION(10401, "Not Authenticated"),
     ACCESS_DENIED_EXCEPTION(10501, "Access is denied"),
     RESULT_CONVERTER_SUPPORTS_EXCEPTION(10502, "Authentication result converter support error"),
 
@@ -42,11 +42,6 @@ public enum BaseErrors implements ErrorDetails {
 
     @Override
     public String trace() {
-        return null;
-    }
-
-    @Override
-    public String exception() {
         return null;
     }
 }

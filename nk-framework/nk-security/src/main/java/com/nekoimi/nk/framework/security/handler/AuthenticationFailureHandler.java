@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 public class AuthenticationFailureHandler implements ServerAuthenticationFailureHandler {
     @Override
     public Mono<Void> onAuthenticationFailure(WebFilterExchange filterExchange, AuthenticationException e) {
-        log.error("登录失败: {}", e.getMessage());
-        return Mono.error(new RequestAuthenticationException(e.getMessage()));
+        log.error("认证失败: {}", e.getMessage());
+        return Mono.error(new RequestAuthenticationException());
     }
 }

@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>com.nekoimi.nk</groupId>
-            <artifactId>nk-base</artifactId>
+            <artifactId>nk-web</artifactId>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>

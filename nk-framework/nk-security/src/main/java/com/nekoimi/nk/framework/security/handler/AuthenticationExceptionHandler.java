@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 public class AuthenticationExceptionHandler implements ServerAuthenticationEntryPoint {
     @Override
     public Mono<Void> commence(ServerWebExchange serverWebExchange, AuthenticationException e) {
-        log.error("认证错误： {}", e.getMessage());
+        log.error("没有登录认证： {}", e.getMessage());
         return Mono.error(new RequestAuthenticationException());
     }
 }

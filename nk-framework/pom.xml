@@ -12,7 +12,7 @@
     <artifactId>nk-framework</artifactId>
     <modules>
         <module>nk-core</module>
-        <module>nk-base</module>
+        <module>nk-web</module>
         <module>nk-security</module>
         <module>nk-oauth2</module>
         <module>nk-openfeign</module>

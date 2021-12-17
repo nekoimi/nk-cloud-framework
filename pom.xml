@@ -134,7 +134,7 @@
             </dependency>
             <dependency>
                 <groupId>com.nekoimi.nk</groupId>
-                <artifactId>nk-base</artifactId>
+                <artifactId>nk-web</artifactId>
                 <version>${nk.version}</version>
             </dependency>
             <dependency>
