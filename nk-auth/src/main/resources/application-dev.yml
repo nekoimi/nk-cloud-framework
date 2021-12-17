@@ -3,6 +3,13 @@ mybatis-plus:
 #  mapper-locations:
   check-config-location: true
 
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://192.168.2.175:10000/pub-key/jwk.json
+
 app:
   id-gen:
     worker-id: 0
@@ -22,8 +29,8 @@ app:
     allow-credentials: true
     max-age: 3600
   security:
-    login-url: /auth/user/login
-    logout-url: /auth/user/logout
+    login-url: /auth/login
+    logout-url: /auth/logout
     matcher:
       permit-all:
         - /home

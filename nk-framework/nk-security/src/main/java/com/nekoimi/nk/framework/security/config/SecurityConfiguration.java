@@ -123,9 +123,11 @@ public class SecurityConfiguration {
                 .logout(logout -> logout.requiresLogout(logoutExchangeMatcher)
                         .logoutSuccessHandler(logoutSuccessHandler))
                 // oauth2
-//                .oauth2Login()
-//                .oauth2Client()
-//                .oauth2ResourceServer()
+                .oauth2Login().and()
+                .oauth2Client().and()
+                .oauth2ResourceServer(oauth2Server -> {
+                    oauth2Server.jwt();
+                })
                 // 关闭csrf
                 .csrf().disable()
                 // 关闭匿名用户
@@ -149,6 +151,7 @@ public class SecurityConfiguration {
                             .pathMatchers("/webjars/**").permitAll()
                             .pathMatchers("/v2/api-docs").permitAll()
                             .pathMatchers("/swagger-resources").permitAll()
+                            .pathMatchers("/pub-key/jwk.json").permitAll()
                             .pathMatchers(properties.getLoginUrl()).permitAll()
                             .pathMatchers(properties.getLogoutUrl()).permitAll();
                     SecurityProperties.PathMatcher pathMatcher = properties.getMatcher();

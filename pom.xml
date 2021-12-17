@@ -142,11 +142,6 @@
                 <artifactId>nk-security</artifactId>
                 <version>${nk.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.nekoimi.nk</groupId>
-                <artifactId>nk-oauth2</artifactId>
-                <version>${nk.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 

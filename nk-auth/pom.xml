@@ -20,10 +20,6 @@
             <groupId>com.nekoimi.nk</groupId>
             <artifactId>nk-security</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.nekoimi.nk</groupId>
-            <artifactId>nk-oauth2</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
