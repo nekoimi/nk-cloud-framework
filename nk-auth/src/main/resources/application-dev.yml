@@ -21,3 +21,11 @@ app:
     exposed-headers:
     allow-credentials: true
     max-age: 3600
+  security:
+    login-url: /auth/user/login
+    logout-url: /auth/user/logout
+    matcher:
+      permit-all:
+        - /home
+      authenticated:
+        - /user/me

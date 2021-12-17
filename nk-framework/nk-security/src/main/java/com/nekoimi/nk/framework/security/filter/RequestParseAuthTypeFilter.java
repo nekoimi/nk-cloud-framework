@@ -27,8 +27,10 @@ public class RequestParseAuthTypeFilter implements WebFilter {
 
     private Mono<String> parse(ServerWebExchange exchange) {
         String authType = exchange.getRequest().getQueryParams().getFirst(authTypeParameter);
-        ;
         if (StringUtils.isBlank(authType)) {
+            return Mono.empty();
+        }
+        if (!StringUtils.isNumeric(authType)) {
             return Mono.empty();
         }
         log.debug("parse auth type: {}", authType);

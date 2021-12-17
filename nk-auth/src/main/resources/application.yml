@@ -61,22 +61,3 @@ mybatis-plus:
       logic-not-delete-value: NULL
   configuration:
     default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
-
-app:
-  id-gen:
-    worker-id: 0
-    data-center-id: 0
-  cors:
-    path-pattern: /**
-    allowed-origins:
-      - "*"
-    allowed-methods:
-      - GET
-      - POST
-      - PUT
-      - DELETE
-    allowed-headers:
-      - Authorization
-    exposed-headers:
-    allow-credentials: true
-    max-age: 3600
