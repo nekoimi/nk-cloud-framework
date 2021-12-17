@@ -16,13 +16,13 @@ import java.security.interfaces.RSAPublicKey;
  */
 @RestController
 public class JwkController {
-    @Autowired
-    private KeyPair keyPair;
-
-    @GetMapping("/pub-key/jwk.json")
-    public Mono<String> key() {
-        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-        RSAKey key = new RSAKey.Builder(publicKey).build();
-        return Mono.just(JsonUtils.write(new JWKSet(key).toJSONObject()));
-    }
+//    @Autowired
+//    private KeyPair keyPair;
+//
+//    @GetMapping("/pub-key/jwk.json")
+//    public Mono<String> key() {
+//        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+//        RSAKey key = new RSAKey.Builder(publicKey).build();
+//        return Mono.just(JsonUtils.write(new JWKSet(key).toJSONObject()));
+//    }
 }

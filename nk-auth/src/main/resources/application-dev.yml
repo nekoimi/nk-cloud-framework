@@ -9,6 +9,11 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://192.168.2.175:10000/pub-key/jwk.json
+      client:
+        registration:
+          google:
+            client-id: YOUR_APP_CLIENT_ID
+            client-secret: YOUR_APP_CLIENT_SECRET
 
 app:
   id-gen:
