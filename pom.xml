@@ -48,12 +48,12 @@
                 <debug>false</debug>
                 <profile.name>dev</profile.name>
                 <!--数据库环境配置-->
-                <db.url>jdbc:mysql://db.youpin-k8s.net:3306/nocode_platform?useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</db.url>
+                <db.url>jdbc:mysql://localhost:3306/nk_cloud?useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</db.url>
                 <db.username>root</db.username>
                 <db.password>123456</db.password>
-                <db.redis.host>db.youpin-k8s.net</db.redis.host>
+                <db.redis.host>localhost</db.redis.host>
                 <db.redis.port>6379</db.redis.port>
-                <db.redis.password>eW95b2hyLmNvbQ==</db.redis.password>
+                <db.redis.password>123456</db.redis.password>
                 <db.redis.database>0</db.redis.database>
             </properties>
         </profile>
@@ -140,6 +140,11 @@
             <dependency>
                 <groupId>com.nekoimi.nk</groupId>
                 <artifactId>nk-security</artifactId>
+                <version>${nk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nekoimi.nk</groupId>
+                <artifactId>nk-mybatis</artifactId>
                 <version>${nk.version}</version>
             </dependency>
         </dependencies>

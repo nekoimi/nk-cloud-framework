@@ -39,5 +39,6 @@ app:
     matcher:
       permit-all:
         - /home
+        - /exists/**
       authenticated:
         - /user/me

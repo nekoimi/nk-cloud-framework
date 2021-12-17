@@ -1,4 +1,4 @@
-package com.nekoimi.nk.framework.security.config.properties;
+package com.nekoimi.nk.framework.web.config.properties;
 
 import lombok.Getter;
 import lombok.Setter;

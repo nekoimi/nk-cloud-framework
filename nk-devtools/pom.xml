@@ -15,7 +15,15 @@
     <dependencies>
         <dependency>
             <groupId>com.nekoimi.nk</groupId>
+            <artifactId>nk-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nekoimi.nk</groupId>
             <artifactId>nk-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nekoimi.nk</groupId>
+            <artifactId>nk-mybatis</artifactId>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>

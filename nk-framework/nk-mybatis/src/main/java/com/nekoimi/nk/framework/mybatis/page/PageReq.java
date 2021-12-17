@@ -1,4 +1,4 @@
-package com.nekoimi.nk.framework.web.request;
+package com.nekoimi.nk.framework.mybatis.page;
 
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;

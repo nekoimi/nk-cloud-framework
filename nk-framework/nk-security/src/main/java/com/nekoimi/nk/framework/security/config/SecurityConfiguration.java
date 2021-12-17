@@ -1,7 +1,6 @@
 package com.nekoimi.nk.framework.security.config;
 
 import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
-import com.nekoimi.nk.framework.security.filter.BeforeRequestFilter;
 import com.nekoimi.nk.framework.security.filter.RequestParseAuthTypeFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +31,6 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
-import org.springframework.web.cors.reactive.CorsConfigurationSource;
 
 import java.util.UUID;
 
@@ -108,7 +106,6 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http,
-                                                       CorsConfigurationSource corsConfigurationSource,
                                                        ServerSecurityContextRepository securityContextRepository) {
         ServerWebExchangeMatcher loginExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, properties.getLoginUrl());
         ServerWebExchangeMatcher logoutExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, properties.getLogoutUrl());
@@ -136,8 +133,8 @@ public class SecurityConfiguration {
                 .headers().disable()
                 // 关闭缓存
                 .requestCache(ServerHttpSecurity.RequestCacheSpec::disable)
-                // 配置cors跨域
-                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                // disable cors
+                .cors().disable()
                 // 异常处理
                 .exceptionHandling(handler -> handler
                         .accessDeniedHandler(accessDeniedHandler)
@@ -161,9 +158,8 @@ public class SecurityConfiguration {
                     if (!pathMatcher.getAuthenticated().isEmpty()) {
                         pathMatcher.getAuthenticated().forEach(path -> exchange.pathMatchers(path).authenticated());
                     }
+                    exchange.anyExchange().authenticated();
                 })
-                // 插入全局预处理filter
-                .addFilterBefore(new BeforeRequestFilter(), SecurityWebFiltersOrder.CSRF)
                 // 插入认证类型解析filter
                 .addFilterBefore(new RequestParseAuthTypeFilter(loginExchangeMatcher), SecurityWebFiltersOrder.HTTP_BASIC)
                 // build

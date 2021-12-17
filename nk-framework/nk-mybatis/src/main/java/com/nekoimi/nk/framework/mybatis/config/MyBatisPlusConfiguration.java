@@ -1,4 +1,4 @@
-package com.nekoimi.nk.framework.web.config;
+package com.nekoimi.nk.framework.mybatis.config;
 
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.nekoimi.nk.framework.core.contract.IdGenerator;

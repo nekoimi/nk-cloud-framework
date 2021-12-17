@@ -29,6 +29,7 @@ spring:
     url: ${db.url}
     username: ${db.username}
     password: ${db.password}
+    schema: classpath:sql/*.sql
     hikari:
       pool-name: ${spring.application.name}-hikari-cp-pool
       auto-commit: true

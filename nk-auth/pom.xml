@@ -20,6 +20,10 @@
             <groupId>com.nekoimi.nk</groupId>
             <artifactId>nk-security</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.nekoimi.nk</groupId>
+            <artifactId>nk-mybatis</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
