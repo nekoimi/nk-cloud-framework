@@ -40,5 +40,6 @@ app:
       permit-all:
         - /home
         - /exists/**
+        - /get/**
       authenticated:
         - /user/me

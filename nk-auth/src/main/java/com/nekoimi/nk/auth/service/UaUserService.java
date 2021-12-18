@@ -1,15 +1,10 @@
 package com.nekoimi.nk.auth.service;
 
-import reactor.core.publisher.Mono;
+import com.nekoimi.nk.auth.entity.UaUser;
+import com.nekoimi.nk.framework.mybatis.service.ReactiveCrudService;
 
 /**
  * nekoimi  2021/12/17 22:57
  */
-public interface UaUserService {
-    /**
-     *
-     * @param id
-     * @return
-     */
-    Mono<Boolean> existsBy(String id);
+public interface UaUserService extends ReactiveCrudService<UaUser> {
 }
