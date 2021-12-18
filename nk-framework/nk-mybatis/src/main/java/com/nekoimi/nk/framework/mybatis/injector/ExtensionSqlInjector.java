@@ -9,6 +9,8 @@ import java.util.List;
 
 /**
  * nekoimi  2021/12/18 22:03
+ *
+ * 注入自定义方法
  */
 public class ExtensionSqlInjector extends DefaultSqlInjector {
 
