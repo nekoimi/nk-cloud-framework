@@ -7,10 +7,12 @@ import com.nekoimi.nk.framework.core.contract.error.ErrorDetails;
  */
 public enum CrudErrors implements ErrorDetails {
     RESOURCE_NOT_FOUND(10600, "resource not found"),
-    RESOURCE_SAVING_FAILED(10600, "resource saving failed"),
-    RESOURCE_UPDATE_FAILED(10600, "resource update failed")
+    RESOURCE_QUERY_FAILED(10601, "resource query found"),
+    RESOURCE_SAVING_FAILED(10602, "resource saving failed"),
+    RESOURCE_UPDATE_FAILED(10603, "resource update failed"),
+    RESOURCE_REMOVE_FAILED(10604, "resource remove failed")
 
-    ;
+            ;
 
     private Integer code;
     private String message;

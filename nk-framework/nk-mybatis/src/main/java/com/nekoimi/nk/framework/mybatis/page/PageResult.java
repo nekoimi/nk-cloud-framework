@@ -11,13 +11,13 @@ import reactor.core.publisher.Flux;
 @AllArgsConstructor(staticName = "of")
 public class PageResult<T> {
     // 总条数
-    private final Integer total;
+    private final Long total;
     // 当前页数
-    private final Integer page;
+    private final Long page;
     // 每页显示数量
-    private final Integer pageSize;
+    private final Long pageSize;
     // 最后一页页码
-    private final Integer lastPage;
+    private final Long lastPage;
     // 数据列表
     private final Flux<T> list;
 }

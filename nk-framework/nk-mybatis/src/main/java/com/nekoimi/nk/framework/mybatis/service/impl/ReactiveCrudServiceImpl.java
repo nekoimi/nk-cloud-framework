@@ -10,13 +10,12 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.nekoimi.nk.framework.core.contract.IdGenerator;
 import com.nekoimi.nk.framework.core.utils.ClazzUtils;
 import com.nekoimi.nk.framework.core.utils.JsonUtils;
 import com.nekoimi.nk.framework.mybatis.collect.QueryMap;
-import com.nekoimi.nk.framework.mybatis.exception.FailedToResourceNotFoundException;
-import com.nekoimi.nk.framework.mybatis.exception.FailedToResourceSaveException;
-import com.nekoimi.nk.framework.mybatis.exception.FailedToResourceUpdateException;
+import com.nekoimi.nk.framework.mybatis.exception.*;
 import com.nekoimi.nk.framework.mybatis.mapper.BaseMapper;
 import com.nekoimi.nk.framework.mybatis.page.PageResult;
 import com.nekoimi.nk.framework.mybatis.service.ReactiveCrudService;
@@ -34,7 +33,6 @@ import java.lang.reflect.Type;
 import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * nekoimi  2021/6/13 上午12:03
@@ -85,6 +83,15 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         Set<Map.Entry<SFunction<E, Object>, Object>> entries = queryMap.map().entrySet();
         entries.forEach(entry -> query.ne(entry.getKey(), entry.getValue()));
         return query;
+    }
+
+    protected LambdaUpdateWrapper<E> acceptUpdateMapConsumer(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
+        LambdaUpdateWrapper<E> update = Wrappers.lambdaUpdate(entityClazz());
+        QueryMap<SFunction<E, Object>, Object> queryMap = new QueryMap<>(new HashMap<>());
+        consumer.accept(queryMap);
+        Set<Map.Entry<SFunction<E, Object>, Object>> entries = queryMap.map().entrySet();
+        entries.forEach(entry -> update.set(entry.getKey(), entry.getValue()));
+        return update;
     }
 
     protected Mono<E> checkGetFail(Mono<E> eMono) {
@@ -166,7 +173,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return Mono.just(consumer)
                 .map(this::acceptQueryConsumer)
                 .publishOn(Schedulers.elastic())
-                .map(ew -> mapper.selectOne(ew))
+                .map(eqw -> mapper.selectOne(eqw))
                 .flatMap(Mono::justOrEmpty);
     }
 
@@ -175,7 +182,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return Mono.just(consumer)
                 .map(this::acceptQueryMapConsumer)
                 .publishOn(Schedulers.elastic())
-                .map(ew -> mapper.selectOne(ew))
+                .map(eqw -> mapper.selectOne(eqw))
                 .flatMap(Mono::justOrEmpty);
     }
 
@@ -384,7 +391,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return Mono.just(consumer)
                 .map(this::acceptQueryConsumer)
                 .publishOn(Schedulers.elastic())
-                .map(ew -> mapper.update(entity, ew))
+                .map(eqw -> mapper.update(entity, eqw))
                 .flatMap(this::dmlRowToBoolean)
                 .onErrorResume(t -> Mono.error(new FailedToResourceUpdateException(t.getMessage())));
     }
@@ -403,127 +410,185 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
 
     @Override
     public Mono<Boolean> updateById(Serializable id, Consumer<LambdaUpdateWrapper<E>> consumer) {
-//        Wrappers.lambdaUpdate(entityClazz())
-        return null;
+        return getByIdOrFail(id).flatMap(e -> Mono.just(consumer)
+                .map(this::acceptUpdateConsumer)
+                .publishOn(Schedulers.elastic())
+                .map(euw -> mapper.update(e, euw))
+                .flatMap(this::dmlRowToBoolean))
+                .onErrorResume(t -> Mono.error(new FailedToResourceUpdateException(t.getMessage())));
+    }
+
+    @Override
+    public Mono<Boolean> updateByIdOfMap(Serializable id, Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
+        return getByIdOrFail(id).flatMap(e -> Mono.just(consumer)
+                .map(this::acceptUpdateMapConsumer)
+                .publishOn(Schedulers.elastic())
+                .map(euw -> mapper.update(e, euw))
+                .flatMap(this::dmlRowToBoolean))
+                .onErrorResume(t -> Mono.error(new FailedToResourceUpdateException(t.getMessage())));
     }
 
     @Override
     public Mono<Boolean> updateOf(Serializable id, SFunction<E, Object> k1, Object v1) {
-        return null;
+        return updateByIdOfMap(id, m -> m.put(k1, v1));
     }
 
     @Override
     public Mono<Boolean> updateOf(Serializable id, SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2) {
-        return null;
+        return updateByIdOfMap(id, m -> m.put(k1, v1).put(k2, v2));
     }
 
     @Override
     public Mono<Boolean> updateOf(Serializable id, SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3) {
-        return null;
+        return updateByIdOfMap(id, m -> m.put(k1, v1).put(k2, v2).put(k3, v3));
     }
 
     @Override
     public Mono<Boolean> updateOf(Serializable id, SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4) {
-        return null;
+        return updateByIdOfMap(id, m -> m.put(k1, v1).put(k2, v2).put(k3, v3).put(k4, v4));
     }
 
     @Override
     public Mono<Boolean> updateOf(Serializable id, SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4, SFunction<E, Object> k5, Object v5) {
-        return null;
+        return updateByIdOfMap(id, m -> m.put(k1, v1).put(k2, v2).put(k3, v3).put(k4, v4).put(k5, v5));
     }
 
     @Override
     public Mono<Boolean> updateOf(Serializable id, SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4, SFunction<E, Object> k5, Object v5, SFunction<E, Object> k6, Object v6) {
-        return null;
+        return updateByIdOfMap(id, m -> m.put(k1, v1).put(k2, v2).put(k3, v3).put(k4, v4).put(k5, v5).put(k6, v6));
     }
 
     @Override
     public Mono<Boolean> updateOf(Serializable id, SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4, SFunction<E, Object> k5, Object v5, SFunction<E, Object> k6, Object v6, SFunction<E, Object> k7, Object v7) {
-        return null;
+        return updateByIdOfMap(id, m -> m.put(k1, v1).put(k2, v2).put(k3, v3).put(k4, v4).put(k5, v5).put(k6, v6).put(k7, v7));
     }
 
     @Override
     public Mono<Boolean> updateOf(Serializable id, SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4, SFunction<E, Object> k5, Object v5, SFunction<E, Object> k6, Object v6, SFunction<E, Object> k7, Object v7, SFunction<E, Object> k8, Object v8) {
-        return null;
+        return updateByIdOfMap(id, m -> m.put(k1, v1).put(k2, v2).put(k3, v3).put(k4, v4).put(k5, v5).put(k6, v6).put(k7, v7).put(k8, v8));
     }
 
     @Override
     public Mono<Boolean> updateOf(Serializable id, SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4, SFunction<E, Object> k5, Object v5, SFunction<E, Object> k6, Object v6, SFunction<E, Object> k7, Object v7, SFunction<E, Object> k8, Object v8, SFunction<E, Object> k9, Object v9) {
-        return null;
+        return updateByIdOfMap(id, m -> m.put(k1, v1).put(k2, v2).put(k3, v3).put(k4, v4).put(k5, v5).put(k6, v6).put(k7, v7).put(k8, v8).put(k9, v9));
     }
 
     @Override
     public Mono<Boolean> updateOf(Serializable id, SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4, SFunction<E, Object> k5, Object v5, SFunction<E, Object> k6, Object v6, SFunction<E, Object> k7, Object v7, SFunction<E, Object> k8, Object v8, SFunction<E, Object> k9, Object v9, SFunction<E, Object> k10, Object v10) {
-        return null;
+        return updateByIdOfMap(id, m -> m.put(k1, v1).put(k2, v2).put(k3, v3).put(k4, v4).put(k5, v5).put(k6, v6).put(k7, v7).put(k8, v8).put(k9, v9).put(k10, v10));
     }
 
     @Override
     public Mono<Void> removeById(Serializable id) {
-        return null;
+        return Mono.fromCallable(() -> mapper.deleteById(id))
+                .subscribeOn(Schedulers.elastic())
+                .onErrorResume(t -> Mono.error(new FailedToResourceRemoveException(t.getMessage())))
+                .then(Mono.empty());
     }
 
     @Override
-    public Mono<Void> removeByQuery(Function<LambdaQueryWrapper<E>, LambdaQueryWrapper<E>> func) {
-        return null;
-    }
-
-    @Override
-    public Mono<Void> removeByMap(Function<Map<SFunction<E, Object>, Object>, Map<SFunction<E, Object>, Object>> func) {
-        return null;
+    public Mono<Void> removeByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
+        return Mono.just(consumer)
+                .map(this::acceptQueryConsumer)
+                .publishOn(Schedulers.elastic())
+                .map(eqw -> mapper.delete(eqw))
+                .onErrorResume(t -> Mono.error(new FailedToResourceRemoveException(t.getMessage())))
+                .then(Mono.empty());
     }
 
     @Override
     public Mono<Void> removeBatch(List<? extends Serializable> idList) {
-        return null;
+        return Flux.fromIterable(idList)
+                .publishOn(Schedulers.elastic())
+                .map(id -> mapper.deleteById(id))
+                .onErrorResume(t -> Mono.error(new FailedToResourceRemoveException(t.getMessage())))
+                .then(Mono.empty());
     }
 
     @Override
     public Mono<Integer> countAll() {
-        return null;
+        return Mono.just(Wrappers.lambdaQuery(entityClazz()))
+                .map(eqw -> mapper.selectCount(eqw))
+                .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())))
+                .subscribeOn(Schedulers.elastic());
     }
 
     @Override
-    public Mono<Integer> countByQuery(Function<LambdaQueryWrapper<E>, LambdaQueryWrapper<E>> func) {
-        return null;
+    public Mono<Integer> countByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
+        return Mono.just(consumer)
+                .map(this::acceptQueryConsumer)
+                .publishOn(Schedulers.elastic())
+                .map(eqw -> mapper.selectCount(eqw))
+                .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 
     @Override
-    public Mono<Integer> countByMap(Function<Map<SFunction<E, Object>, Object>, Map<SFunction<E, Object>, Object>> func) {
-        return null;
+    public Mono<Integer> countByMap(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
+        return Mono.just(consumer)
+                .map(this::acceptQueryMapConsumer)
+                .publishOn(Schedulers.elastic())
+                .map(eqw -> mapper.selectCount(eqw))
+                .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 
     @Override
     public Flux<E> findAll() {
-        return null;
+        Flux<E> push = Flux.push(fluxSink -> {
+            mapper.selectListWithHandler(Wrappers.lambdaQuery(entityClazz()), ctx -> fluxSink.next(ctx.getResultObject()));
+            fluxSink.complete();
+        });
+        return push.publishOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.elastic())
+                .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 
     @Override
     public Flux<E> findByIds(Serializable... ids) {
-        return null;
+        return findByIds(Arrays.asList(ids));
     }
 
     @Override
     public Flux<E> findByIds(List<? extends Serializable> ids) {
-        return null;
+        Flux<E> push = Flux.push(fluxSink -> {
+            mapper.selectBatchIdsWithHandler(ids, ctx -> fluxSink.next(ctx.getResultObject()));
+            fluxSink.complete();
+        });
+        return push.publishOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.elastic())
+                .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 
     @Override
-    public Flux<E> findByQuery(Function<LambdaQueryWrapper<E>, LambdaQueryWrapper<E>> func) {
-        return null;
+    public Flux<E> findByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
+        Flux<E> push = Flux.push(fluxSink -> {
+            mapper.selectListWithHandler(acceptQueryConsumer(consumer), ctx -> fluxSink.next(ctx.getResultObject()));
+            fluxSink.complete();
+        });
+
+        return push.publishOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.elastic())
+                .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 
     @Override
-    public Flux<E> findByMap(Function<Map<SFunction<E, Object>, Object>, Map<SFunction<E, Object>, Object>> func) {
-        return null;
+    public Mono<PageResult<E>> page(Mono<Page<E>> page) {
+        return page(page, eqw -> {
+        });
     }
 
     @Override
-    public Mono<PageResult<E>> page(Mono<E> page) {
-        return null;
-    }
-
-    @Override
-    public Mono<PageResult<E>> page(Mono<E> page, Function<LambdaQueryWrapper<E>, LambdaQueryWrapper<E>> func) {
-        return null;
+    public Mono<PageResult<E>> page(Mono<Page<E>> page, Consumer<LambdaQueryWrapper<E>> consumer) {
+        return page.flatMap(ep -> Mono.just(acceptQueryConsumer(consumer))
+                .publishOn(Schedulers.elastic())
+                .map(eqw -> mapper.selectPage(ep, eqw))
+                .flatMap(result -> Mono.just(PageResult.of(
+                        result.getTotal(),
+                        result.getCurrent(),
+                        result.getSize(),
+                        result.getPages(),
+                        Flux.fromIterable(result.getRecords()))
+                ))
+        ).subscribeOn(Schedulers.elastic())
+                .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 }

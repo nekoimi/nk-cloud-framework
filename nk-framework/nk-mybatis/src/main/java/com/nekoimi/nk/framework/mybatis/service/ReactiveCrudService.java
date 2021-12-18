@@ -3,6 +3,7 @@ package com.nekoimi.nk.framework.mybatis.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.nekoimi.nk.framework.mybatis.collect.QueryMap;
 import com.nekoimi.nk.framework.mybatis.page.PageResult;
 import reactor.core.publisher.Flux;
@@ -12,7 +13,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * nekoimi  2021/12/18 13:59
@@ -70,17 +70,15 @@ public interface ReactiveCrudService<E> {
     Mono<Boolean> updateOf(Serializable id, SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4, SFunction<E, Object> k5, Object v5, SFunction<E, Object> k6, Object v6, SFunction<E, Object> k7, Object v7, SFunction<E, Object> k8, Object v8, SFunction<E, Object> k9, Object v9);
     Mono<Boolean> updateOf(Serializable id, SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4, SFunction<E, Object> k5, Object v5, SFunction<E, Object> k6, Object v6, SFunction<E, Object> k7, Object v7, SFunction<E, Object> k8, Object v8, SFunction<E, Object> k9, Object v9, SFunction<E, Object> k10, Object v10);
     Mono<Void> removeById(Serializable id);
-    Mono<Void> removeByQuery(Function<LambdaQueryWrapper<E>, LambdaQueryWrapper<E>> func);
-    Mono<Void> removeByMap(Function<Map<SFunction<E, Object>, Object>, Map<SFunction<E, Object>, Object>> func);
+    Mono<Void> removeByQuery(Consumer<LambdaQueryWrapper<E>> consumer);
     Mono<Void> removeBatch(List<? extends Serializable> idList);
     Mono<Integer> countAll();
-    Mono<Integer> countByQuery(Function<LambdaQueryWrapper<E>, LambdaQueryWrapper<E>> func);
-    Mono<Integer> countByMap(Function<Map<SFunction<E, Object>, Object>, Map<SFunction<E, Object>, Object>> func);
+    Mono<Integer> countByQuery(Consumer<LambdaQueryWrapper<E>> consumer);
+    Mono<Integer> countByMap(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer);
     Flux<E> findAll();
     Flux<E> findByIds(Serializable...ids);
     Flux<E> findByIds(List<? extends Serializable> ids);
-    Flux<E> findByQuery(Function<LambdaQueryWrapper<E>, LambdaQueryWrapper<E>> func);
-    Flux<E> findByMap(Function<Map<SFunction<E, Object>, Object>, Map<SFunction<E, Object>, Object>> func);
-    Mono<PageResult<E>> page(Mono<E> page);
-    Mono<PageResult<E>> page(Mono<E> page, Function<LambdaQueryWrapper<E>, LambdaQueryWrapper<E>> func);
+    Flux<E> findByQuery(Consumer<LambdaQueryWrapper<E>> consumer);
+    Mono<PageResult<E>> page(Mono<Page<E>> page);
+    Mono<PageResult<E>> page(Mono<Page<E>> page, Consumer<LambdaQueryWrapper<E>> consumer);
 }
