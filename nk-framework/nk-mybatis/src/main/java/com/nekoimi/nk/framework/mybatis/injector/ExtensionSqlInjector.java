@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * nekoimi  2021/12/18 22:03
  */
-public class NkExtensionSqlInjector extends DefaultSqlInjector {
+public class ExtensionSqlInjector extends DefaultSqlInjector {
 
     @Override
     public List<AbstractMethod> getMethodList(Class<?> mapperClass) {

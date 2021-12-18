@@ -3,7 +3,7 @@ package com.nekoimi.nk.framework.mybatis.config;
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.nekoimi.nk.framework.core.contract.IdGenerator;
-import com.nekoimi.nk.framework.mybatis.injector.NkExtensionSqlInjector;
+import com.nekoimi.nk.framework.mybatis.injector.ExtensionSqlInjector;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +19,7 @@ public class MyBatisPlusConfiguration {
 
     @Bean
     public ISqlInjector nkExtensionSqlInjector() {
-        return new NkExtensionSqlInjector();
+        return new ExtensionSqlInjector();
     }
 
     @Bean

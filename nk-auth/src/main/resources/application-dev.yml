@@ -3,6 +3,8 @@ mybatis-plus:
 #  mapper-locations:
   check-config-location: true
 
+
+
 spring:
   security:
     oauth2:
@@ -41,5 +43,6 @@ app:
         - /home
         - /exists/**
         - /get/**
+        - /list
       authenticated:
         - /user/me

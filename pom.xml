@@ -48,7 +48,8 @@
                 <debug>false</debug>
                 <profile.name>dev</profile.name>
                 <!--数据库环境配置-->
-                <db.url>jdbc:mysql://localhost:3306/nk_cloud?useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</db.url>
+                <db.driver-class-name>com.p6spy.engine.spy.P6SpyDriver</db.driver-class-name>
+                <db.url>jdbc:p6spy:mysql://localhost:3306/nk_cloud?useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</db.url>
                 <db.username>root</db.username>
                 <db.password>123456</db.password>
                 <db.redis.host>localhost</db.redis.host>
