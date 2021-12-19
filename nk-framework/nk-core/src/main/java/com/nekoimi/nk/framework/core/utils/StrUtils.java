@@ -12,7 +12,7 @@ public class StrUtils {
 
     public static String parseSchema(String url) {
         // jdbc:mysql://db.youpin-k8s.net:3306/nocode_platform?
-        Pattern pattern = Pattern.compile("^jdbc:[mysql]+://.*:[0-9]*/(.*)");
+        Pattern pattern = Pattern.compile("^jdbc:.*//.*:[0-9]*/(.*)");
         Matcher matcher = pattern.matcher(url);
         if (!matcher.find()) {
             return null;
