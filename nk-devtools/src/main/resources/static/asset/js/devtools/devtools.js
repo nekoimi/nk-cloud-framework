@@ -19,6 +19,8 @@ app.controller('generatorController', [
             onlyGenEntity: false,
 
             router: {
+                module: '',
+                info: '',
                 version: '',
                 prefix: '',
                 name: ''

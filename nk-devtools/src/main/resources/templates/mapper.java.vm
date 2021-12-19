@@ -1,15 +1,16 @@
 package ${package.Mapper};
 
-
 import ${superMapperClassPackage};
 import ${package.Entity}.${entity};
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Component;
 
 /**
- * ${entity} Mapper 接口
+ * ${entity} Mapper
  *
- * nekoimi  ${date}
+ * ${author}  ${date}
+ *
+ * This code is generated using nk-devtools.
  */
 @Mapper
 @Component

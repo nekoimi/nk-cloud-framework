@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.web.context.request.async.DeferredResult;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -20,7 +19,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebFlux;
  */
 @Configuration
 @EnableSwagger2WebFlux
-@Profile({"dev"})
 public class SwaggerConfiguration {
     @Value("${spring.application.name}")
     private String name;

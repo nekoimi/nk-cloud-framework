@@ -3,11 +3,11 @@ package ${package.Entity};
 #foreach($pkg in ${table.importPackages})
 import ${pkg};
 #end
-#if(${entityLombokModel})
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-#end
 #if(${superEntityClass})
 #else
 import java.io.Serializable;
@@ -16,9 +16,10 @@ import java.io.Serializable;
 /**
  * ${entity} Entity
  *
- * nekoimi  ${date}
+ * ${author}  ${date}
+ *
+ * This code is generated using nk-devtools.
  */
-#if(${entityLombokModel})
 @Data
 #if(${superEntityClass})
 @EqualsAndHashCode(callSuper = true)
@@ -26,26 +27,29 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = false)
 #end
 @NoArgsConstructor
-#end
+@ApiModel(description = "${cfg.route.info}", parent = BaseEntity.class)
 @TableName(value = "${table.name}", autoResultMap = true)
 #if(${superEntityClass})
 public class ${entity} extends ${superEntityClass} {
 #else
 public class ${entity} implements Serializable{
 #end
+
 #if(${entitySerialVersionUID})
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 #end
 
 #if(${entityColumnConstant})
-    #foreach($field in ${table.fields})
-    public static final String ${field.name.toUpperCase()} = "${field.name}";
-    #end
+#foreach($field in ${table.fields})
+    public static final String FILED_${field.name.toUpperCase()} = "${field.name}";
+#end
 #end
 
 ## ----------  BEGIN 字段循环遍历  ----------
 #foreach($field in ${table.fields})
     // ${field.comment}
+    @ApiModelProperty(value = "${field.comment}")
+    @TableField
     private ${field.propertyType} ${field.propertyName};
 #end
 ## ----------  END 字段循环遍历  ----------
@@ -73,18 +77,10 @@ public class ${entity} implements Serializable{
     #end
 #end
 
-#if(!${entityLombokModel})
-    @Override
-    public String toString() {
-        return "${entity}{" +
-    #foreach($field in ${table.fields})
-        #if($!{foreach.index}==0)
-                "${field.propertyName}=" + ${field.propertyName} +
-        #else
-                ", ${field.propertyName}=" + ${field.propertyName} +
-        #end
-    #end
-        "}";
-    }
-#end
+    /**
+     * ===============================================================================
+     *
+     * TODO 非数据库字段
+     */
+
 }

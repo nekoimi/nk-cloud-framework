@@ -162,15 +162,18 @@ public class GenerateService {
         // 父类公共字段
         strategyConfig.setSuperEntityColumns("id", "created_at", "updated_at", "deleted_at");
         // controller 父类
-        strategyConfig.setSuperControllerClass("com.yoyohr.boot.framework.http.BaseController");
+//        strategyConfig.setSuperControllerClass("com.nekoimi.nk.framework.mybatis.controller.BaseController");
+        customMap.put("jsonResp", "JsonResp");
+        customMap.put("jsonRespClass", "com.nekoimi.nk.framework.core.protocol.JsonResp");
         // mapper 父类
-        strategyConfig.setSuperMapperClass("com.yoyohr.boot.framework.mybatis.mapper.BaseMapper");
+        strategyConfig.setSuperMapperClass("com.nekoimi.nk.framework.mybatis.mapper.BaseMapper");
         // 实体父类
-        strategyConfig.setSuperEntityClass("com.yoyohr.boot.framework.mybatis.entity.BaseEntity");
+        strategyConfig.setSuperEntityClass(com.nekoimi.nk.framework.mybatis.entity.BaseEntity.class);
+        customMap.put("superEntityClassPackage", "com.nekoimi.nk.framework.mybatis.entity");
         // 接口父类
-        strategyConfig.setSuperServiceClass("com.yoyohr.boot.framework.mybatis.service.BaseService");
+        strategyConfig.setSuperServiceClass(com.nekoimi.nk.framework.mybatis.service.ReactiveCrudService.class);
         // 接口实现类父类
-        strategyConfig.setSuperServiceImplClass("com.yoyohr.boot.framework.mybatis.service.impl.BaseServiceImpl");
+        strategyConfig.setSuperServiceImplClass(com.nekoimi.nk.framework.mybatis.service.impl.ReactiveCrudServiceImpl.class);
     }
 
     protected void initPackageConfig() {

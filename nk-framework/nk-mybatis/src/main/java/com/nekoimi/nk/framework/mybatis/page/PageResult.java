@@ -2,7 +2,8 @@ package com.nekoimi.nk.framework.mybatis.page;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import reactor.core.publisher.Flux;
+
+import java.util.List;
 
 /**
  * nekoimi  2021/12/18 16:29
@@ -11,13 +12,13 @@ import reactor.core.publisher.Flux;
 @AllArgsConstructor(staticName = "of")
 public class PageResult<T> {
     // 总条数
-    private final Long total;
+    private final long total;
     // 当前页数
-    private final Long page;
+    private final long page;
     // 每页显示数量
-    private final Long pageSize;
+    private final long pageSize;
     // 最后一页页码
-    private final Long lastPage;
+    private final long lastPage;
     // 数据列表
-    private final Flux<T> list;
+    private final List<T> list;
 }

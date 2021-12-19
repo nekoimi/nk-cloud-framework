@@ -130,7 +130,7 @@ public class JacksonConfiguration {
             //Long 转String类型，否则js丢失精度
             SimpleModule simpleModule = new SimpleModule();
             simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
-            simpleModule.addSerializer(Long.TYPE, ToStringSerializer.instance);
+            // simpleModule.addSerializer(Long.TYPE, ToStringSerializer.instance);
             //支持jdk8新特性
             builder.modules(new ParameterNamesModule(),
                     new Jdk8Module(),

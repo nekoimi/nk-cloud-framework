@@ -2,8 +2,8 @@ package com.nekoimi.nk.framework.mybatis.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.nekoimi.nk.framework.mybatis.collect.QueryMap;
 import com.nekoimi.nk.framework.mybatis.page.PageResult;
 import reactor.core.publisher.Flux;
@@ -55,7 +55,10 @@ public interface ReactiveCrudService<E> {
     Mono<Void> saveBatch(List<E> entityList);
     Mono<Serializable> saveOrUpdate(E entity);
     Mono<Boolean> update(E entity);
+    Mono<Void> updateBatch(String ids, Map<String, Object> map);
+    Mono<Void> updateBatch(List<? extends Serializable> idList, Map<String, Object> map);
     Mono<Boolean> updateByQuery(E entity, Consumer<LambdaQueryWrapper<E>> consumer);
+    Mono<Boolean> updateById(Serializable id, E entity);
     Mono<Boolean> updateById(Serializable id, Map<String, Object> map);
     Mono<Boolean> updateById(Serializable id, Consumer<LambdaUpdateWrapper<E>> consumer);
     Mono<Boolean> updateByIdOfMap(Serializable id, Consumer<QueryMap<SFunction<E, Object>, Object>> consumer);
@@ -71,6 +74,7 @@ public interface ReactiveCrudService<E> {
     Mono<Boolean> updateOf(Serializable id, SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4, SFunction<E, Object> k5, Object v5, SFunction<E, Object> k6, Object v6, SFunction<E, Object> k7, Object v7, SFunction<E, Object> k8, Object v8, SFunction<E, Object> k9, Object v9, SFunction<E, Object> k10, Object v10);
     Mono<Void> removeById(Serializable id);
     Mono<Void> removeByQuery(Consumer<LambdaQueryWrapper<E>> consumer);
+    Mono<Void> removeBatch(String ids);
     Mono<Void> removeBatch(List<? extends Serializable> idList);
     Mono<Integer> countAll();
     Mono<Integer> countByQuery(Consumer<LambdaQueryWrapper<E>> consumer);
@@ -79,6 +83,6 @@ public interface ReactiveCrudService<E> {
     Flux<E> findByIds(Serializable...ids);
     Flux<E> findByIds(List<? extends Serializable> ids);
     Flux<E> findByQuery(Consumer<LambdaQueryWrapper<E>> consumer);
-    Mono<PageResult<E>> page(Mono<Page<E>> page);
-    Mono<PageResult<E>> page(Mono<Page<E>> page, Consumer<LambdaQueryWrapper<E>> consumer);
+    Mono<PageResult<E>> page(IPage<E> page);
+    Mono<PageResult<E>> page(IPage<E> page, Consumer<LambdaQueryWrapper<E>> consumer);
 }

@@ -25,6 +25,8 @@ public class GenReq {
     @Getter
     @Setter
     public static class Router {
+        private String module;
+        private String info;
         private String prefix;
         private String name;
         private String version;

@@ -45,5 +45,6 @@ app:
         - /get/**
         - /list
         - /return/**
+        - /ua/**
       authenticated:
         - /user/me

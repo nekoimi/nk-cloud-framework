@@ -6,7 +6,9 @@ import ${package.Entity}.${entity};
 /**
  * ${entity} Service
  *
- * nekoimi  ${date}
+ * ${author}  ${date}
+ *
+ * This code is generated using nk-devtools.
  */
 public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
 }

@@ -1,140 +1,184 @@
 package ${package.Controller};
 
-#if(${controllerMappingHyphenStyle})
-    #set($routePathName = ${controllerMappingHyphen})
-#else
-    #set($routePathName = ${table.entityPath})
-#end
-
-#if(${cfg.routePrefix} != "")
-    #set($routePrefix = ${cfg.routePrefix} + "/")
+#if(${cfg.route.prefix} != "")
+    #set($routePrefix = ${cfg.route.prefix})
 #else
     #set($routePrefix = "")
 #end
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.yoyohr.boot.framework.mybatis.entity.BaseEntity;
-import com.yoyohr.boot.common.annotaction.LoginRequired;
-import com.yoyohr.boot.framework.http.PageResult;
-import ${package.Entity}.${entity};
-import ${package.Service}.${table.serviceName};
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-#if(${superControllerClassPackage})
-import ${superControllerClassPackage};
+#if(${cfg.route.version} != "")
+    #set($routeVersion = ${cfg.route.version})
+#else
+    #set($routeVersion = "")
 #end
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
+#if(${cfg.route.name} != "")
+    #set($routePathName = ${cfg.route.name})
+#else
+    #set($routePathName = ${table.entityPath})
+#end
+
+import ${cfg.jsonRespClass};
+import ${package.Entity}.${entity};
+import ${package.Service}.${table.serviceName};
+import com.nekoimi.nk.framework.mybatis.page.PageReq;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import com.nekoimi.nk.framework.mybatis.page.PageResult;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Api;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
+import springfox.documentation.annotations.ApiIgnore;
+
 import java.util.Map;
 
 /**
  * ${entity} Controller
- *
- * nekoimi  ${date}
+ * <p>
+ * ${author}  ${date}
+ * <p>
+ * This code is generated using nk-devtools.
  */
 @RestController
-#if(${superControllerClass})
-public class ${table.controllerName} extends ${superControllerClass} {
+#if(${cfg.route.module} != "")
+@Api(tags = "${routeVersion}${cfg.route.module}", produces = "application/json", consumes = "application/json")
 #else
-public class ${table.controllerName} {
+@Api(tags = "${routeVersion}${table.controllerName}", produces = "application/json", consumes = "application/json")
 #end
+public class ${table.controllerName} {
+    private final ${table.serviceName} service;
 
-    @Autowired
-    private ${table.serviceName} targetService;
+    public ${table.controllerName}(${table.serviceName} service) {
+        this.service = service;
+    }
 
     /**
-     * 获取分页列表
+     * 获取${cfg.route.info}分页列表
      *
      * @return
      */
-    @LoginRequired
-    @GetMapping("${routePrefix}api/${cfg.routeVersion}/${cfg.routeName}/list")
-    public PageResult<${entity}> list() {
-        LambdaQueryWrapper<${entity}> wrapper = new LambdaQueryWrapper<>();
-        wrapper.orderByDesc(BaseEntity::getCreatedAt);
-        PageResult<${entity}> result = targetService.listPaginator(page(), pageSize(), wrapper);
-        return result;
+    @GetMapping("${routePrefix}/${routeVersion}/${routePathName}/list")
+    @ApiOperation(value = "获取${cfg.route.info}分页列表", response = PageResult.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "p", value = "分页页码", required = false, defaultValue = "1", paramType = "query", dataType = "Integer"),
+            @ApiImplicitParam(name = "ps", value = "每页显示条数", required = false, defaultValue = "10", paramType = "query", dataType = "Integer"),
+            @ApiImplicitParam(name = "st", value = "排序字段", required = false, defaultValue = "", paramType = "query", dataType = "String",
+                    allowableValues = "#foreach($field in ${table.fields})#if(${field.keyFlag})${field.name}#end#end,#foreach($field in ${table.commonFields})${field.name},#end#foreach($field in ${table.fields})#if(!${field.keyFlag})${field.name},#end#end"),
+            @ApiImplicitParam(name = "od", value = "排序规则", required = false, defaultValue = "", paramType = "query", dataType = "String", allowableValues = "asc,desc")
+    })
+    public Mono<${cfg.jsonResp}> list(@ApiIgnore ServerHttpRequest request) {
+        return service.page(PageReq.buildFromRequest(request)).map(JsonResp::ok);
     }
 
     /**
-    * 获取下拉列表
-    *
-    * @return
-    */
-    @LoginRequired
-    @GetMapping("${routePrefix}api/${cfg.routeVersion}/${cfg.routeName}/down")
-    public Map down() {
-        LambdaQueryWrapper<${entity}> wrapper = new LambdaQueryWrapper<>();
-        wrapper.orderByDesc(BaseEntity::getCreatedAt);
-        List<${entity}> list = targetService.findAll(wrapper);
-        return Map.of("list", list);
-    }
-
-    /**
-     * 根据id获取数据
+     * 根据id获取${cfg.route.info}数据
      *
      * @param id
      * @return
      */
-    @LoginRequired
-    @GetMapping("${routePrefix}api/${cfg.routeVersion}/${cfg.routeName}/{id}")
-    public ${entity} get(@PathVariable("id") Serializable id) {
-        ${entity} result = targetService.getByOrFail(id);
-        return result;
+    @GetMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}")
+    @ApiOperation(value = "根据id获取${cfg.route.info}数据", response = ${entity}.class)
+    public Mono<${cfg.jsonResp}> get(@PathVariable("id") String id) {
+        return service.getByIdOrFail(id).map(JsonResp::ok);
     }
 
     /**
-     * 添加数据
+     * 添加${cfg.route.info}数据
      *
      * @return
      */
-    @LoginRequired
-    @PostMapping("${routePrefix}api/${cfg.routeVersion}/${cfg.routeName}")
-    public ${entity} create(@RequestBody Map<String, Object> map) {
-        Serializable id = targetService.create(map);
-        ${entity} result = targetService.getBy(id);
-        return result;
+    @PostMapping("${routePrefix}/${routeVersion}/${routePathName}")
+    @ApiOperation(value = "添加${cfg.route.info}数据", response = ${entity}.class)
+    public Mono<${cfg.jsonResp}> save(@Validated @RequestBody ${entity} body) {
+        return service.save(body).flatMap(service::getByIdOrFail).map(JsonResp::ok);
     }
 
     /**
-     * 根据id更新数据
+     * 根据id更新${cfg.route.info}所有字段
+     *
+     * @param body
+     * @return
+     */
+    @PutMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}/full")
+    @ApiOperation(value = "根据id更新${cfg.route.info}所有字段", response = ${cfg.jsonResp}.class)
+    public Mono<${cfg.jsonResp}> updateFull(@PathVariable("id") String id, @Validated @RequestBody ${entity} body) {
+        return service.updateById(id, body).map(JsonResp::ok);
+    }
+
+    /**
+     * 根据id更新${cfg.route.info}部分字段
      *
      * @param map
      * @return
      */
-    @LoginRequired
-    @PutMapping("${routePrefix}api/${cfg.routeVersion}/${cfg.routeName}/{id}")
-    public void update(@PathVariable("id") String id, @RequestBody Map<String, Object> map) {
-        targetService.update(id, map);
+    @PutMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}")
+    @ApiOperation(value = "根据id更新${cfg.route.info}部分字段", response = ${cfg.jsonResp}.class)
+    @ApiImplicitParams({
+        #foreach($field in ${table.fields})
+            #if(!${field.keyFlag})
+                #if($foreach.hasNext)
+                        @ApiImplicitParam(name = "${field.propertyName}", value = "${field.comment}", required = false, paramType = "body", dataType = "${field.propertyType}"),
+                #else
+                        @ApiImplicitParam(name = "${field.propertyName}", value = "${field.comment}", required = false, paramType = "body", dataType = "${field.propertyType}")
+                #end
+            #end
+        #end
+    })
+    public Mono<${cfg.jsonResp}> updateFull(@PathVariable("id") String id, @ApiIgnore @RequestBody Map<String, Object> map) {
+        return service.updateById(id, map).map(JsonResp::ok);
     }
 
     /**
-     * 根据id删除数据
+     * 批量更新${cfg.route.info}数据
+     *
+     * @param map
+     * @return
+     */
+    @PutMapping("${routePrefix}/${routeVersion}/${routePathName}/batch")
+    @ApiOperation(value = "批量更新${cfg.route.info}数据", response = ${cfg.jsonResp}.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ids", value = "id的列表，使用,分割", required = true, example = "1,2,3", paramType = "query", dataType = "String"),
+        #foreach($field in ${table.fields})
+            #if(!${field.keyFlag})
+                #if($foreach.hasNext)
+                        @ApiImplicitParam(name = "${field.propertyName}", value = "${field.comment}", required = false, paramType = "body", dataType = "${field.propertyType}"),
+                #else
+                        @ApiImplicitParam(name = "${field.propertyName}", value = "${field.comment}", required = false, paramType = "body", dataType = "${field.propertyType}")
+                #end
+            #end
+        #end
+    })
+    public Mono<${cfg.jsonResp}> updateBatch(@RequestParam("ids") String ids, @ApiIgnore @RequestBody Map<String, Object> map) {
+        return service.updateBatch(ids, map).map(JsonResp::ok);
+    }
+
+    /**
+     * 根据id删除${cfg.route.info}数据
      *
      * @param id
      * @return
      */
-    @LoginRequired
-    @DeleteMapping("${routePrefix}api/${cfg.routeVersion}/${cfg.routeName}/{id}")
-    public void remove(@PathVariable("id") String id) {
-        targetService.removeBy(id);
+    @DeleteMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}")
+    @ApiOperation(value = "根据id删除${cfg.route.info}数据", response = ${cfg.jsonResp}.class)
+    public Mono<${cfg.jsonResp}> remove(@PathVariable("id") String id) {
+        return service.removeById(id).map(JsonResp::ok);
     }
 
     /**
-     * 批量删除数据
+     * 批量删除${cfg.route.info}数据
      *
      * @return
      */
-    @LoginRequired
-    @DeleteMapping("${routePrefix}api/${cfg.routeVersion}/${cfg.routeName}/batch")
-    public void removeBatch(@RequestParam(value = "ids", required = false) String ids) {
-        if (ids == null || ids.trim().length() <= 0) {
-            return; // Ignore.
-        }
-        List<String> list = Arrays.asList(ids.trim().split("[,]"));
-        targetService.removeBy(list);
+    @DeleteMapping("${routePrefix}/${routeVersion}/${routePathName}/batch")
+    @ApiOperation(value = "批量删除${cfg.route.info}数据", response = ${cfg.jsonResp}.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ids", value = "id的列表，使用,分割", required = true, example = "1,2,3", paramType = "query", dataType = "String")
+    })
+    public Mono<${cfg.jsonResp}> removeBatch(@RequestParam(value = "ids") String ids) {
+        return service.removeBatch(ids).map(JsonResp::ok);
     }
 
 }

@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 /**
  * ${entity} Service
  *
- * nekoimi  ${date}
+ * ${author}  ${date}
+ *
+ * This code is generated using nk-devtools.
  */
 #if(${entity} == 'Service')
 @org.springframework.stereotype.Service

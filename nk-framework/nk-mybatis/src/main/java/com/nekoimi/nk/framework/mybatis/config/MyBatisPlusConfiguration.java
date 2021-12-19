@@ -1,7 +1,10 @@
 package com.nekoimi.nk.framework.mybatis.config;
 
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.nekoimi.nk.framework.core.contract.IdGenerator;
 import com.nekoimi.nk.framework.mybatis.injector.ExtensionSqlInjector;
 import lombok.extern.slf4j.Slf4j;
@@ -35,5 +38,12 @@ public class MyBatisPlusConfiguration {
                 return idGenerator.uuid();
             }
         };
+    }
+
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        return interceptor;
     }
 }

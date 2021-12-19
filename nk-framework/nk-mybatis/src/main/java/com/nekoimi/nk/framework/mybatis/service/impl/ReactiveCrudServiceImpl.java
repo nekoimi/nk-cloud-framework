@@ -1,17 +1,16 @@
 package com.nekoimi.nk.framework.mybatis.service.impl;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.nekoimi.nk.framework.core.contract.IdGenerator;
 import com.nekoimi.nk.framework.core.utils.ClazzUtils;
 import com.nekoimi.nk.framework.core.utils.JsonUtils;
@@ -22,8 +21,6 @@ import com.nekoimi.nk.framework.mybatis.page.PageResult;
 import com.nekoimi.nk.framework.mybatis.service.ReactiveCrudService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.type.TypeHandler;
-import org.apache.ibatis.type.UnknownTypeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -322,9 +319,9 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     public Mono<Serializable> save(E entity) {
         return Mono.just(entity).flatMap(e -> {
             String keyProperty = tableInfo().getKeyProperty();
-            Object keyValue = ReflectionKit.getFieldValue(entity, keyProperty);
-            if (keyValue == null) {
-                Map<String, Field> fieldMap = ReflectionKit.getFieldMap(entity.getClass());
+            Object keyValue = ReflectionKit.getFieldValue(e, keyProperty);
+            if (keyValue == null || keyValue.toString().length() <= 0) {
+                Map<String, Field> fieldMap = ReflectionKit.getFieldMap(e.getClass());
                 Field field = fieldMap.get(keyProperty);
                 TableId tableId = field.getDeclaredAnnotation(TableId.class);
                 if (tableId != null && tableId.type() == IdType.AUTO) {
@@ -334,21 +331,18 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                 }
                 field.setAccessible(true);
                 try {
-                    field.set(entity, keyValue);
+                    field.set(e, keyValue);
                 } catch (IllegalAccessException ex) {
                     return Mono.error(ex);
                 }
             }
-            return Mono.just(keyValue).publishOn(Schedulers.elastic()).flatMap(id ->
-                    dmlRowToBoolean(mapper.insert(e))
-                            .flatMap(b -> {
-                                if (!b) {
-                                    return Mono.error(new FailedToResourceSaveException());
-                                }
-                                return Mono.just(true);
-                            })
-                            .flatMap(b -> Mono.just((Serializable) id))
-            ).onErrorResume(t -> Mono.error(new FailedToResourceSaveException(t.getMessage())));
+            return Mono.fromCallable(() -> dmlRowToBoolean(mapper.insert(e)).flatMap(b -> {
+                if (!b) {
+                    return Mono.error(new FailedToResourceSaveException());
+                }
+                return Mono.just(true);
+            })).subscribeOn(Schedulers.elastic())
+                    .thenReturn((Serializable) keyValue);
         });
     }
 
@@ -367,7 +361,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return Mono.just(entity).flatMap(e -> {
             String keyProperty = tableInfo().getKeyProperty();
             Object keyValue = ReflectionKit.getFieldValue(entity, keyProperty);
-            if (keyValue == null) {
+            if (keyValue == null || keyValue.toString().length() <= 0) {
                 return save(e);
             }
             return exists(keyProperty).flatMap(bool -> {
@@ -389,6 +383,20 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     }
 
     @Override
+    public Mono<Void> updateBatch(String ids, Map<String, Object> map) {
+        return updateBatch(Arrays.asList(ids.split("[,]")), map);
+    }
+
+    @Override
+    public Mono<Void> updateBatch(List<? extends Serializable> idList, Map<String, Object> map) {
+        return Flux.fromIterable(idList)
+                .publishOn(Schedulers.elastic())
+                .flatMap(id -> updateById(id, map))
+                .onErrorResume(t -> Mono.error(new FailedToResourceRemoveException(t.getMessage())))
+                .then(Mono.empty());
+    }
+
+    @Override
     public Mono<Boolean> updateByQuery(E entity, Consumer<LambdaQueryWrapper<E>> consumer) {
         return Mono.just(consumer)
                 .map(this::acceptQueryConsumer)
@@ -396,6 +404,27 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                 .map(eqw -> mapper.update(entity, eqw))
                 .flatMap(this::dmlRowToBoolean)
                 .onErrorResume(t -> Mono.error(new FailedToResourceUpdateException(t.getMessage())));
+    }
+
+    @Override
+    public Mono<Boolean> updateById(Serializable id, E entity) {
+        return getByIdOrFail(id).flatMap(ignoreEntity -> {
+            String keyProperty = tableInfo().getKeyProperty();
+            Field keyField = ClazzUtils.findField(entityClazz(), keyProperty);
+            if (keyField == null) {
+                return Mono.error(new FailedToResourceSaveException("Key property (%s) not found!", keyProperty));
+            }
+            keyField.trySetAccessible();
+            try {
+                keyField.set(entity, id);
+            } catch (IllegalAccessException e) {
+                if (log.isDebugEnabled()) {
+                    e.printStackTrace();
+                }
+                return Mono.error(new FailedToResourceSaveException(e.getMessage()));
+            }
+            return update(entity);
+        });
     }
 
     @Override
@@ -499,6 +528,11 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     }
 
     @Override
+    public Mono<Void> removeBatch(String ids) {
+        return removeBatch(Arrays.asList(ids.split("[,]")));
+    }
+
+    @Override
     public Mono<Void> removeBatch(List<? extends Serializable> idList) {
         return Flux.fromIterable(idList)
                 .publishOn(Schedulers.elastic())
@@ -573,24 +607,23 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     }
 
     @Override
-    public Mono<PageResult<E>> page(Mono<Page<E>> page) {
+    public Mono<PageResult<E>> page(IPage<E> page) {
         return page(page, eqw -> {
         });
     }
 
     @Override
-    public Mono<PageResult<E>> page(Mono<Page<E>> page, Consumer<LambdaQueryWrapper<E>> consumer) {
-        return page.flatMap(ep -> Mono.just(acceptQueryConsumer(consumer))
+    public Mono<PageResult<E>> page(IPage<E> page, Consumer<LambdaQueryWrapper<E>> consumer) {
+        return Mono.just(acceptQueryConsumer(consumer))
                 .publishOn(Schedulers.elastic())
-                .map(eqw -> mapper.selectPage(ep, eqw))
+                .map(eqw -> mapper.selectPage(page, eqw))
                 .flatMap(result -> Mono.just(PageResult.of(
                         result.getTotal(),
                         result.getCurrent(),
                         result.getSize(),
                         result.getPages(),
-                        Flux.fromIterable(result.getRecords()))
-                ))
-        ).subscribeOn(Schedulers.elastic())
+                        result.getRecords())
+                )).subscribeOn(Schedulers.elastic())
                 .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 }

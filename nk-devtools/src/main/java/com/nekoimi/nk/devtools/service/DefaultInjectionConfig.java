@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * nekoimi  2021/12/15 11:07
@@ -16,7 +15,6 @@ import java.util.Map;
 @Setter
 public class DefaultInjectionConfig extends InjectionConfig {
     private String entityName;
-    private Map<String, Object> customMap;
 
     @Override
     public void initMap() {
@@ -28,6 +26,5 @@ public class DefaultInjectionConfig extends InjectionConfig {
                 }
             }
         }
-        this.setMap(customMap);
     }
 }
