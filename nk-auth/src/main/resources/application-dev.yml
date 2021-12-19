@@ -44,5 +44,6 @@ app:
         - /exists/**
         - /get/**
         - /list
+        - /return/**
       authenticated:
         - /user/me

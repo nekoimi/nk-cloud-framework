@@ -1,6 +1,7 @@
 package com.nekoimi.nk.framework.mybatis.service.impl;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -21,6 +22,8 @@ import com.nekoimi.nk.framework.mybatis.page.PageResult;
 import com.nekoimi.nk.framework.mybatis.service.ReactiveCrudService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.type.TypeHandler;
+import org.apache.ibatis.type.UnknownTypeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -122,23 +125,22 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         List<TableFieldInfo> fieldList = tableInfo().getFieldList();
         try {
             for (TableFieldInfo fieldInfo : fieldList) {
-                Field field = fieldInfo.getField();
-                String fieldName = field.getName();
-                if (map.containsKey(fieldName)) {
-                    field.setAccessible(true);
-                    Object value = map.get(fieldName);
-                    Class<?> type = field.getType();
+                String propertyName = fieldInfo.getProperty();
+                if (map.containsKey(propertyName)) {
+                    Object value = map.get(propertyName);
+                    Class<?> propertyType = fieldInfo.getPropertyType();
                     if (value instanceof Map<?, ?> || value instanceof Collection<?>) {
                         String json = JsonUtils.write(value);
-                        value = JsonUtils.read(json, type);
+                        value = JsonUtils.read(json, propertyType);
                     }
-                    if (ClazzUtils.instanceOf(type, Map.class) || ClazzUtils.instanceOf(type, Collection.class)) {
+                    if (ClazzUtils.instanceOf(propertyType, Map.class) || ClazzUtils.instanceOf(propertyType, Collection.class)) {
                         if (value instanceof String) {
                             String json = (String) value;
-                            value = JsonUtils.read(json, type);
+                            value = JsonUtils.read(json, propertyType);
                         }
                     }
-                    field.set(e, value);
+                    fieldInfo.getField().setAccessible(true);
+                    fieldInfo.getField().set(e, value);
                 }
             }
 

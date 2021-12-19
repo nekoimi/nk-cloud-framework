@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -29,5 +30,30 @@ public class UaUserController {
     @GetMapping("/get/{id}")
     public Mono<JsonResp> get(@PathVariable String id) {
         return userService.getById(id).map(JsonResp::ok);
+    }
+
+    @GetMapping("/return/string")
+    public String returnString() {
+        return "string";
+    }
+
+    @GetMapping("/return/mono/string")
+    public Mono<String> returnMonoString() {
+        return Mono.just("string");
+    }
+
+    @GetMapping("/return/mono/void")
+    public Mono<Void> returnMonoVoid() {
+        return Mono.empty();
+    }
+
+    @GetMapping("/return/flux/void")
+    public Flux<Void> returnFluxVoid() {
+        return Flux.empty();
+    }
+
+    @GetMapping("/return/flux/string")
+    public Flux<String> returnFluxString() {
+        return Flux.just("AAA", "BBB", "CCC");
     }
 }

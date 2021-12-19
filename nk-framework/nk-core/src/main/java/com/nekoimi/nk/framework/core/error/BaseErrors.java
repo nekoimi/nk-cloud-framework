@@ -11,6 +11,7 @@ public enum BaseErrors implements ErrorDetails {
     HTTP_STATUS_FORBIDDEN(10403, "Forbidden"),
     HTTP_STATUS_NOT_FOUND(10404, "Not found"),
     HTTP_STATUS_METHOD_NOT_ALLOWED(10405, "Method not allowed"),
+    HTTP_STATUS_NOT_ACCEPTABLE(10406, "Not Acceptable"),
 
     AUTHENTICATION_EXCEPTION(10401, "Not Authenticated"),
     ACCESS_DENIED_EXCEPTION(10501, "Access is denied"),

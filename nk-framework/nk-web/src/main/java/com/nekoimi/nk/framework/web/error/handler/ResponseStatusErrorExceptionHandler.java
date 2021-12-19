@@ -60,6 +60,8 @@ public class ResponseStatusErrorExceptionHandler implements ErrorExceptionHandle
                 return BaseErrors.HTTP_STATUS_NOT_FOUND;
             case METHOD_NOT_ALLOWED:
                 return BaseErrors.HTTP_STATUS_METHOD_NOT_ALLOWED;
+            case NOT_ACCEPTABLE:
+                return BaseErrors.HTTP_STATUS_NOT_ACCEPTABLE;
         }
         return BaseErrors.DEFAULT_CLIENT_ERROR;
     }

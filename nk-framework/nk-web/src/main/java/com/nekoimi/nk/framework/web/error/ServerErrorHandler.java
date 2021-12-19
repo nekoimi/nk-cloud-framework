@@ -29,6 +29,9 @@ public class ServerErrorHandler implements ErrorWebExceptionHandler, Ordered {
 
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
+        if (log.isDebugEnabled()) {
+            ex.printStackTrace();
+        }
         return handlerResolver.resolve(ex)
                 .flatMap(handler -> (Mono<ErrorDetails>) handler.handle(exchange, ex))
                 .flatMap(error -> resultWriter.writer(exchange, error))
