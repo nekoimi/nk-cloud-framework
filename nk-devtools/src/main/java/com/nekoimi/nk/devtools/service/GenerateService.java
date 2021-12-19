@@ -198,9 +198,9 @@ public class GenerateService {
             templateConfig.setServiceImpl("templates/serviceimpl.java.vm");
         } else {
             templateConfig.setController(null);
-            templateConfig.setEntity(null);
-            templateConfig.setMapper(null);
-            templateConfig.setXml(null);
+//            templateConfig.setEntity(null);
+//            templateConfig.setMapper(null);
+//            templateConfig.setXml(null);
             templateConfig.setService(null);
             templateConfig.setServiceImpl(null);
         }

@@ -7,12 +7,12 @@ angular.module('messager', [])
 	.run(["$templateCache", function($templateCache) {
 		$templateCache.put("template/modal/confirmModelTemplate.html",
 			'<div class="m-c">\n' +
-			'  <div class="modal-header bg-primary text-white">\n' +
+			'  <div class="modal-header bg-danger text-white">\n' +
 			'    <h4 class="modal-title">{{title}}</h4>\n' +
 			'  </div>\n' +
 			'  <div class="modal-body">{{content}}</div>\n' +
 			'  <div class="modal-footer" style="text-align: right;">\n' +
-			'    <button type="button" class="btn btn-primary" ng-click="ok()">确定</button>\n' +
+			'    <button type="button" class="btn btn-success" ng-click="ok()">确定</button>\n' +
 			'    <button type="button" class="btn btn-default" ng-click="cancel()">取消</button>\n' +
 			'  </div>\n' +
 			'</div>\n' +

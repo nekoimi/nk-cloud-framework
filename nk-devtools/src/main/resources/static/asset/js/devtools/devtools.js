@@ -8,7 +8,7 @@ app.controller('generatorController', [
         $scope.tables = [];
         $scope.data = {
             location: '',
-            author: 'nekoimi',
+            author: '',
             packageName: '',
             moduleName: '',
 
@@ -16,7 +16,7 @@ app.controller('generatorController', [
             tablePrefix: '',
             fieldPrefix: '',
             entityName: '',
-            onlyGenEntity: '',
+            onlyGenEntity: false,
 
             router: {
                 version: '',
@@ -27,10 +27,18 @@ app.controller('generatorController', [
 
         function loadFromLocalStorage() {
             let data = localStorage.getItem(localStorageDataKey);
-            $scope.data = JSON.parse(data)
+            if (data != null) {
+                try {
+                    $scope.data = JSON.parse(data);
+                } catch (e) {
+                    localStorage.removeItem(localStorageDataKey);
+                    console.error(e);
+                }
+            }
         }
 
         function saveToLocalStorage(data) {
+            localStorage.removeItem(localStorageDataKey);
             localStorage.setItem(localStorageDataKey, JSON.stringify(data))
         }
 
@@ -54,57 +62,20 @@ app.controller('generatorController', [
         loadBootstrap();
 
         $scope.onTableClick = function (table) {
-            $scope.current = table;
-            if (table.tableComment) {
-                $scope.data.entityName = table.tableComment;
-            }
-        }
-
-        $scope.parseEnityName = function (table) {
-            if (!table) {
-                return;
-            }
-            table = table.toLowerCase();
-            if ($scope.data.tablePrefix) {
-                table = table.replace($scope.data.tablePrefix, "");
-            }
-            var names = table.split("_");
-            var entityName = [];
-            for (var i = 0; i < names.length; i++) {
-                var name = names[i];
-                if (name.length > 0) {
-                    var upperName = name.substring(0, 1).toUpperCase() + name.substring(1, name.length);
-                    entityName.push(upperName);
-                }
-            }
-            return entityName.join("");
+            $scope.data.tableName = table.name;
         }
 
 
-        $scope.generate = function () {
-
+        $scope.submitGenerate = function () {
             Messager.confirm("提示", "确定要生成代码?").then(function () {
-                var setting = $scope.data;
-                var params = {
-                    projectLocation: setting.projectLocation,
-                    developer: setting.developer,
-                    module: setting.module,
-                    entityName: setting.entityName,
-                    tableName: $scope.current.tableName,
-                    tablePrefix: setting.tablePrefix,
-                    packageName: setting.packageName,
-                    onlyGenerateEntity: setting.onlyGenerateEntity
-                };
                 $scope.generating = true;
                 var toast = $scope.toaster.wait("正在生成...");
-                $http.post('generator/generate', params).success(
-                    function (data, status, headers, config) {
+                $http.post('generator/generate', $scope.data).success(
+                    function (result, status, headers, config) {
                         $scope.generating = false;
-                        if (data.success) {
-                            /* $scope.dataForm.$setPristine();
-                             $scope.dataForm.$setUntouched();*/
+                        if (result.code === 0) {
+                            saveToLocalStorage($scope.data);
                             toast.doSuccess("生成成功");
-                            $scope.forward(0);
                         } else {
                             toast.doError("生成失败：" + (result.msg || status));
                         }
@@ -113,7 +84,5 @@ app.controller('generatorController', [
                     toast.doError("生成失败：" + (result.msg || status));
                 });
             });
-
-
         }
     }]);
