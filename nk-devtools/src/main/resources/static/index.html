@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+    <meta charset="utf-8"/>
+    <title>nk cloud framework</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <link rel="stylesheet" href="asset/dist/css/share.css" type="text/css"/>
+    <link rel="stylesheet" href="asset/dist/css/control.min.css" type="text/css"/>
+    <link rel="stylesheet" href="asset/dist/css/app.min.css" type="text/css"/>
+</head>
+<body ng-controller="appController" style="overflow: auto">
+<toaster-container toaster-options="{'position-class': 'toast-top-right', 'close-button':true}"></toaster-container>
+<div class="app app-client" id="app">
+    <div class="app-header box-shadow pos-rlt bg-danger w-full">
+        <div class="collapse pos-rlt navbar-collapse">
+            <div class="wrapper-sm">
+                <span class="block text-center"><span class="app-name">nk cloud framework - 代码生成器</span></span>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div ui-butterbar></div>
+        <div class="container" ui-view></div>
+    </div>
+    <!-- /content -->
+</div>
+<script src="asset/dist/js/basic.min.js"></script>
+<script src="asset/dist/js/basic.angular.js"></script>
+<script src="asset/dist/js/basic.module.js"></script>
+<script src="asset/js/app.js"></script>
+<script src="asset/js/devtools/devtools.js"></script>
+</body>
+</html>
