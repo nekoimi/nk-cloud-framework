@@ -24,7 +24,6 @@ spring:
     initialization-mode: always
     continue-on-error: false
     platform: mysql
-    # driver-class-name: com.mysql.cj.jdbc.Driver
     driver-class-name: ${db.driver-class-name}
     type: com.zaxxer.hikari.HikariDataSource
     url: ${db.url}

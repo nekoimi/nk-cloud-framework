@@ -58,6 +58,27 @@
                 <db.redis.database>0</db.redis.database>
             </properties>
         </profile>
+        <profile>
+            <id>test</id>
+            <activation>
+                <!--默认激活-->
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <!--具体环境变量配置-->
+                <debug>false</debug>
+                <profile.name>test</profile.name>
+                <!--数据库环境配置-->
+                <db.driver-class-name>com.mysql.cj.jdbc.Driver</db.driver-class-name>
+                <db.url>jdbc:mysql://localhost:3306/nk_cloud?useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</db.url>
+                <db.username>root</db.username>
+                <db.password>123456</db.password>
+                <db.redis.host>localhost</db.redis.host>
+                <db.redis.port>6379</db.redis.port>
+                <db.redis.password>123456</db.redis.password>
+                <db.redis.database>0</db.redis.database>
+            </properties>
+        </profile>
     </profiles>
 
     <developers>
