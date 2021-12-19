@@ -111,7 +111,7 @@ public class ${table.controllerName} {
     /**
      * 根据id更新${cfg.route.info}部分字段
      *
-     * @param map
+     * @param body
      * @return
      */
     @PutMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}")
@@ -127,14 +127,14 @@ public class ${table.controllerName} {
             #end
         #end
     })
-    public Mono<${cfg.jsonResp}> updateFull(@PathVariable("id") String id, @ApiIgnore @RequestBody Map<String, Object> map) {
-        return service.updateById(id, map).map(JsonResp::ok);
+    public Mono<${cfg.jsonResp}> updateFull(@PathVariable("id") String id, @ApiIgnore @RequestBody Map<String, Object> body) {
+        return service.updateById(id, body).map(JsonResp::ok);
     }
 
     /**
      * 批量更新${cfg.route.info}数据
      *
-     * @param map
+     * @param body
      * @return
      */
     @PutMapping("${routePrefix}/${routeVersion}/${routePathName}/batch")
@@ -151,8 +151,8 @@ public class ${table.controllerName} {
             #end
         #end
     })
-    public Mono<${cfg.jsonResp}> updateBatch(@RequestParam("ids") String ids, @ApiIgnore @RequestBody Map<String, Object> map) {
-        return service.updateBatch(ids, map).map(JsonResp::ok);
+    public Mono<${cfg.jsonResp}> updateBatch(@RequestParam("ids") String ids, @ApiIgnore @RequestBody Map<String, Object> body) {
+        return service.updateBatch(ids, body).map(JsonResp::ok);
     }
 
     /**
