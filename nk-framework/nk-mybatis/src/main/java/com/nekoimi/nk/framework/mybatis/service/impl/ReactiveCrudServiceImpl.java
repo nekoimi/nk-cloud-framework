@@ -22,6 +22,7 @@ import com.nekoimi.nk.framework.mybatis.service.ReactiveCrudService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -160,6 +161,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return Mono.just(e);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Mono<E> getById(Serializable id) {
         return Mono.fromCallable(() -> mapper.selectById(id))
@@ -167,6 +169,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                 .subscribeOn(Schedulers.elastic());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Mono<E> getByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
         return Mono.just(consumer)
@@ -176,6 +179,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                 .flatMap(Mono::justOrEmpty);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Mono<E> getByMap(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
         return Mono.just(consumer)
@@ -315,6 +319,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return checkExists(getByMap(consumer));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Mono<Serializable> save(E entity) {
         return Mono.just(entity).flatMap(e -> {
@@ -351,6 +356,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return mapConvertToEntity(map).flatMap(this::save);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Mono<Void> saveBatch(List<E> entityList) {
         return Flux.fromIterable(entityList).flatMap(this::save).then(Mono.empty());
@@ -374,6 +380,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         });
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Mono<Boolean> update(E entity) {
         return Mono.just(entity).publishOn(Schedulers.elastic())
@@ -387,6 +394,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return updateBatch(Arrays.asList(ids.split("[,]")), map);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Mono<Void> updateBatch(List<? extends Serializable> idList, Map<String, Object> map) {
         return Flux.fromIterable(idList)
@@ -396,6 +404,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                 .then(Mono.empty());
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Mono<Boolean> updateByQuery(E entity, Consumer<LambdaQueryWrapper<E>> consumer) {
         return Mono.just(consumer)
@@ -439,6 +448,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                 .flatMap(this::update);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Mono<Boolean> updateById(Serializable id, Consumer<LambdaUpdateWrapper<E>> consumer) {
         return getByIdOrFail(id).flatMap(e -> Mono.just(consumer)
@@ -449,6 +459,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                 .onErrorResume(t -> Mono.error(new FailedToResourceUpdateException(t.getMessage())));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Mono<Boolean> updateByIdOfMap(Serializable id, Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
         return getByIdOrFail(id).flatMap(e -> Mono.just(consumer)
@@ -509,6 +520,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return updateByIdOfMap(id, m -> m.put(k1, v1).put(k2, v2).put(k3, v3).put(k4, v4).put(k5, v5).put(k6, v6).put(k7, v7).put(k8, v8).put(k9, v9).put(k10, v10));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Mono<Void> removeById(Serializable id) {
         return Mono.fromCallable(() -> mapper.deleteById(id))
@@ -517,6 +529,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                 .then(Mono.empty());
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Mono<Void> removeByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
         return Mono.just(consumer)
@@ -527,11 +540,13 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                 .then(Mono.empty());
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Mono<Void> removeBatch(String ids) {
         return removeBatch(Arrays.asList(ids.split("[,]")));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Mono<Void> removeBatch(List<? extends Serializable> idList) {
         return Flux.fromIterable(idList)
@@ -541,6 +556,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                 .then(Mono.empty());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Mono<Integer> countAll() {
         return Mono.just(Wrappers.lambdaQuery(entityClazz()))
@@ -549,6 +565,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                 .subscribeOn(Schedulers.elastic());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Mono<Integer> countByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
         return Mono.just(consumer)
@@ -558,6 +575,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                 .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Mono<Integer> countByMap(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
         return Mono.just(consumer)
@@ -567,6 +585,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                 .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Flux<E> findAll() {
         Flux<E> push = Flux.push(fluxSink -> {
@@ -583,6 +602,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return findByIds(Arrays.asList(ids));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Flux<E> findByIds(List<? extends Serializable> ids) {
         Flux<E> push = Flux.push(fluxSink -> {
@@ -594,6 +614,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                 .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Flux<E> findByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
         Flux<E> push = Flux.push(fluxSink -> {
@@ -612,6 +633,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         });
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Mono<PageResult<E>> page(IPage<E> page, Consumer<LambdaQueryWrapper<E>> consumer) {
         return Mono.just(acceptQueryConsumer(consumer))
