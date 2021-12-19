@@ -3,6 +3,7 @@ package com.nekoimi.nk.framework.security.config;
 import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
 import com.nekoimi.nk.framework.security.filter.RequestParseAuthTypeFilter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -28,7 +29,6 @@ import org.springframework.security.web.server.authentication.ServerAuthenticati
 import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
 import org.springframework.security.web.server.authorization.ServerAccessDeniedHandler;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
-import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 
@@ -41,6 +41,7 @@ import java.util.UUID;
 @Configuration
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
+@ConditionalOnBean(value = ServerSecurityContextRepository.class)
 public class SecurityConfiguration {
     private final SecurityProperties properties;
     private final ServerAccessDeniedHandler accessDeniedHandler;
@@ -48,6 +49,7 @@ public class SecurityConfiguration {
     private final ServerAuthenticationSuccessHandler authenticationSuccessHandler;
     private final ServerAuthenticationFailureHandler authenticationFailureHandler;
     private final ServerLogoutSuccessHandler logoutSuccessHandler;
+    private final ServerSecurityContextRepository securityContextRepository;
     private final ReactiveAuthenticationManager integratedAuthenticationManager;
     private final ServerAuthenticationConverter integratedToAuthenticationTokenConverterManager;
 
@@ -57,6 +59,7 @@ public class SecurityConfiguration {
                                  ServerAuthenticationSuccessHandler authenticationSuccessHandler,
                                  ServerAuthenticationFailureHandler authenticationFailureHandler,
                                  ServerLogoutSuccessHandler logoutSuccessHandler,
+                                 ServerSecurityContextRepository securityContextRepository,
                                  ReactiveAuthenticationManager integratedAuthenticationManager,
                                  ServerAuthenticationConverter integratedToAuthenticationTokenConverterManager) {
         this.properties = properties;
@@ -65,6 +68,7 @@ public class SecurityConfiguration {
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.logoutSuccessHandler = logoutSuccessHandler;
+        this.securityContextRepository = securityContextRepository;
         this.integratedAuthenticationManager = integratedAuthenticationManager;
         this.integratedToAuthenticationTokenConverterManager = integratedToAuthenticationTokenConverterManager;
     }
@@ -72,11 +76,6 @@ public class SecurityConfiguration {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(30);
-    }
-
-    @Bean
-    public ServerSecurityContextRepository securityContextRepository() {
-        return new WebSessionServerSecurityContextRepository();
     }
 
     @Bean
@@ -105,8 +104,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http,
-                                                       ServerSecurityContextRepository securityContextRepository) {
+    public SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http) {
         ServerWebExchangeMatcher loginExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, properties.getLoginUrl());
         ServerWebExchangeMatcher logoutExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, properties.getLogoutUrl());
         SecurityWebFilterChain filterChain = http

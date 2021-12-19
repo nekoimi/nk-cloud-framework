@@ -24,6 +24,10 @@
             <groupId>com.nekoimi.nk</groupId>
             <artifactId>nk-mybatis</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.nekoimi.nk</groupId>
+            <artifactId>nk-redis</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

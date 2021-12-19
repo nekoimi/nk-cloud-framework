@@ -16,5 +16,6 @@
         <module>nk-security</module>
         <module>nk-openfeign</module>
         <module>nk-mybatis</module>
+        <module>nk-redis</module>
     </modules>
 </project>

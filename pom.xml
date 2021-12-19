@@ -169,6 +169,11 @@
                 <artifactId>nk-mybatis</artifactId>
                 <version>${nk.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.nekoimi.nk</groupId>
+                <artifactId>nk-redis</artifactId>
+                <version>${nk.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

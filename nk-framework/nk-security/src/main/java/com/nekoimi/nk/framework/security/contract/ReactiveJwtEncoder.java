@@ -13,4 +13,11 @@ public interface ReactiveJwtEncoder {
      * @return
      */
     Mono<String> encode(String subject);
+
+    /**
+     * 解析token
+     * @param token
+     * @return
+     */
+    Mono<String> decode(String token);
 }

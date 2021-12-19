@@ -1,6 +1,7 @@
 package com.nekoimi.nk.framework.security.authentication;
 
 import com.nekoimi.nk.framework.security.contract.AuthenticationSupportManager;
+import com.nekoimi.nk.framework.security.token.SubjectAuthenticationToken;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.core.Authentication;
 import reactor.core.publisher.Mono;
@@ -26,7 +27,7 @@ public class AuthenticationManagerAdapter implements AuthenticationSupportManage
     }
 
     @Override
-    public Mono<Authentication> authenticate(Authentication authentication) {
-        return manager.authenticate(authentication);
+    public Mono<SubjectAuthenticationToken> authenticate(Authentication authentication) {
+        return manager.authenticate(authentication).cast(SubjectAuthenticationToken.class);
     }
 }

@@ -1,5 +1,6 @@
 package com.nekoimi.nk.framework.security.contract;
 
+import com.nekoimi.nk.framework.security.token.SubjectAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import reactor.core.publisher.Mono;
 
@@ -18,5 +19,5 @@ public interface AuthenticationSupportManager {
      * @param authentication
      * @return
      */
-    Mono<Authentication> authenticate(Authentication authentication);
+    Mono<SubjectAuthenticationToken> authenticate(Authentication authentication);
 }
