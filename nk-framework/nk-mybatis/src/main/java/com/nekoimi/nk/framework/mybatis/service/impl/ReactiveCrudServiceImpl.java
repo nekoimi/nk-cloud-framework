@@ -20,18 +20,15 @@ import com.nekoimi.nk.framework.mybatis.mapper.BaseMapper;
 import com.nekoimi.nk.framework.mybatis.page.PageResult;
 import com.nekoimi.nk.framework.mybatis.service.ReactiveCrudService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ReflectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -45,41 +42,43 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Autowired
     protected IdGenerator idGenerator;
 
-    public Class<E> entityClazz() {
-        Class<E> clazz = null;
-        Type genericSuperclass = this.getClass().getGenericSuperclass();
-        if (genericSuperclass instanceof ParameterizedType) {
-            Type[] actualTypeArguments = ((ParameterizedType) genericSuperclass).getActualTypeArguments();
-            if (actualTypeArguments != null && actualTypeArguments.length > 1) {
-                clazz = (Class<E>) actualTypeArguments[1];
-            }
-        }
-        return clazz;
+    protected Class<E> entityClass = currentModelClass();
+
+    protected TableInfo tableInfo = currentTableInfo();
+
+    @SuppressWarnings("unchecked")
+    protected Class<M> currentMapperClass() {
+        return (Class<M>) ReflectionKit.getSuperClassGenericType(this.getClass(), ReactiveCrudServiceImpl.class, 0);
     }
 
-    protected TableInfo tableInfo() {
-        TableInfo info = TableInfoHelper.getTableInfo(entityClazz());
-        if (info == null || StringUtils.isBlank(info.getKeyColumn())) {
-            throw new InvalidParameterException("Table " + entityClazz().getName() + " recover info error! ");
-        }
-        return info;
+    @SuppressWarnings("unchecked")
+    protected Class<E> currentModelClass() {
+        return (Class<E>) ReflectionKit.getSuperClassGenericType(this.getClass(), ReactiveCrudServiceImpl.class, 1);
+    }
+
+    protected TableInfo currentTableInfo() {
+        return TableInfoHelper.getTableInfo(getEntityClass());
+    }
+
+    protected List<TableFieldInfo> currentTableFieldList() {
+        return tableInfo.getFieldList();
     }
 
     protected LambdaQueryWrapper<E> acceptQueryConsumer(Consumer<LambdaQueryWrapper<E>> consumer) {
-        LambdaQueryWrapper<E> query = Wrappers.lambdaQuery(entityClazz());
+        var query = lambdaQuery();
         consumer.accept(query);
         return query;
     }
 
     protected LambdaUpdateWrapper<E> acceptUpdateConsumer(Consumer<LambdaUpdateWrapper<E>> consumer) {
-        LambdaUpdateWrapper<E> query = Wrappers.lambdaUpdate(entityClazz());
+        var query = lambdaUpdate();
         consumer.accept(query);
         return query;
     }
 
     protected LambdaQueryWrapper<E> acceptQueryMapConsumer(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
-        LambdaQueryWrapper<E> query = Wrappers.lambdaQuery(entityClazz());
-        QueryMap<SFunction<E, Object>, Object> queryMap = new QueryMap<>(new HashMap<>());
+        var query = lambdaQuery();
+        var queryMap = queryMap();
         consumer.accept(queryMap);
         Set<Map.Entry<SFunction<E, Object>, Object>> entries = queryMap.map().entrySet();
         entries.forEach(entry -> query.ne(entry.getKey(), entry.getValue()));
@@ -87,10 +86,10 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     }
 
     protected LambdaUpdateWrapper<E> acceptUpdateMapConsumer(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
-        LambdaUpdateWrapper<E> update = Wrappers.lambdaUpdate(entityClazz());
-        QueryMap<SFunction<E, Object>, Object> queryMap = new QueryMap<>(new HashMap<>());
-        consumer.accept(queryMap);
-        Set<Map.Entry<SFunction<E, Object>, Object>> entries = queryMap.map().entrySet();
+        var update = lambdaUpdate();
+        var updateMap = queryMap();
+        consumer.accept(updateMap);
+        Set<Map.Entry<SFunction<E, Object>, Object>> entries = updateMap.map().entrySet();
         entries.forEach(entry -> update.set(entry.getKey(), entry.getValue()));
         return update;
     }
@@ -107,58 +106,63 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return Mono.justOrEmpty(rows).flatMap(i -> Mono.just(i > 0)).switchIfEmpty(Mono.just(false));
     }
 
-    protected Mono<E> mapConvertToEntity(Map<String, Object> map) {
-        Class<E> entityClazz = entityClazz();
-        E e = null;
-        try {
-            e = entityClazz.getDeclaredConstructor().newInstance();
-        } catch (ReflectiveOperationException rex) {
-            log.error(rex.getMessage());
-            if (log.isDebugEnabled()) {
-                rex.printStackTrace();
-            }
-            return Mono.error(new FailedToResourceSaveException());
+    protected Mono<E> readMapCopyProperties(Map<String, Object> map) {
+        E e = ClazzUtils.newInstance(currentModelClass());
+        if (e == null) {
+            return Mono.error(new FailedToResourceOperationException());
         }
-        // fixme 这里返回的数据表字段不包含主键
-        List<TableFieldInfo> fieldList = tableInfo().getFieldList();
-        try {
-            for (TableFieldInfo fieldInfo : fieldList) {
-                String propertyName = fieldInfo.getProperty();
-                if (map.containsKey(propertyName)) {
-                    Object value = map.get(propertyName);
-                    Class<?> propertyType = fieldInfo.getPropertyType();
-                    if (value instanceof Map<?, ?> || value instanceof Collection<?>) {
-                        String json = JsonUtils.write(value);
-                        value = JsonUtils.read(json, propertyType);
-                    }
-                    if (ClazzUtils.instanceOf(propertyType, Map.class) || ClazzUtils.instanceOf(propertyType, Collection.class)) {
-                        if (value instanceof String) {
-                            String json = (String) value;
-                            value = JsonUtils.read(json, propertyType);
-                        }
-                    }
-                    fieldInfo.getField().setAccessible(true);
-                    fieldInfo.getField().set(e, value);
-                }
-            }
 
-            String keyProperty = tableInfo().getKeyProperty();
-            if (map.containsKey(keyProperty)) {
-                Field keyField = ClazzUtils.findField(entityClazz, keyProperty);
-                if (keyField == null) {
-                    return Mono.error(new FailedToResourceSaveException("Key property (%s) not found!", keyProperty));
+        Flux.fromIterable(currentTableFieldList()).filter(info -> map.containsKey(info.getProperty())).subscribe(info -> {
+            Object value = map.get(info.getProperty());
+            Class<?> propertyType = info.getPropertyType();
+            if (value instanceof Map<?, ?> || value instanceof Collection<?>) {
+                String json = JsonUtils.write(value);
+                value = JsonUtils.read(json, propertyType);
+            }
+            if (ClazzUtils.instanceOf(propertyType, Map.class) || ClazzUtils.instanceOf(propertyType, Collection.class)) {
+                if (value instanceof String) {
+                    String json = (String) value;
+                    value = JsonUtils.read(json, propertyType);
                 }
-                keyField.setAccessible(true);
-                keyField.set(e, map.get(keyProperty));
             }
-        } catch (IllegalAccessException ex) {
-            log.error(ex.getMessage());
-            if (log.isDebugEnabled()) {
-                ex.printStackTrace();
+            Field field = ReflectionKit.setAccessible(info.getField());
+            ReflectionUtils.setField(field, e, value);
+        });
+
+        return Mono.just(currentTableInfo().getKeyProperty()).filter(map::containsKey).flatMap(s -> {
+            Field field = ClazzUtils.findField(currentModelClass(), s);
+            if (field == null) {
+                return Mono.error(new FailedToResourceOperationException("Key property (%s) not found!", s));
             }
-            return Mono.error(new FailedToResourceSaveException());
-        }
-        return Mono.just(e);
+            field = ReflectionKit.setAccessible(field);
+            ReflectionUtils.setField(field, e, map.get(s));
+            return Mono.just(e);
+        }).onErrorResume(t -> Mono.error(new FailedToResourceOperationException(t.getMessage())));
+    }
+
+    @Override
+    public Class<E> getEntityClass() {
+        return entityClass;
+    }
+
+    @Override
+    public M getMapper() {
+        return mapper;
+    }
+
+    @Override
+    public QueryMap<SFunction<E, Object>, Object> queryMap() {
+        return new QueryMap<>(new HashMap<>());
+    }
+
+    @Override
+    public LambdaQueryWrapper<E> lambdaQuery() {
+        return Wrappers.lambdaQuery(currentModelClass());
+    }
+
+    @Override
+    public LambdaUpdateWrapper<E> lambdaUpdate() {
+        return Wrappers.lambdaUpdate(currentModelClass());
     }
 
     @Transactional(readOnly = true)
@@ -323,7 +327,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Override
     public Mono<Serializable> save(E entity) {
         return Mono.just(entity).flatMap(e -> {
-            String keyProperty = tableInfo().getKeyProperty();
+            String keyProperty = currentTableInfo().getKeyProperty();
             Object keyValue = ReflectionKit.getFieldValue(e, keyProperty);
             if (keyValue == null || keyValue.toString().length() <= 0) {
                 Map<String, Field> fieldMap = ReflectionKit.getFieldMap(e.getClass());
@@ -353,7 +357,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
 
     @Override
     public Mono<Serializable> saveMap(Map<String, Object> map) {
-        return mapConvertToEntity(map).flatMap(this::save);
+        return readMapCopyProperties(map).flatMap(this::save);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -365,7 +369,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Override
     public Mono<Serializable> saveOrUpdate(E entity) {
         return Mono.just(entity).flatMap(e -> {
-            String keyProperty = tableInfo().getKeyProperty();
+            String keyProperty = currentTableInfo().getKeyProperty();
             Object keyValue = ReflectionKit.getFieldValue(entity, keyProperty);
             if (keyValue == null || keyValue.toString().length() <= 0) {
                 return save(e);
@@ -418,8 +422,8 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Override
     public Mono<Boolean> updateById(Serializable id, E entity) {
         return getByIdOrFail(id).flatMap(ignoreEntity -> {
-            String keyProperty = tableInfo().getKeyProperty();
-            Field keyField = ClazzUtils.findField(entityClazz(), keyProperty);
+            String keyProperty = currentTableInfo().getKeyProperty();
+            Field keyField = ClazzUtils.findField(currentModelClass(), keyProperty);
             if (keyField == null) {
                 return Mono.error(new FailedToResourceSaveException("Key property (%s) not found!", keyProperty));
             }
@@ -438,13 +442,13 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
 
     @Override
     public Mono<Boolean> updateById(Serializable id, Map<String, Object> map) {
-        return Mono.just(tableInfo().getKeyProperty())
+        return Mono.just(currentTableInfo().getKeyProperty())
                 .flatMap(keyProperty -> Mono.just(map)
                         .flatMap(d -> {
                             d.put(keyProperty, id);
                             return Mono.just(d);
                         }))
-                .flatMap(this::mapConvertToEntity)
+                .flatMap(this::readMapCopyProperties)
                 .flatMap(this::update);
     }
 
@@ -558,8 +562,8 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
 
     @Transactional(readOnly = true)
     @Override
-    public Mono<Integer> countAll() {
-        return Mono.just(Wrappers.lambdaQuery(entityClazz()))
+    public Mono<Long> countAll() {
+        return Mono.just(Wrappers.lambdaQuery(currentModelClass()))
                 .map(eqw -> mapper.selectCount(eqw))
                 .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())))
                 .subscribeOn(Schedulers.elastic());
@@ -567,7 +571,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
 
     @Transactional(readOnly = true)
     @Override
-    public Mono<Integer> countByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
+    public Mono<Long> countByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
         return Mono.just(consumer)
                 .map(this::acceptQueryConsumer)
                 .publishOn(Schedulers.elastic())
@@ -577,7 +581,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
 
     @Transactional(readOnly = true)
     @Override
-    public Mono<Integer> countByMap(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
+    public Mono<Long> countByMap(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
         return Mono.just(consumer)
                 .map(this::acceptQueryMapConsumer)
                 .publishOn(Schedulers.elastic())
@@ -585,52 +589,128 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                 .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 
-    @Transactional(readOnly = true)
-    @Override
-    public Flux<E> findAll() {
-        Flux<E> push = Flux.push(fluxSink -> {
-            mapper.selectListWithHandler(Wrappers.lambdaQuery(entityClazz()), ctx -> fluxSink.next(ctx.getResultObject()));
-            fluxSink.complete();
-        });
+    private Flux<E> findAllFluxPushScheduler(Flux<E> push) {
         return push.publishOn(Schedulers.elastic())
                 .subscribeOn(Schedulers.elastic())
                 .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public Flux<E> findByIds(Serializable... ids) {
-        return findByIds(Arrays.asList(ids));
+    public Flux<E> findAll() {
+        return findAllFluxPushScheduler(Flux.push(fluxSink -> {
+            mapper.selectListWithHandler(Wrappers.lambdaQuery(currentModelClass()), ctx -> fluxSink.next(ctx.getResultObject()));
+            fluxSink.complete();
+        }));
     }
 
     @Transactional(readOnly = true)
     @Override
     public Flux<E> findByIds(List<? extends Serializable> ids) {
-        Flux<E> push = Flux.push(fluxSink -> {
+        return findAllFluxPushScheduler(Flux.push(fluxSink -> {
             mapper.selectBatchIdsWithHandler(ids, ctx -> fluxSink.next(ctx.getResultObject()));
             fluxSink.complete();
-        });
-        return push.publishOn(Schedulers.elastic())
-                .subscribeOn(Schedulers.elastic())
-                .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
+        }));
     }
 
     @Transactional(readOnly = true)
     @Override
     public Flux<E> findByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
-        Flux<E> push = Flux.push(fluxSink -> {
+        return findAllFluxPushScheduler(Flux.push(fluxSink -> {
             mapper.selectListWithHandler(acceptQueryConsumer(consumer), ctx -> fluxSink.next(ctx.getResultObject()));
             fluxSink.complete();
-        });
-
-        return push.publishOn(Schedulers.elastic())
-                .subscribeOn(Schedulers.elastic())
-                .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
+        }));
     }
 
     @Override
-    public Mono<PageResult<E>> page(IPage<E> page) {
-        return page(page, eqw -> {
-        });
+    public Flux<E> findByMap(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
+        return findAllFluxPushScheduler(Flux.push(fluxSink -> {
+            mapper.selectListWithHandler(acceptQueryMapConsumer(consumer), ctx -> fluxSink.next(ctx.getResultObject()));
+            fluxSink.complete();
+        }));
+    }
+
+    @Override
+    @SafeVarargs
+    public final Flux<E> findAllSelectColumn(SFunction<E, Object>... columns) {
+        return findAllFluxPushScheduler(Flux.push(fluxSink -> {
+            mapper.selectListWithHandler(Wrappers.lambdaQuery(currentModelClass()).select(columns), ctx -> fluxSink.next(ctx.getResultObject()));
+            fluxSink.complete();
+        }));
+    }
+
+    @SafeVarargs
+    @Override
+    public final Flux<E> findByQuerySelectColumn(Consumer<LambdaQueryWrapper<E>> consumer, SFunction<E, Object>... columns) {
+        return findAllFluxPushScheduler(Flux.push(fluxSink -> {
+            mapper.selectListWithHandler(acceptQueryConsumer(consumer).select(columns), ctx -> fluxSink.next(ctx.getResultObject()));
+            fluxSink.complete();
+        }));
+    }
+
+    @SafeVarargs
+    @Override
+    public final Flux<E> findByMapSelectColumn(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer, SFunction<E, Object>... columns) {
+        return findAllFluxPushScheduler(Flux.push(fluxSink -> {
+            mapper.selectListWithHandler(acceptQueryMapConsumer(consumer).select(columns), ctx -> fluxSink.next(ctx.getResultObject()));
+            fluxSink.complete();
+        }));
+    }
+
+    @Override
+    public Flux<E> findOf(SFunction<E, Object> k1, Object v1) {
+        return findByMap(map -> map.put(k1, v1));
+    }
+
+    @Override
+    public Flux<E> findOf(SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2) {
+        return findByMap(map -> map.put(k1, v1).put(k2, v2));
+    }
+
+    @Override
+    public Flux<E> findOf(SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3) {
+        return findByMap(map -> map.put(k1, v1).put(k2, v2).put(k3, v3));
+    }
+
+    @Override
+    public Flux<E> findOf(SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4) {
+        return findByMap(map -> map.put(k1, v1).put(k2, v2).put(k3, v3).put(k4, v4));
+    }
+
+    @Override
+    public Flux<E> findOf(SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4, SFunction<E, Object> k5, Object v5) {
+        return findByMap(map -> map.put(k1, v1).put(k2, v2).put(k3, v3).put(k4, v4).put(k5, v5));
+    }
+
+    @Override
+    public Flux<E> findOf(SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4, SFunction<E, Object> k5, Object v5, SFunction<E, Object> k6, Object v6) {
+        return findByMap(map -> map.put(k1, v1).put(k2, v2).put(k3, v3).put(k4, v4).put(k5, v5).put(k6, v6));
+    }
+
+    @Override
+    public Flux<E> findOf(SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4, SFunction<E, Object> k5, Object v5, SFunction<E, Object> k6, Object v6, SFunction<E, Object> k7, Object v7) {
+        return findByMap(map -> map.put(k1, v1).put(k2, v2).put(k3, v3).put(k4, v4).put(k5, v5).put(k6, v6).put(k7, v7));
+    }
+
+    @Override
+    public Flux<E> findOf(SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4, SFunction<E, Object> k5, Object v5, SFunction<E, Object> k6, Object v6, SFunction<E, Object> k7, Object v7, SFunction<E, Object> k8, Object v8) {
+        return findByMap(map -> map.put(k1, v1).put(k2, v2).put(k3, v3).put(k4, v4).put(k5, v5).put(k6, v6).put(k7, v7).put(k8, v8));
+    }
+
+    @Override
+    public Flux<E> findOf(SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4, SFunction<E, Object> k5, Object v5, SFunction<E, Object> k6, Object v6, SFunction<E, Object> k7, Object v7, SFunction<E, Object> k8, Object v8, SFunction<E, Object> k9, Object v9) {
+        return findByMap(map -> map.put(k1, v1).put(k2, v2).put(k3, v3).put(k4, v4).put(k5, v5).put(k6, v6).put(k7, v7).put(k8, v8).put(k9, v9));
+    }
+
+    @Override
+    public Flux<E> findOf(SFunction<E, Object> k1, Object v1, SFunction<E, Object> k2, Object v2, SFunction<E, Object> k3, Object v3, SFunction<E, Object> k4, Object v4, SFunction<E, Object> k5, Object v5, SFunction<E, Object> k6, Object v6, SFunction<E, Object> k7, Object v7, SFunction<E, Object> k8, Object v8, SFunction<E, Object> k9, Object v9, SFunction<E, Object> k10, Object v10) {
+        return findByMap(map -> map.put(k1, v1).put(k2, v2).put(k3, v3).put(k4, v4).put(k5, v5).put(k6, v6).put(k7, v7).put(k8, v8).put(k9, v9).put(k10, v10));
+    }
+
+    @SafeVarargs
+    @Override
+    public final Mono<PageResult<E>> page(IPage<E> page, SFunction<E, Object>... columns) {
+        return page(page, eqw -> eqw.select(columns));
     }
 
     @Transactional(readOnly = true)

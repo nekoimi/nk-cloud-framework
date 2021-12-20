@@ -10,9 +10,10 @@ public enum CrudErrors implements ErrorDetails {
     RESOURCE_QUERY_FAILED(10601, "resource query found"),
     RESOURCE_SAVING_FAILED(10602, "resource saving failed"),
     RESOURCE_UPDATE_FAILED(10603, "resource update failed"),
-    RESOURCE_REMOVE_FAILED(10604, "resource remove failed")
+    RESOURCE_REMOVE_FAILED(10604, "resource remove failed"),
+    RESOURCE_OPERATION_FAILED(10605, "resource operation failed")
 
-            ;
+    ;
 
     private Integer code;
     private String message;

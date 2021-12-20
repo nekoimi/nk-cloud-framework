@@ -1,5 +1,6 @@
 package com.nekoimi.nk.framework.core.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
@@ -11,6 +12,7 @@ import java.util.List;
 /**
  * nekoimi  2021/8/31 16:06
  */
+@Slf4j
 public class ClazzUtils {
 
     /**
@@ -86,10 +88,14 @@ public class ClazzUtils {
      * @param <T>
      * @return
      */
-    public static <T> T instance(Class<T> clazz, Object...args) {
+    public static <T> T newInstance(Class<T> clazz, Object...args) {
         try {
             return clazz.getDeclaredConstructor().newInstance(args);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            log.error(e.getMessage(), e);
+            if (log.isDebugEnabled()) {
+                e.printStackTrace();
+            }
             return null;
         }
     }

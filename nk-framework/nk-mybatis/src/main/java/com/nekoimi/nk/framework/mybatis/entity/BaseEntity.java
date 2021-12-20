@@ -22,6 +22,7 @@ public class BaseEntity implements Serializable {
     @TableId(type = IdType.ASSIGN_UUID)
     protected String id;
 
+    @OrderBy
     @TableField(fill = FieldFill.INSERT)
     protected LocalDateTime createdAt;
 
