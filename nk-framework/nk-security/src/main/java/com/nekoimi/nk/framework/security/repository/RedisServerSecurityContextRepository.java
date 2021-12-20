@@ -1,4 +1,4 @@
-package com.nekoimi.nk.framework.security.context;
+package com.nekoimi.nk.framework.security.repository;
 
 import com.nekoimi.nk.framework.security.exception.RequestAuthenticationException;
 import com.nekoimi.nk.framework.security.token.SubjectAuthenticationToken;
@@ -10,7 +10,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
-import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -29,7 +28,6 @@ import java.time.Duration;
  * 保存在redis中
  */
 @Slf4j
-@Component
 public class RedisServerSecurityContextRepository implements ServerSecurityContextRepository {
     private final static String SUB_KEY = "auth:sub:";
     private final ReactiveRedisTemplate<String, Object> redisTemplate;

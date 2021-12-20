@@ -21,7 +21,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfiguration {
 
     @Bean
-    @ConditionalOnBean(value = ObjectMapper.class)
     public ReactiveRedisTemplate<String, Object> reactiveRedisOperations(ReactiveRedisConnectionFactory connectionFactory,
                                                                            ObjectMapper objectMapper) {
         Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
@@ -42,44 +41,44 @@ public class RedisConfiguration {
      * 对hash类型的数据操作
      */
     @Bean
-    @ConditionalOnBean(value = ReactiveRedisOperations.class)
-    public ReactiveHashOperations<String, String, Object> reactiveHashOperations(ReactiveRedisOperations<String, Object> redisOperations) {
-        return redisOperations.opsForHash();
+    @ConditionalOnBean(value = ReactiveRedisTemplate.class)
+    public ReactiveHashOperations<String, String, Object> reactiveHashOperations(ReactiveRedisTemplate<String, Object> redisTemplate) {
+        return redisTemplate.opsForHash();
     }
 
     /**
      * 对redis字符串类型数据操作
      */
     @Bean
-    @ConditionalOnBean(value = ReactiveRedisOperations.class)
-    public ReactiveValueOperations<String, Object> reactiveValueOperations(ReactiveRedisOperations<String, Object> redisOperations) {
-        return redisOperations.opsForValue();
+    @ConditionalOnBean(value = ReactiveRedisTemplate.class)
+    public ReactiveValueOperations<String, Object> reactiveValueOperations(ReactiveRedisTemplate<String, Object> redisTemplate) {
+        return redisTemplate.opsForValue();
     }
 
     /**
      * 对链表类型的数据操作
      */
     @Bean
-    @ConditionalOnBean(value = ReactiveRedisOperations.class)
-    public ReactiveListOperations<String, Object> reactiveListOperations(ReactiveRedisOperations<String, Object> redisOperations) {
-        return redisOperations.opsForList();
+    @ConditionalOnBean(value = ReactiveRedisTemplate.class)
+    public ReactiveListOperations<String, Object> reactiveListOperations(ReactiveRedisTemplate<String, Object> redisTemplate) {
+        return redisTemplate.opsForList();
     }
 
     /**
      * 对无序集合类型的数据操作
      */
     @Bean
-    @ConditionalOnBean(value = ReactiveRedisOperations.class)
-    public ReactiveSetOperations<String, Object> reactiveSetOperations(ReactiveRedisOperations<String, Object> redisOperations) {
-        return redisOperations.opsForSet();
+    @ConditionalOnBean(value = ReactiveRedisTemplate.class)
+    public ReactiveSetOperations<String, Object> reactiveSetOperations(ReactiveRedisTemplate<String, Object> redisTemplate) {
+        return redisTemplate.opsForSet();
     }
 
     /**
      * 对有序集合类型的数据操作
      */
     @Bean
-    @ConditionalOnBean(value = ReactiveRedisOperations.class)
-    public ReactiveZSetOperations<String, Object> reactiveZSetOperations(ReactiveRedisOperations<String, Object> redisOperations) {
-        return redisOperations.opsForZSet();
+    @ConditionalOnBean(value = ReactiveRedisTemplate.class)
+    public ReactiveZSetOperations<String, Object> reactiveZSetOperations(ReactiveRedisTemplate<String, Object> redisTemplate) {
+        return redisTemplate.opsForZSet();
     }
 }

@@ -2,10 +2,11 @@ package com.nekoimi.nk.framework.security.config;
 
 import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
 import com.nekoimi.nk.framework.security.filter.RequestParseAuthTypeFilter;
+import com.nekoimi.nk.framework.security.repository.RedisServerSecurityContextRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
@@ -14,12 +15,6 @@ import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.InMemoryReactiveClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
@@ -32,8 +27,6 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 
-import java.util.UUID;
-
 /**
  * nekoimi  2021/12/16 17:50
  */
@@ -41,7 +34,6 @@ import java.util.UUID;
 @Configuration
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
-@ConditionalOnBean(value = ServerSecurityContextRepository.class)
 public class SecurityConfiguration {
     private final SecurityProperties properties;
     private final ServerAccessDeniedHandler accessDeniedHandler;
@@ -49,7 +41,6 @@ public class SecurityConfiguration {
     private final ServerAuthenticationSuccessHandler authenticationSuccessHandler;
     private final ServerAuthenticationFailureHandler authenticationFailureHandler;
     private final ServerLogoutSuccessHandler logoutSuccessHandler;
-    private final ServerSecurityContextRepository securityContextRepository;
     private final ReactiveAuthenticationManager integratedAuthenticationManager;
     private final ServerAuthenticationConverter integratedToAuthenticationTokenConverterManager;
 
@@ -59,7 +50,6 @@ public class SecurityConfiguration {
                                  ServerAuthenticationSuccessHandler authenticationSuccessHandler,
                                  ServerAuthenticationFailureHandler authenticationFailureHandler,
                                  ServerLogoutSuccessHandler logoutSuccessHandler,
-                                 ServerSecurityContextRepository securityContextRepository,
                                  ReactiveAuthenticationManager integratedAuthenticationManager,
                                  ServerAuthenticationConverter integratedToAuthenticationTokenConverterManager) {
         this.properties = properties;
@@ -68,7 +58,6 @@ public class SecurityConfiguration {
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.logoutSuccessHandler = logoutSuccessHandler;
-        this.securityContextRepository = securityContextRepository;
         this.integratedAuthenticationManager = integratedAuthenticationManager;
         this.integratedToAuthenticationTokenConverterManager = integratedToAuthenticationTokenConverterManager;
     }
@@ -79,32 +68,14 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public ReactiveClientRegistrationRepository clientRegistrationRepository() {
-        ClientRegistration loginClient = ClientRegistration.withRegistrationId(UUID.randomUUID().toString())
-                .clientId("login-client")
-                .clientSecret("{noop}openid-connect")
-                .clientAuthenticationMethod(ClientAuthenticationMethod.BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUriTemplate("http://127.0.0.1:8080/login/oauth2/code/login-client")
-                .scope(OidcScopes.OPENID)
-                .scope(OidcScopes.PROFILE)
-                .tokenUri("http://127.0.0.1:8080/login/oauth2/code/login-client")
-                .build();
-        ClientRegistration registeredClient = ClientRegistration.withRegistrationId(UUID.randomUUID().toString())
-                .clientId("messaging-client")
-                .clientSecret("{noop}secret")
-                .clientAuthenticationMethod(ClientAuthenticationMethod.BASIC)
-                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .scope("message:read")
-                .scope("message:write")
-                .tokenUri("http://127.0.0.1:8080/login/oauth2/code/login-client")
-                .build();
-        return new InMemoryReactiveClientRegistrationRepository(loginClient, registeredClient);
+    public ServerSecurityContextRepository securityContextRepository(
+            ReactiveRedisTemplate<String, Object> redisTemplate) {
+        return new RedisServerSecurityContextRepository(redisTemplate);
     }
 
     @Bean
-    public SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http) {
+    public SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http,
+                                                       ServerSecurityContextRepository securityContextRepository) {
         ServerWebExchangeMatcher loginExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, properties.getLoginUrl());
         ServerWebExchangeMatcher logoutExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, properties.getLogoutUrl());
         SecurityWebFilterChain filterChain = http
