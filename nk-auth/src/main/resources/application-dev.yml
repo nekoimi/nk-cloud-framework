@@ -1,8 +1,7 @@
 mybatis-plus:
-#  type-enums-package:
-#  mapper-locations:
+  #  type-enums-package:
+  #  mapper-locations:
   check-config-location: true
-
 
 
 spring:
