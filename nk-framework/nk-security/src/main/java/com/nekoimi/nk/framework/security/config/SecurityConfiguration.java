@@ -2,6 +2,8 @@ package com.nekoimi.nk.framework.security.config;
 
 import com.nekoimi.nk.framework.redis.service.RedisService;
 import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
+import com.nekoimi.nk.framework.security.contract.SecurityAuthorizeExchangeCustomizer;
+import com.nekoimi.nk.framework.security.contract.SecurityConfigCustomizer;
 import com.nekoimi.nk.framework.security.filter.RequestParseAuthTypeFilter;
 import com.nekoimi.nk.framework.security.repository.RedisServerSecurityContextRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,8 @@ import org.springframework.security.web.server.authorization.ServerAccessDeniedH
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
+
+import java.util.List;
 
 /**
  * nekoimi  2021/12/16 17:50
@@ -77,23 +81,21 @@ public class SecurityConfiguration {
     @Bean
     @ConditionalOnBean(value = RedisService.class)
     public SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http,
-                                                       ServerSecurityContextRepository securityContextRepository) {
+                                                       ServerSecurityContextRepository securityContextRepository,
+                                                       List<SecurityConfigCustomizer> configCustomizers,
+                                                       List<SecurityAuthorizeExchangeCustomizer> authorizeExchangeCustomizers) {
         ServerWebExchangeMatcher loginExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, properties.getLoginUrl());
         ServerWebExchangeMatcher logoutExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, properties.getLogoutUrl());
-        SecurityWebFilterChain filterChain = http
-                // 登录认证
-                .formLogin(login -> login.requiresAuthenticationMatcher(loginExchangeMatcher)
-                        .authenticationSuccessHandler(authenticationSuccessHandler)
-                        .authenticationFailureHandler(authenticationFailureHandler)
-                        .authenticationManager(integratedAuthenticationManager)
-                        .securityContextRepository(securityContextRepository))
+        // 登录认证
+        http.formLogin(login -> login.requiresAuthenticationMatcher(loginExchangeMatcher)
+                .authenticationSuccessHandler(authenticationSuccessHandler)
+                .authenticationFailureHandler(authenticationFailureHandler)
+                .authenticationManager(integratedAuthenticationManager)
+                .securityContextRepository(securityContextRepository))
                 // 注销认证
                 .logout(logout -> logout.requiresLogout(logoutExchangeMatcher)
-                        .logoutSuccessHandler(logoutSuccessHandler))
-                // oauth2
-//                .oauth2Login().and()
-//                .oauth2Client().and()
-//                .oauth2ResourceServer(ServerHttpSecurity.OAuth2ResourceServerSpec::jwt)
+                        .logoutSuccessHandler(logoutSuccessHandler)
+                )
                 // 关闭csrf
                 .csrf().disable()
                 // 关闭匿名用户
@@ -107,9 +109,9 @@ public class SecurityConfiguration {
                 // disable cors
                 .cors().disable()
                 // 异常处理
-                .exceptionHandling(handler -> handler
-                        .accessDeniedHandler(accessDeniedHandler)
-                        .authenticationEntryPoint(authenticationExceptionHandler))
+                .exceptionHandling(handler -> handler.accessDeniedHandler(accessDeniedHandler)
+                        .authenticationEntryPoint(authenticationExceptionHandler)
+                )
                 // 配置请求过滤
                 .authorizeExchange(exchange -> {
                     exchange.pathMatchers("/").permitAll()
@@ -117,9 +119,6 @@ public class SecurityConfiguration {
                             .pathMatchers("/webjars/**").permitAll()
                             .pathMatchers("/v2/api-docs").permitAll()
                             .pathMatchers("/swagger-resources").permitAll()
-                            .pathMatchers("/oauth2/**").permitAll()
-                            .pathMatchers("/login/oauth2/**").permitAll()
-                            .pathMatchers("/pub-key/jwk.json").permitAll()
                             .pathMatchers(properties.getLoginUrl()).permitAll()
                             .pathMatchers(properties.getLogoutUrl()).permitAll();
                     SecurityProperties.PathMatcher pathMatcher = properties.getMatcher();
@@ -129,13 +128,13 @@ public class SecurityConfiguration {
                     if (!pathMatcher.getAuthenticated().isEmpty()) {
                         pathMatcher.getAuthenticated().forEach(path -> exchange.pathMatchers(path).authenticated());
                     }
+                    authorizeExchangeCustomizers.forEach(exchangeCustomizer -> exchangeCustomizer.customize(exchange));
                     exchange.anyExchange().authenticated();
                 })
                 // 插入认证类型解析filter
-                .addFilterBefore(new RequestParseAuthTypeFilter(loginExchangeMatcher), SecurityWebFiltersOrder.HTTP_BASIC)
-                // build
-                .build();
-
+                .addFilterBefore(new RequestParseAuthTypeFilter(loginExchangeMatcher), SecurityWebFiltersOrder.HTTP_BASIC);
+        configCustomizers.forEach(configCustomizer -> configCustomizer.customize(http));
+        SecurityWebFilterChain filterChain = http.build();
         // TODO 综合认证Token解析器
         filterChain.getWebFilters()
                 .filter(webFilter -> webFilter instanceof AuthenticationWebFilter)

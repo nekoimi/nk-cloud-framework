@@ -2,10 +2,11 @@ package com.nekoimi.nk.framework.web.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nekoimi.nk.framework.web.filter.RequestLogFilter;
+import com.nekoimi.nk.framework.web.listener.ScanRequestMappingListener;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.web.ResourceProperties;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.WebFluxAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,12 +33,18 @@ import java.time.Duration;
 @AllArgsConstructor
 public class WebFluxConfiguration implements WebFluxConfigurer {
     private final ObjectMapper objectMapper;
-    private final ResourceProperties resourceProperties;
+    private final WebProperties.Resources resourceProperties;
 
     @Bean
     @ConditionalOnProperty(name = "debug", havingValue = "true")
     public WebFilter requestLogFilter() {
         return new RequestLogFilter();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "app.web", name = "scan-request-mapping", havingValue = "true")
+    public ScanRequestMappingListener scanRequestMappingListener() {
+        return new ScanRequestMappingListener();
     }
 
     @Override
@@ -60,7 +67,7 @@ public class WebFluxConfiguration implements WebFluxConfigurer {
 
     private void configureResourceCaching(ResourceHandlerRegistration registration) {
         Duration cachePeriod = this.resourceProperties.getCache().getPeriod();
-        ResourceProperties.Cache.Cachecontrol cacheControl = this.resourceProperties.getCache().getCachecontrol();
+        WebProperties.Resources.Cache.Cachecontrol cacheControl = this.resourceProperties.getCache().getCachecontrol();
         if (cachePeriod != null && cacheControl.getMaxAge() == null) {
             cacheControl.setMaxAge(cachePeriod);
         }

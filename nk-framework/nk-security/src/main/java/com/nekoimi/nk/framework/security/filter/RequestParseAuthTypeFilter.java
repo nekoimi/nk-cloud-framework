@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
  */
 @Slf4j
 public class RequestParseAuthTypeFilter implements WebFilter {
-    private static String authTypeParameter = "auth_type";
+    private static final String authTypeParameter = "auth_type";
     private final ServerWebExchangeMatcher matcher;
 
     public RequestParseAuthTypeFilter(ServerWebExchangeMatcher matcher) {
@@ -41,9 +41,8 @@ public class RequestParseAuthTypeFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        return Mono.just(matcher)
-                .flatMap(m -> m.matches(exchange)
-                        .filter(ServerWebExchangeMatcher.MatchResult::isMatch))
+        return matcher.matches(exchange)
+                .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
                 .switchIfEmpty(chain.filter(exchange).then(Mono.empty()))
                 .flatMap(r -> parse(exchange)
                         .switchIfEmpty(Mono.error(new RequestValidationException("Query params is missing `auth_type` parameter")))
