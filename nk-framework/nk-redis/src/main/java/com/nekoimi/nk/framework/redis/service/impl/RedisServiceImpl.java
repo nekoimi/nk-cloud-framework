@@ -1,10 +1,8 @@
 package com.nekoimi.nk.framework.redis.service.impl;
 
 import com.nekoimi.nk.framework.redis.service.RedisService;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -18,10 +16,12 @@ import java.util.Map;
  * nekoimi  2021/12/21 14:03
  */
 @Slf4j
-@Service
-@AllArgsConstructor
 public class RedisServiceImpl implements RedisService {
     private final ReactiveRedisTemplate<String, Object> template;
+
+    public RedisServiceImpl(ReactiveRedisTemplate<String, Object> template) {
+        this.template = template;
+    }
 
     @Override
     public Mono<Long> delete(String... keys) {

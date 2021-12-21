@@ -1,12 +1,13 @@
 package com.nekoimi.nk.framework.security.config;
 
+import com.nekoimi.nk.framework.redis.service.RedisService;
 import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
 import com.nekoimi.nk.framework.security.filter.RequestParseAuthTypeFilter;
 import com.nekoimi.nk.framework.security.repository.RedisServerSecurityContextRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
@@ -68,12 +69,13 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public ServerSecurityContextRepository securityContextRepository(
-            ReactiveRedisTemplate<String, Object> redisTemplate) {
+    @ConditionalOnBean(value = RedisService.class)
+    public ServerSecurityContextRepository securityContextRepository(RedisService redisTemplate) {
         return new RedisServerSecurityContextRepository(redisTemplate);
     }
 
     @Bean
+    @ConditionalOnBean(value = RedisService.class)
     public SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http,
                                                        ServerSecurityContextRepository securityContextRepository) {
         ServerWebExchangeMatcher loginExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, properties.getLoginUrl());
