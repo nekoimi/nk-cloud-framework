@@ -2,8 +2,6 @@ package com.nekoimi.nk.gateway.controller;
 
 import com.nekoimi.nk.framework.core.protocol.JsonResp;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,14 +14,9 @@ import java.util.Date;
  */
 @RestController
 public class HomeController {
-    @Autowired
-    private PasswordEncoder encoder;
 
     @RequestMapping("/home")
     public JsonResp hello() {
-        String encode = encoder.encode("ky123456");
-        System.out.println(encode);
-
         User user = new User();
         user.setUsername("");
         user.setDate(new Date());

@@ -3,11 +3,9 @@ package com.nekoimi.nk.gateway;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.cors.reactive.CorsWebFilter;
-import org.springframework.web.filter.CorsFilter;
 
 /**
- * nekoimi  2021/12/7 10:44
+ * nekoimi  2021/12/21 9:45
  */
 @SpringBootApplication
 @ComponentScan("com.nekoimi.nk")
