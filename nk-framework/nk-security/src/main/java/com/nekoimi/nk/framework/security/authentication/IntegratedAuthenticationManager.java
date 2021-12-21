@@ -39,7 +39,9 @@ public class IntegratedAuthenticationManager implements ReactiveAuthenticationMa
                 .roles("USER")
                 .build();
         supportManagers.add(new AuthenticationManagerAdapter(
-                UsernamePasswordAuthenticationToken.class, new UserDetailsRepositoryReactiveAuthenticationManager(new MapReactiveUserDetailsService(user))));
+                UsernamePasswordAuthenticationToken.class,
+                new UserDetailsRepositoryReactiveAuthenticationManager(new MapReactiveUserDetailsService(user))
+        ));
     }
 
     @Override
