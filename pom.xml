@@ -15,6 +15,8 @@
         <module>nk-devtools</module>
         <module>nk-auth</module>
         <module>nk-platform</module>
+        <module>nk-test</module>
+        <module>nk-gateway</module>
     </modules>
     <version>1.0</version>
 

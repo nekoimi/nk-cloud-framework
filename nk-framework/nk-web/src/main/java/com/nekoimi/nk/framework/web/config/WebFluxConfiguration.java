@@ -3,8 +3,10 @@ package com.nekoimi.nk.framework.web.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.boot.autoconfigure.web.reactive.WebFluxAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
@@ -14,6 +16,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.ResourceHandlerRegistration;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
+import org.springframework.web.server.WebFilter;
 
 import java.time.Duration;
 
@@ -29,6 +32,12 @@ import java.time.Duration;
 public class WebFluxConfiguration implements WebFluxConfigurer {
     private final ObjectMapper objectMapper;
     private final ResourceProperties resourceProperties;
+
+//    @Bean
+//    @ConditionalOnProperty(name = "debug", havingValue = "true")
+//    public WebFilter requestLogFilter() {
+//
+//    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

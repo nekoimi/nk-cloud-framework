@@ -1,17 +1,17 @@
-package com.nekoimi.nk.gateway;
+package com.nekoimi.nk.test;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
- * nekoimi  2021/12/21 9:45
+ * nekoimi  2021/12/21 12:00
  */
 @SpringBootApplication
 @ComponentScan("com.nekoimi.nk")
-public class GatewayApplication {
+public class TestApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GatewayApplication.class, args);
+        SpringApplication.run(TestApplication.class, args);
     }
 }
