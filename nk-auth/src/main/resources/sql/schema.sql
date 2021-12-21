@@ -10,7 +10,11 @@ create table if not exists ua_user (
     `email` varchar(255) null default null comment '邮箱',
     `tenant_id` varchar(255) null default null comment '租户ID',
     `enable` tinyint(1) null default 1 comment '是否启用；1 - enable，0 - disable'
-) ENGINE=InnoDB character set utf8mb4 collate utf8mb4_unicode_ci;
+) ENGINE=InnoDB
+    character set utf8mb4
+    collate utf8mb4_unicode_ci
+    comment '用户信息表'
+;
 
 -- private Long id;
 -- private String username;
