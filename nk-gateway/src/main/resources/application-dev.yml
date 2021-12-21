@@ -1,0 +1,23 @@
+mybatis-plus:
+#  type-enums-package:
+#  mapper-locations:
+  check-config-location: true
+
+app:
+  id-gen:
+    worker-id: 0
+    data-center-id: 0
+  cors:
+    path-pattern: /**
+    allowed-origins:
+      - "*"
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+    allowed-headers:
+      - Authorization
+    exposed-headers:
+    allow-credentials: true
+    max-age: 3600

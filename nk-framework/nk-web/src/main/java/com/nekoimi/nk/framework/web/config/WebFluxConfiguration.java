@@ -1,6 +1,7 @@
 package com.nekoimi.nk.framework.web.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nekoimi.nk.framework.web.filter.RequestLogFilter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -33,11 +34,11 @@ public class WebFluxConfiguration implements WebFluxConfigurer {
     private final ObjectMapper objectMapper;
     private final ResourceProperties resourceProperties;
 
-//    @Bean
-//    @ConditionalOnProperty(name = "debug", havingValue = "true")
-//    public WebFilter requestLogFilter() {
-//
-//    }
+    @Bean
+    @ConditionalOnProperty(name = "debug", havingValue = "true")
+    public WebFilter requestLogFilter() {
+        return new RequestLogFilter();
+    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

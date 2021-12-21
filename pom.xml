@@ -10,7 +10,6 @@
     <description>nk-cloud-framework-dependencies</description>
     <modules>
         <module>nk-framework</module>
-        <module>nk-gateway</module>
         <module>nk-services</module>
         <module>nk-devtools</module>
         <module>nk-auth</module>
@@ -47,7 +46,7 @@
             </activation>
             <properties>
                 <!--具体环境变量配置-->
-                <debug>false</debug>
+                <debug>true</debug>
                 <profile.name>dev</profile.name>
                 <!--数据库环境配置-->
                 <db.driver-class-name>com.p6spy.engine.spy.P6SpyDriver</db.driver-class-name>
