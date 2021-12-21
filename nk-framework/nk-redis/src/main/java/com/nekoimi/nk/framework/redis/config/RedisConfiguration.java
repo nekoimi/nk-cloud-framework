@@ -10,7 +10,7 @@ import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 
 /**
  * nekoimi  2021/12/19 19:54
@@ -28,9 +28,9 @@ public class RedisConfiguration {
         RedisSerializationContext.RedisSerializationContextBuilder<String, Object>
                 builder = RedisSerializationContext.newSerializationContext();
         RedisSerializationContext<String, Object> context = builder
-                .string(new StringRedisSerializer())
-                .key(new StringRedisSerializer())
-                .hashKey(new StringRedisSerializer())
+                .string(RedisSerializer.string())
+                .key(RedisSerializer.string())
+                .hashKey(RedisSerializer.string())
                 .value(serializer)
                 .hashValue(serializer)
                 .build();
