@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.config.*;
 import com.baomidou.mybatisplus.generator.config.converts.MySqlTypeConvert;
+import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
@@ -13,6 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +51,6 @@ public class GenerateService {
         initPackageConfig();
         initPackageConfig();
         initTemplateConfig(true);
-        initFileOutConfigList();
         initInjectionConfig();
     }
 
@@ -59,19 +61,23 @@ public class GenerateService {
         if (isOnlyGenEntity) {
             initTemplateConfig(false);
         }
-
+        String outputDir = StringUtils.removeEnd(req.getLocation(), "/") + "/src/main/java";
+        String packageName = req.getPackageName();
         // 全局配置
-        globalConfig.setOutputDir(StringUtils.removeEnd(req.getLocation(), "/") + "/src/main/java");
+        globalConfig.setOutputDir(outputDir);
         globalConfig.setAuthor(req.getAuthor());
         // 此处可以修改为您的表前缀
         strategyConfig.setTablePrefix(req.getTablePrefix());
         strategyConfig.setFieldPrefix(req.getFieldPrefix());
         strategyConfig.setInclude(req.getTableName());
         // 包配置
-        packageConfig.setParent(req.getPackageName());
+        packageConfig.setParent(packageName);
         packageConfig.setModuleName(req.getModuleName());
         // 自定义配置
         customMap.put("route", req.getRouter());
+        customMap.put("feign", req.getFeign());
+        // 添加自定义模板
+        initCustomFileOutConfig(outputDir);
         injectionConfig.setMap(customMap);
         injectionConfig.setEntityName(req.getEntityName());
         injectionConfig.setFileOutConfigList(fileOutConfigList);
@@ -215,16 +221,41 @@ public class GenerateService {
         }
     }
 
-    protected void initFileOutConfigList() {
-        String jsPath = "templates/api.js.vm";
-//        String vuePath = "templates/index.vue.vm";
-//        // 自定义配置会被优先输出
-//        fileOutConfigList.add(new FileOutConfig(jsPath) {
+    protected void initCustomFileOutConfig(String outputDir) {
+        customMap.put("feignClientPackage", packageConfig.getParent() + ".client");
+        String feignClientVmPath = "templates/feignclient.java.vm";
+//        fileOutConfigList.add(new FileOutConfig(feignClientVmPath) {
 //            @Override
 //            public String outputFile(TableInfo tableInfo) {
-//                // 自定义输出文件名 ， 如果你 Entity 设置了前后缀、此处注意 xml 的名称会跟着发生变化！！
-//                String path = gc.getOutputDir() + File.separator + pc.getParent().replace(".", File.separator) + File.separator + "js" + File.separator + tableInfo.getEntityName() + ".js";
-//                return path;
+//                customMap.put("feignClient", tableInfo.getEntityName() + "Client");
+//                customMap.put("feignClientFallback", tableInfo.getEntityName() + "ClientFallback");
+//                return Paths.get(outputDir, packageConfig.getParent().replace(".", File.separator),
+//                        "client", tableInfo.getEntityName() + "Client.java")
+//                        .toAbsolutePath()
+//                        .toString();
+//            }
+//        });
+
+        String feignClientFallbackVmPath = "templates/feignclient.fallback.java.vm";
+//        fileOutConfigList.add(new FileOutConfig(feignClientFallbackVmPath) {
+//            @Override
+//            public String outputFile(TableInfo tableInfo) {
+//                return Paths.get(outputDir, packageConfig.getParent().replace(".", File.separator),
+//                        "client", tableInfo.getEntityName() + "ClientFallback.java")
+//                        .toAbsolutePath()
+//                        .toString();
+//            }
+//        });
+
+        String originalControllerVmPath = "templates/controller.original.java.vm";
+//        fileOutConfigList.add(new FileOutConfig(originalControllerVmPath) {
+//            @Override
+//            public String outputFile(TableInfo tableInfo) {
+//                customMap.put("originalControllerName", tableInfo.getEntityName() + "OriginalController");
+//                return Paths.get(outputDir, packageConfig.getParent().replace(".", File.separator),
+//                        "controller", tableInfo.getEntityName() + "OriginalController.java")
+//                        .toAbsolutePath()
+//                        .toString();
 //            }
 //        });
     }

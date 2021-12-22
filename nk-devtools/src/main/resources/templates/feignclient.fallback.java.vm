@@ -1,0 +1,11 @@
+package ${cfg.feignClientPackage};
+
+/**
+ * ${entity} Feign Client Fallback
+ * <p>
+ * ${author}  ${date}
+ * <p>
+ * This code is generated using nk-devtools.
+ */
+public class ${cfg.feignClientFallback} implements ${cfg.feignClient} {
+}

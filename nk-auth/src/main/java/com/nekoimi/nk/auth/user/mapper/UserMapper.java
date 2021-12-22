@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 /**
  * User Mapper
  *
- * nekoimi  2021-12-20
+ * nekoimi  2021-12-22
  *
  * This code is generated using nk-devtools.
  */

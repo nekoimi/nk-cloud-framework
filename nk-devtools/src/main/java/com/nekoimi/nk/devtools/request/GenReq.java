@@ -21,6 +21,7 @@ public class GenReq {
     private Boolean onlyGenEntity;
 
     private Router router;
+    private Feign feign;
 
     @Getter
     @Setter
@@ -30,5 +31,11 @@ public class GenReq {
         private String prefix;
         private String name;
         private String version;
+    }
+
+    @Getter
+    @Setter
+    public static class Feign {
+        private String service;
     }
 }

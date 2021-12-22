@@ -64,6 +64,7 @@
     <logger name="io.netty" level="info"/>
     <logger name="io.lettuce" level="info"/>
     <logger name="springfox.documentation" level="info"/>
+    <logger name="org.springframework.boot.autoconfigure.logging" level="info"/>
 
     <!--开发环境:打印控制台-->
     <springProfile name="dev">

@@ -1,0 +1,114 @@
+package ${cfg.feignClientPackage};
+
+#if(${cfg.route.prefix} != "")
+    #set($routePrefix = ${cfg.route.prefix})
+#else
+    #set($routePrefix = "")
+#end
+
+#if(${cfg.route.version} != "")
+    #set($routeVersion = ${cfg.route.version})
+#else
+    #set($routeVersion = "")
+#end
+
+#if(${cfg.route.name} != "")
+    #set($routePathName = ${cfg.route.name})
+#else
+    #set($routePathName = ${table.entityPath})
+#end
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+/**
+ * ${entity} Feign Client
+ * <p>
+ * ${author}  ${date}
+ * <p>
+ * This code is generated using nk-devtools.
+ */
+@FeignClient(name = "${cfg.feign.service}", fallback = ${cfg.feignClient}Fallback.class)
+public interface ${cfg.feignClient} {
+
+    /**
+     * 根据id获取${cfg.route.info}数据
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}")
+    public ${entity} get(@PathVariable("id") String id);
+
+    /**
+     * 添加${cfg.route.info}数据
+     *
+     * @return
+     */
+    @PostMapping("${routePrefix}/${routeVersion}/${routePathName}")
+    public ${entity} save(${entity} body);
+
+    /**
+     * 根据id更新${cfg.route.info}所有字段
+     *
+     * @param body
+     * @return
+     */
+    @PutMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}/full")
+    public Boolean updateFull(@PathVariable("id") String id, ${entity} body);
+
+    /**
+     * 根据id更新${cfg.route.info}部分字段
+     *
+     * @param body
+
+    #foreach($field in ${table.fields})
+        #if(!${field.keyFlag})
+
+    ${field.propertyName}   ${field.comment}
+
+        #end
+    #end
+
+     * @return
+     */
+    @PutMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}")
+    public Boolean updateFull(@PathVariable("id") String id, Map<String, Object> body);
+
+    /**
+     * 批量更新${cfg.route.info}数据
+     *
+     * @param body
+
+    #foreach($field in ${table.fields})
+        #if(!${field.keyFlag})
+
+    ${field.propertyName}   ${field.comment}
+
+        #end
+    #end
+
+     * @return
+     */
+    @PutMapping("${routePrefix}/${routeVersion}/${routePathName}/batch")
+    public void updateBatch(@RequestParam("ids") String ids, Map<String, Object> body);
+
+    /**
+     * 根据id删除${cfg.route.info}数据
+     *
+     * @param id
+     * @return
+     */
+    @DeleteMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}")
+    public void remove(@PathVariable("id") String id);
+
+    /**
+     * 批量删除${cfg.route.info}数据
+     *
+     * @return
+     */
+    @DeleteMapping("${routePrefix}/${routeVersion}/${routePathName}/batch")
+    public void removeBatch(@RequestParam(value = "ids") String ids);
+}

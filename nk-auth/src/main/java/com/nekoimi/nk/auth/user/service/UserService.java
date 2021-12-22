@@ -6,7 +6,7 @@ import com.nekoimi.nk.auth.user.entity.User;
 /**
  * User Service
  *
- * nekoimi  2021-12-20
+ * nekoimi  2021-12-22
  *
  * This code is generated using nk-devtools.
  */

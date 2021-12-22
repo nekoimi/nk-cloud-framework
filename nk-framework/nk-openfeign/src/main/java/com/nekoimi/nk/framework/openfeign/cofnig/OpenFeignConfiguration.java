@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
 /**
  * nekoimi  2021/12/16 9:58
  */
-@Configuration
 @FeignClient
+@Configuration
 @EnableFeignClients
 public class OpenFeignConfiguration {
 

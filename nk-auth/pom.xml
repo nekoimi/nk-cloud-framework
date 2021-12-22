@@ -32,6 +32,10 @@
             <groupId>com.nekoimi.nk</groupId>
             <artifactId>nk-redis</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.nekoimi.nk</groupId>
+            <artifactId>nk-openfeign</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

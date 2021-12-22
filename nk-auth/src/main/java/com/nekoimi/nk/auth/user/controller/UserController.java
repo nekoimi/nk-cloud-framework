@@ -5,9 +5,12 @@ import com.nekoimi.nk.framework.core.protocol.JsonResp;
 import com.nekoimi.nk.auth.user.entity.User;
 import com.nekoimi.nk.auth.user.service.UserService;
 import com.nekoimi.nk.framework.mybatis.page.PageReq;
-import io.swagger.annotations.*;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import com.nekoimi.nk.framework.mybatis.page.PageResult;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Api;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -18,7 +21,7 @@ import java.util.Map;
 /**
  * User Controller
  * <p>
- * nekoimi  2021-12-20
+ * nekoimi  2021-12-22
  * <p>
  * This code is generated using nk-devtools.
  */
@@ -39,12 +42,11 @@ public class UserController {
     @GetMapping("ua/v1/user/list")
     @ApiOperation(value = "获取用户信息分页列表", response = PageResult.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "p", value = "分页页码", required = false, defaultValue = "1", paramType = "query", dataType = "Integer", dataTypeClass = Integer.class),
-            @ApiImplicitParam(name = "ps", value = "每页显示条数", required = false, defaultValue = "10", paramType = "query", dataType = "Integer", dataTypeClass = Integer.class),
-            @ApiImplicitParam(name = "st", value = "排序字段", required = false, defaultValue = "", paramType = "query", dataType = "String", dataTypeClass = String.class,
+            @ApiImplicitParam(name = "p", value = "分页页码", required = false, defaultValue = "1", paramType = "query", dataType = "Integer"),
+            @ApiImplicitParam(name = "ps", value = "每页显示条数", required = false, defaultValue = "10", paramType = "query", dataType = "Integer"),
+            @ApiImplicitParam(name = "st", value = "排序字段", required = false, defaultValue = "", paramType = "query", dataType = "String",
                     allowableValues = ",id,created_at,updated_at,deleted_at,username,password,mobile,email,tenant_id,enable,"),
-            @ApiImplicitParam(name = "od", value = "排序规则", required = false, defaultValue = "", paramType = "query", dataType = "String", dataTypeClass = String.class,
-                    allowableValues = "asc,desc")
+            @ApiImplicitParam(name = "od", value = "排序规则", required = false, defaultValue = "", paramType = "query", dataType = "String", allowableValues = "asc,desc")
     })
     public Mono<JsonResp> list(@ApiIgnore ServerHttpRequest request) {
         return service.page(PageReq.buildFromRequest(request)).map(JsonResp::ok);
@@ -94,12 +96,12 @@ public class UserController {
     @PutMapping("ua/v1/user/{id}")
     @ApiOperation(value = "根据id更新用户信息部分字段", response = JsonResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "username", value = "用户名", required = false, paramType = "body", dataType = "String", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "password", value = "密码", required = false, paramType = "body", dataType = "String", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "mobile", value = "手机号", required = false, paramType = "body", dataType = "String", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "email", value = "邮箱", required = false, paramType = "body", dataType = "String", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "tenantId", value = "租户ID", required = false, paramType = "body", dataType = "String", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "enable", value = "是否启用；1 - enable，0 - disable", required = false, paramType = "body", dataType = "Boolean", dataTypeClass = Boolean.class)
+            @ApiImplicitParam(name = "username", value = "用户名", required = false, paramType = "body", dataType = "String"),
+            @ApiImplicitParam(name = "password", value = "密码", required = false, paramType = "body", dataType = "String"),
+            @ApiImplicitParam(name = "mobile", value = "手机号", required = false, paramType = "body", dataType = "String"),
+            @ApiImplicitParam(name = "email", value = "邮箱", required = false, paramType = "body", dataType = "String"),
+            @ApiImplicitParam(name = "tenantId", value = "租户ID", required = false, paramType = "body", dataType = "String"),
+            @ApiImplicitParam(name = "enable", value = "是否启用；1 - enable，0 - disable", required = false, paramType = "body", dataType = "Boolean")
     })
     public Mono<JsonResp> updateFull(@PathVariable("id") String id, @ApiIgnore @RequestBody Map<String, Object> body) {
         return service.updateById(id, body).map(JsonResp::ok);
@@ -114,13 +116,13 @@ public class UserController {
     @PutMapping("ua/v1/user/batch")
     @ApiOperation(value = "批量更新用户信息数据", response = JsonResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "ids", value = "id的列表，使用,分割", required = true, example = "1,2,3", paramType = "query", dataType = "String", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "username", value = "用户名", required = false, paramType = "body", dataType = "String", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "password", value = "密码", required = false, paramType = "body", dataType = "String", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "mobile", value = "手机号", required = false, paramType = "body", dataType = "String", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "email", value = "邮箱", required = false, paramType = "body", dataType = "String", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "tenantId", value = "租户ID", required = false, paramType = "body", dataType = "String", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "enable", value = "是否启用；1 - enable，0 - disable", required = false, paramType = "body", dataType = "Boolean", dataTypeClass = Boolean.class)
+            @ApiImplicitParam(name = "ids", value = "id的列表，使用,分割", required = true, example = "1,2,3", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "username", value = "用户名", required = false, paramType = "body", dataType = "String"),
+            @ApiImplicitParam(name = "password", value = "密码", required = false, paramType = "body", dataType = "String"),
+            @ApiImplicitParam(name = "mobile", value = "手机号", required = false, paramType = "body", dataType = "String"),
+            @ApiImplicitParam(name = "email", value = "邮箱", required = false, paramType = "body", dataType = "String"),
+            @ApiImplicitParam(name = "tenantId", value = "租户ID", required = false, paramType = "body", dataType = "String"),
+            @ApiImplicitParam(name = "enable", value = "是否启用；1 - enable，0 - disable", required = false, paramType = "body", dataType = "Boolean")
     })
     public Mono<JsonResp> updateBatch(@RequestParam("ids") String ids, @ApiIgnore @RequestBody Map<String, Object> body) {
         return service.updateBatch(ids, body).map(JsonResp::ok);
@@ -146,7 +148,7 @@ public class UserController {
     @DeleteMapping("ua/v1/user/batch")
     @ApiOperation(value = "批量删除用户信息数据", response = JsonResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "ids", value = "id的列表，使用,分割", required = true, example = "1,2,3", paramType = "query", dataType = "String", dataTypeClass = String.class)
+            @ApiImplicitParam(name = "ids", value = "id的列表，使用,分割", required = true, example = "1,2,3", paramType = "query", dataType = "String")
     })
     public Mono<JsonResp> removeBatch(@RequestParam(value = "ids") String ids) {
         return service.removeBatch(ids).map(JsonResp::ok);
