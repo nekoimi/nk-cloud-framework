@@ -4,6 +4,13 @@ import com.nekoimi.nk.framework.cache.contract.CacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.reactive.result.method.RequestMappingInfo;
+import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
+
+import java.util.Map;
 
 /**
  * nekoimi  2021/12/21 21:09
@@ -19,7 +26,12 @@ public class ScanRequestMappingListener implements ApplicationListener<Applicati
     }
 
     @Override
-    public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
+    public void onApplicationEvent(ApplicationReadyEvent event) {
         log.debug("------- request mapping scan -------");
+//        ConfigurableApplicationContext context = event.getApplicationContext();
+//        ConfigurableEnvironment environment = context.getEnvironment();
+//        String microService = environment.getProperty("spring.application.name", "application");
+//        RequestMappingHandlerMapping handlerMapping = context.getBean(RequestMappingHandlerMapping.class);
+//        Map<RequestMappingInfo, HandlerMethod> handlerMethods = handlerMapping.getHandlerMethods();
     }
 }
