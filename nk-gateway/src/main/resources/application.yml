@@ -13,31 +13,13 @@ server:
     whitelabel:
       enabled: false
 spring:
+  application:
+    name: ${artifactId}
   profiles:
     active: ${profile.name}
   main:
     banner-mode: off
     web-application-type: reactive
-  application:
-    name: ${artifactId}
-  datasource:
-    initialization-mode: always
-    continue-on-error: false
-    platform: mysql
-    driver-class-name: ${db.driver-class-name}
-    type: com.zaxxer.hikari.HikariDataSource
-    url: ${db.url}
-    username: ${db.username}
-    password: ${db.password}
-    hikari:
-      pool-name: ${spring.application.name}-hikari-cp-pool
-      auto-commit: true
-      minimum-idle: 5
-      maximum-pool-size: 10
-      max-lifetime: 1800000
-      idle-timeout: 30000
-      connection-timeout: 30000
-      connection-test-query: SELECT 1
   redis:
     host: ${db.redis.host}
     port: ${db.redis.port}
@@ -50,17 +32,6 @@ spring:
         max-wait: -1   # 最大阻塞等待时间
         max-idle: 8    # 最大空闲时间
         min-idle: 0    # 最小空闲时间
-
-mybatis-plus:
-  check-config-location: true
-  global-config:
-    banner: false
-    enable-sql-runner: true
-    db-config:
-      logic-delete-value: CURRENT_TIMESTAMP()
-      logic-not-delete-value: NULL
-  configuration:
-    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
 
 app:
   id-gen:

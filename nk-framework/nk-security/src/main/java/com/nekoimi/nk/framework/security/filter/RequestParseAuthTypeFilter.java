@@ -1,6 +1,6 @@
 package com.nekoimi.nk.framework.security.filter;
 
-import com.nekoimi.nk.framework.core.constant.SystemConstants;
+import com.nekoimi.nk.framework.core.constant.CustomHeaderConstants;
 import com.nekoimi.nk.framework.core.exception.http.RequestValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +35,7 @@ public class RequestParseAuthTypeFilter implements WebFilter {
         }
         log.debug("parse auth type: {}", authType);
         // 设置认证类型header
-        exchange.getRequest().mutate().header(SystemConstants.AUTH_TYPE_REQUEST_HEADER, authType);
+        exchange.getRequest().mutate().header(CustomHeaderConstants.AUTH_TYPE_REQUEST_HEADER, authType);
         return Mono.just(authType);
     }
 

@@ -1,6 +1,6 @@
 package com.nekoimi.nk.framework.security.repository;
 
-import com.nekoimi.nk.framework.redis.service.RedisService;
+import com.nekoimi.nk.framework.cache.contract.CacheService;
 import com.nekoimi.nk.framework.security.exception.RequestAuthenticationException;
 import com.nekoimi.nk.framework.security.token.SubjectAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
@@ -28,17 +28,17 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class RedisServerSecurityContextRepository implements ServerSecurityContextRepository {
     private final static String SUB_KEY = "auth:sub:";
-    private final RedisService redisService;
+    private final CacheService cacheService;
 
-    public RedisServerSecurityContextRepository(RedisService redisService) {
-        this.redisService = redisService;
+    public RedisServerSecurityContextRepository(CacheService cacheService) {
+        this.cacheService = cacheService;
     }
 
     @Override
     public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {
         return Mono.just(context.getAuthentication())
                 .cast(SubjectAuthenticationToken.class)
-                .flatMap(subjectToken -> redisService
+                .flatMap(subjectToken -> cacheService
                         .set(SUB_KEY + subjectToken.getSub(), subjectToken.getDetails(), 10))
                 .then(Mono.empty());
     }
@@ -52,7 +52,7 @@ public class RedisServerSecurityContextRepository implements ServerSecurityConte
                 .flatMap(token -> {
                     // TODO 解析Token，获取sub
                     return Mono.just("sub");
-                }).flatMap(sub -> redisService.get(SUB_KEY + sub))
+                }).flatMap(sub -> cacheService.get(SUB_KEY + sub))
                 .switchIfEmpty(Mono.error(new RequestAuthenticationException("Authorization expired")))
                 .cast(UserDetails.class)
                 .flatMap(userDetails -> {

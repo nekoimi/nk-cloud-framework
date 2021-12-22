@@ -1,5 +1,6 @@
 package com.nekoimi.nk.framework.web.listener;
 
+import com.nekoimi.nk.framework.cache.contract.CacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -11,6 +12,11 @@ import org.springframework.context.ApplicationListener;
  */
 @Slf4j
 public class ScanRequestMappingListener implements ApplicationListener<ApplicationReadyEvent> {
+    private final CacheService cacheService;
+
+    public ScanRequestMappingListener(CacheService cacheService) {
+        this.cacheService = cacheService;
+    }
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {

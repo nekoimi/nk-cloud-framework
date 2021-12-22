@@ -1,4 +1,4 @@
-package com.nekoimi.nk.framework.redis.service;
+package com.nekoimi.nk.framework.core.contract;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * nekoimi  2021/12/21 14:03
  */
-public interface RedisService {
+public interface CacheService {
     /**
      * 删除缓存
      *

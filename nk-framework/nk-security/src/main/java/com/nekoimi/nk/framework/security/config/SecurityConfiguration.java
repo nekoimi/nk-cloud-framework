@@ -1,6 +1,6 @@
 package com.nekoimi.nk.framework.security.config;
 
-import com.nekoimi.nk.framework.redis.service.RedisService;
+import com.nekoimi.nk.framework.cache.contract.CacheService;
 import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
 import com.nekoimi.nk.framework.security.contract.SecurityAuthorizeExchangeCustomizer;
 import com.nekoimi.nk.framework.security.contract.SecurityConfigCustomizer;
@@ -8,6 +8,7 @@ import com.nekoimi.nk.framework.security.filter.RequestParseAuthTypeFilter;
 import com.nekoimi.nk.framework.security.repository.RedisServerSecurityContextRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -73,13 +74,13 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean(value = RedisService.class)
-    public ServerSecurityContextRepository securityContextRepository(RedisService redisTemplate) {
-        return new RedisServerSecurityContextRepository(redisTemplate);
+    @ConditionalOnBean(value = CacheService.class, search = SearchStrategy.CURRENT)
+    public ServerSecurityContextRepository securityContextRepository(CacheService cacheService) {
+        return new RedisServerSecurityContextRepository(cacheService);
     }
 
     @Bean
-    @ConditionalOnBean(value = RedisService.class)
+    @ConditionalOnBean(value = CacheService.class, search = SearchStrategy.CURRENT)
     public SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http,
                                                        ServerSecurityContextRepository securityContextRepository,
                                                        List<SecurityConfigCustomizer> configCustomizers,

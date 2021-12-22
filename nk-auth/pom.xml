@@ -26,6 +26,10 @@
         </dependency>
         <dependency>
             <groupId>com.nekoimi.nk</groupId>
+            <artifactId>nk-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nekoimi.nk</groupId>
             <artifactId>nk-redis</artifactId>
         </dependency>
     </dependencies>

@@ -13,5 +13,6 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "app.web")
 public class WebProperties {
+    // 是否扫描全部接口
     private Boolean scanRequestMapping;
 }

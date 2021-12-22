@@ -13,23 +13,28 @@ server:
     whitelabel:
       enabled: false
 spring:
+  application:
+    name: ${artifactId}
   profiles:
     active: ${profile.name}
   main:
     banner-mode: off
     web-application-type: reactive
-  application:
-    name: ${artifactId}
+  sql:
+    init:
+      platform: mysql
+      mode: always
+      continue-on-error: false
+      separator: ;
+      encoding: UTF-8
+      schema-locations: classpath:sql/*.sql
+      # data-locations:
   datasource:
-    initialization-mode: always
-    continue-on-error: false
-    platform: mysql
     driver-class-name: ${db.driver-class-name}
     type: com.zaxxer.hikari.HikariDataSource
     url: ${db.url}
     username: ${db.username}
     password: ${db.password}
-    schema: classpath:sql/*.sql
     hikari:
       pool-name: ${spring.application.name}-hikari-cp-pool
       auto-commit: true

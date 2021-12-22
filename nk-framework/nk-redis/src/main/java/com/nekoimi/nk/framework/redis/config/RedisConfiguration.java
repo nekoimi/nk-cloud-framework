@@ -1,10 +1,6 @@
 package com.nekoimi.nk.framework.redis.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nekoimi.nk.framework.redis.service.RedisLockService;
-import com.nekoimi.nk.framework.redis.service.RedisService;
-import com.nekoimi.nk.framework.redis.service.impl.RedisLockServiceImpl;
-import com.nekoimi.nk.framework.redis.service.impl.RedisServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.cache.annotation.EnableCaching;
@@ -23,16 +19,6 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 @Configuration
 @EnableCaching
 public class RedisConfiguration {
-
-    @Bean
-    public RedisService redisService(ReactiveRedisTemplate<String, Object> redisTemplate) {
-        return new RedisServiceImpl(redisTemplate);
-    }
-
-    @Bean
-    public RedisLockService redisLockService(ReactiveRedisTemplate<String, Object> redisTemplate) {
-        return new RedisLockServiceImpl(redisTemplate);
-    }
 
     @Bean
     public ReactiveRedisTemplate<String, Object> reactiveRedisOperations(ReactiveRedisConnectionFactory connectionFactory,

@@ -34,6 +34,8 @@ app:
     exposed-headers:
     allow-credentials: true
     max-age: 3600
+  web:
+    scan-request-mapping: true
   security:
     login-url: /auth/login
     logout-url: /auth/logout

@@ -1,6 +1,6 @@
 package com.nekoimi.nk.framework.security.converter;
 
-import com.nekoimi.nk.framework.core.constant.SystemConstants;
+import com.nekoimi.nk.framework.core.constant.CustomHeaderConstants;
 import com.nekoimi.nk.framework.core.exception.http.RequestValidationException;
 import com.nekoimi.nk.framework.security.constant.AuthType;
 import com.nekoimi.nk.framework.security.contract.RequestToAuthenticationTokenConverter;
@@ -46,8 +46,8 @@ public class IntegratedToAuthenticationTokenConverterManager implements ServerAu
     public Mono<Authentication> convert(ServerWebExchange exchange) {
         log.debug("------------- request convert to token -------------");
         return Mono.just(exchange.getRequest().getHeaders())
-                .flatMap(headers -> Mono.justOrEmpty(headers.getFirst(SystemConstants.AUTH_TYPE_REQUEST_HEADER)))
-                .switchIfEmpty(Mono.error(new RequestValidationException("Headers is missing `%s` parameter", SystemConstants.AUTH_TYPE_REQUEST_HEADER)))
+                .flatMap(headers -> Mono.justOrEmpty(headers.getFirst(CustomHeaderConstants.AUTH_TYPE_REQUEST_HEADER)))
+                .switchIfEmpty(Mono.error(new RequestValidationException("Headers is missing `%s` parameter", CustomHeaderConstants.AUTH_TYPE_REQUEST_HEADER)))
                 .map(Integer::parseInt)
                 .flatMap(AuthType::valueOf)
                 .switchIfEmpty(Mono.error(new RequestValidationException("Illegal authentication type")))
