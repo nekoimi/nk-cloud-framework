@@ -1,6 +1,8 @@
 package com.nekoimi.nk.framework.core.protocol;
 
 import com.nekoimi.nk.framework.core.utils.JsonUtils;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,12 +18,17 @@ import java.util.Map;
 @Slf4j
 @Getter
 @Setter
+@ApiModel(description = "响应结构")
 @AllArgsConstructor(staticName = "build")
 public class JsonResp implements Serializable {
     private final static String MESSAGE_OK = "ok";
     private final static Map<String, String> EMPTY_DATA = new HashMap<>();
+
+    @ApiModelProperty(value = "业务状态码；0 - 表示接口返回成功，其他值表示操作不成功，具体消息由msg字段表示")
     private Integer code;
+    @ApiModelProperty(value = "业务消息；当且仅当code不为0时有效")
     private String msg;
+    @ApiModelProperty(value = "业务数据")
     private Object data;
 
     public static JsonResp ok() {
