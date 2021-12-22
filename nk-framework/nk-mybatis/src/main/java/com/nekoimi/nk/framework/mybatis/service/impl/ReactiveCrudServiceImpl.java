@@ -170,7 +170,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     public Mono<E> getById(Serializable id) {
         return Mono.fromCallable(() -> mapper.selectById(id))
                 .flatMap(Mono::justOrEmpty)
-                .subscribeOn(Schedulers.elastic());
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     @Transactional(readOnly = true)
@@ -178,7 +178,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     public Mono<E> getByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
         return Mono.just(consumer)
                 .map(this::acceptQueryConsumer)
-                .publishOn(Schedulers.elastic())
+                .publishOn(Schedulers.boundedElastic())
                 .map(eqw -> mapper.selectOne(eqw))
                 .flatMap(Mono::justOrEmpty);
     }
@@ -188,7 +188,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     public Mono<E> getByMap(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
         return Mono.just(consumer)
                 .map(this::acceptQueryMapConsumer)
-                .publishOn(Schedulers.elastic())
+                .publishOn(Schedulers.boundedElastic())
                 .map(eqw -> mapper.selectOne(eqw))
                 .flatMap(Mono::justOrEmpty);
     }
@@ -350,7 +350,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                     return Mono.error(new FailedToResourceSaveException());
                 }
                 return Mono.just(true);
-            })).subscribeOn(Schedulers.elastic())
+            })).subscribeOn(Schedulers.boundedElastic())
                     .thenReturn((Serializable) keyValue);
         });
     }
@@ -387,7 +387,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Mono<Boolean> update(E entity) {
-        return Mono.just(entity).publishOn(Schedulers.elastic())
+        return Mono.just(entity).publishOn(Schedulers.boundedElastic())
                 .map(e -> mapper.updateById(entity))
                 .flatMap(this::dmlRowToBoolean)
                 .onErrorResume(t -> Mono.error(new FailedToResourceUpdateException(t.getMessage())));
@@ -402,7 +402,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Override
     public Mono<Void> updateBatch(List<? extends Serializable> idList, Map<String, Object> map) {
         return Flux.fromIterable(idList)
-                .publishOn(Schedulers.elastic())
+                .publishOn(Schedulers.boundedElastic())
                 .flatMap(id -> updateById(id, map))
                 .onErrorResume(t -> Mono.error(new FailedToResourceRemoveException(t.getMessage())))
                 .then(Mono.empty());
@@ -413,7 +413,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     public Mono<Boolean> updateByQuery(E entity, Consumer<LambdaQueryWrapper<E>> consumer) {
         return Mono.just(consumer)
                 .map(this::acceptQueryConsumer)
-                .publishOn(Schedulers.elastic())
+                .publishOn(Schedulers.boundedElastic())
                 .map(eqw -> mapper.update(entity, eqw))
                 .flatMap(this::dmlRowToBoolean)
                 .onErrorResume(t -> Mono.error(new FailedToResourceUpdateException(t.getMessage())));
@@ -457,7 +457,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     public Mono<Boolean> updateById(Serializable id, Consumer<LambdaUpdateWrapper<E>> consumer) {
         return getByIdOrFail(id).flatMap(e -> Mono.just(consumer)
                 .map(this::acceptUpdateConsumer)
-                .publishOn(Schedulers.elastic())
+                .publishOn(Schedulers.boundedElastic())
                 .map(euw -> mapper.update(e, euw))
                 .flatMap(this::dmlRowToBoolean))
                 .onErrorResume(t -> Mono.error(new FailedToResourceUpdateException(t.getMessage())));
@@ -468,7 +468,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     public Mono<Boolean> updateByIdOfMap(Serializable id, Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
         return getByIdOrFail(id).flatMap(e -> Mono.just(consumer)
                 .map(this::acceptUpdateMapConsumer)
-                .publishOn(Schedulers.elastic())
+                .publishOn(Schedulers.boundedElastic())
                 .map(euw -> mapper.update(e, euw))
                 .flatMap(this::dmlRowToBoolean))
                 .onErrorResume(t -> Mono.error(new FailedToResourceUpdateException(t.getMessage())));
@@ -528,7 +528,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Override
     public Mono<Void> removeById(Serializable id) {
         return Mono.fromCallable(() -> mapper.deleteById(id))
-                .subscribeOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.boundedElastic())
                 .onErrorResume(t -> Mono.error(new FailedToResourceRemoveException(t.getMessage())))
                 .then(Mono.empty());
     }
@@ -538,7 +538,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     public Mono<Void> removeByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
         return Mono.just(consumer)
                 .map(this::acceptQueryConsumer)
-                .publishOn(Schedulers.elastic())
+                .publishOn(Schedulers.boundedElastic())
                 .map(eqw -> mapper.delete(eqw))
                 .onErrorResume(t -> Mono.error(new FailedToResourceRemoveException(t.getMessage())))
                 .then(Mono.empty());
@@ -554,7 +554,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Override
     public Mono<Void> removeBatch(List<? extends Serializable> idList) {
         return Flux.fromIterable(idList)
-                .publishOn(Schedulers.elastic())
+                .publishOn(Schedulers.boundedElastic())
                 .map(id -> mapper.deleteById(id))
                 .onErrorResume(t -> Mono.error(new FailedToResourceRemoveException(t.getMessage())))
                 .then(Mono.empty());
@@ -566,7 +566,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return Mono.just(Wrappers.lambdaQuery(currentModelClass()))
                 .map(eqw -> mapper.selectCount(eqw))
                 .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())))
-                .subscribeOn(Schedulers.elastic());
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     @Transactional(readOnly = true)
@@ -574,7 +574,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     public Mono<Long> countByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
         return Mono.just(consumer)
                 .map(this::acceptQueryConsumer)
-                .publishOn(Schedulers.elastic())
+                .publishOn(Schedulers.boundedElastic())
                 .map(eqw -> mapper.selectCount(eqw))
                 .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
@@ -584,14 +584,14 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     public Mono<Long> countByMap(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
         return Mono.just(consumer)
                 .map(this::acceptQueryMapConsumer)
-                .publishOn(Schedulers.elastic())
+                .publishOn(Schedulers.boundedElastic())
                 .map(eqw -> mapper.selectCount(eqw))
                 .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 
     private Flux<E> findAllFluxPushScheduler(Flux<E> push) {
-        return push.publishOn(Schedulers.elastic())
-                .subscribeOn(Schedulers.elastic())
+        return push.publishOn(Schedulers.boundedElastic())
+                .subscribeOn(Schedulers.boundedElastic())
                 .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 
@@ -707,6 +707,11 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return findByMap(map -> map.put(k1, v1).put(k2, v2).put(k3, v3).put(k4, v4).put(k5, v5).put(k6, v6).put(k7, v7).put(k8, v8).put(k9, v9).put(k10, v10));
     }
 
+    @Override
+    public Mono<PageResult<E>> page(IPage<E> page) {
+        return page(page, eqw -> {});
+    }
+
     @SafeVarargs
     @Override
     public final Mono<PageResult<E>> page(IPage<E> page, SFunction<E, Object>... columns) {
@@ -717,7 +722,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Override
     public Mono<PageResult<E>> page(IPage<E> page, Consumer<LambdaQueryWrapper<E>> consumer) {
         return Mono.just(acceptQueryConsumer(consumer))
-                .publishOn(Schedulers.elastic())
+                .publishOn(Schedulers.boundedElastic())
                 .map(eqw -> mapper.selectPage(page, eqw))
                 .flatMap(result -> Mono.just(PageResult.of(
                         result.getTotal(),
@@ -725,7 +730,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                         result.getSize(),
                         result.getPages(),
                         result.getRecords())
-                )).subscribeOn(Schedulers.elastic())
+                )).subscribeOn(Schedulers.boundedElastic())
                 .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 }

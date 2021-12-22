@@ -1,6 +1,7 @@
 package com.nekoimi.nk.framework.security.config;
 
 import com.nekoimi.nk.framework.cache.contract.CacheService;
+import com.nekoimi.nk.framework.core.constant.SecurityConstants;
 import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
 import com.nekoimi.nk.framework.security.contract.SecurityAuthorizeExchangeCustomizer;
 import com.nekoimi.nk.framework.security.contract.SecurityConfigCustomizer;
@@ -115,13 +116,9 @@ public class SecurityConfiguration {
                 )
                 // 配置请求过滤
                 .authorizeExchange(exchange -> {
-                    exchange.pathMatchers("/").permitAll()
-                            .pathMatchers("/doc.html").permitAll()
-                            .pathMatchers("/webjars/**").permitAll()
-                            .pathMatchers("/v2/api-docs").permitAll()
-                            .pathMatchers("/swagger-resources").permitAll()
-                            .pathMatchers(properties.getLoginUrl()).permitAll()
+                    exchange.pathMatchers(properties.getLoginUrl()).permitAll()
                             .pathMatchers(properties.getLogoutUrl()).permitAll();
+                    SecurityConstants.getDefaultPermitAll().forEach(path -> exchange.pathMatchers(path).permitAll());
                     SecurityProperties.PathMatcher pathMatcher = properties.getMatcher();
                     if (!pathMatcher.getPermitAll().isEmpty()) {
                         pathMatcher.getPermitAll().forEach(path -> exchange.pathMatchers(path).permitAll());
