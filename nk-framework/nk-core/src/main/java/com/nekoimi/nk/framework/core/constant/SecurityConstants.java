@@ -14,6 +14,7 @@ public final class SecurityConstants {
         DEFAULT_PERMIT_ALL.add("/v2/api-docs");
         DEFAULT_PERMIT_ALL.add("/webjars/**");
         DEFAULT_PERMIT_ALL.add("/swagger-resources");
+        DEFAULT_PERMIT_ALL.add("/swagger-resources/**");
     }
 
     public static List<String> getDefaultPermitAll() {

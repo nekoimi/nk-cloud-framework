@@ -20,6 +20,17 @@ spring:
   main:
     banner-mode: off
     web-application-type: reactive
+  cloud:
+    consul:
+      host: ${consul.host}
+      port: ${consul.port}
+      discovery:
+        service-name: ${spring.application.name}
+        health-check-path: /
+        health-check-interval: 60s
+        metadata:
+          name: ${spring.application.name}
+          port: ${server.port}
   redis:
     host: ${db.redis.host}
     port: ${db.redis.port}
@@ -32,7 +43,6 @@ spring:
         max-wait: -1   # 最大阻塞等待时间
         max-idle: 8    # 最大空闲时间
         min-idle: 0    # 最小空闲时间
-
 app:
   id-gen:
     worker-id: 0

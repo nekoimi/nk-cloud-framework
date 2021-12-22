@@ -3,13 +3,11 @@ package com.nekoimi.nk.framework.web.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nekoimi.nk.framework.cache.contract.CacheService;
 import com.nekoimi.nk.framework.core.holder.ObjectMapperHolder;
+import com.nekoimi.nk.framework.web.controller.IndexController;
 import com.nekoimi.nk.framework.web.customizer.HttpJackson2ObjectMapperBuilderCustomizer;
 import com.nekoimi.nk.framework.web.filter.RequestLogFilter;
 import com.nekoimi.nk.framework.web.listener.ScanRequestMappingListener;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.condition.SearchStrategy;
+import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.context.ApplicationContext;
@@ -24,6 +22,12 @@ import org.springframework.web.server.WebFilter;
  */
 @Configuration
 public class HttpConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean(name = "indexController", search = SearchStrategy.CURRENT)
+    public IndexController indexController() {
+        return new IndexController();
+    }
 
     @Bean
     @ConditionalOnProperty(name = "debug", havingValue = "true")

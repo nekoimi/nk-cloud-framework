@@ -1,6 +1,8 @@
 spring:
   cloud:
     gateway:
+      loadbalancer:
+        use404: true
       enabled: true
       fail-on-route-definition-error: true
       discovery:
