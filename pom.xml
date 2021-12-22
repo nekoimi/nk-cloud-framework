@@ -34,11 +34,13 @@
         <apache-commons-codec.version>1.15</apache-commons-codec.version>
         <apache-commons-io.version>2.10.0</apache-commons-io.version>
         <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
+        <mybatis-plus-generator.version>3.4.1</mybatis-plus-generator.version>
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <p6spy.version>3.9.1</p6spy.version>
         <swagger.version>2.10.5</swagger.version>
-        <swagger.annotations.version>1.5.20</swagger.annotations.version>
-        <swagger.knife4j-ui.version>2.0.9</swagger.knife4j-ui.version>
+        <swagger-annotations.version>1.5.20</swagger-annotations.version>
+        <swagger-knife4j-ui.version>2.0.9</swagger-knife4j-ui.version>
     </properties>
 
     <!--环境-->
@@ -155,6 +157,16 @@
                 <artifactId>mybatis-plus-extension</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-generator</artifactId>
+                <version>${mybatis-plus-generator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>p6spy</groupId>
+                <artifactId>p6spy</artifactId>
+                <version>${p6spy.version}</version>
+            </dependency>
             <!-- swagger docs -->
             <dependency>
                 <groupId>io.springfox</groupId>
@@ -169,12 +181,12 @@
             <dependency>
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-spring-ui</artifactId>
-                <version>${swagger.knife4j-ui.version}</version>
+                <version>${swagger-knife4j-ui.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>${swagger.annotations.version}</version>
+                <version>${swagger-annotations.version}</version>
             </dependency>
             <!-- nk-modules -->
             <dependency>
