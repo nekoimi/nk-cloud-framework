@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 /**
  * User Service
  *
- * nekoimi  2021-12-22
+ * nekoimi  2021-12-23
  *
  * This code is generated using nk-devtools.
  */

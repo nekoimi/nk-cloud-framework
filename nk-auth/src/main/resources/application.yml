@@ -23,12 +23,11 @@ spring:
   flyway:
     enabled: true
     table: migrations
-    baseline-version: 1
     baseline-on-migrate: true
-    baseline-description: true
-    sql-migration-separator: _
     sql-migration-prefix: v
     repeatable-sql-migration-prefix: repeat
+    clean-disabled: true
+    driver-class-name: ${db.driver-class-name}
   datasource:
     driver-class-name: ${db.driver-class-name}
     type: com.zaxxer.hikari.HikariDataSource
