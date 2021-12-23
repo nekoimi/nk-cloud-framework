@@ -25,6 +25,20 @@
             <result column="enable" property="enable"/>
         </resultMap>
 
+    <!--  通用返回字段列表  -->
+    <sql id="base_column_list" >
+                                                                        id,
+created_at,
+updated_at,
+deleted_at,
+            username,
+                        password,
+                        mobile,
+                        email,
+                        tenant_id,
+                        enable
+                </sql>
+
     <!-- table fields
 
 id     主键ID

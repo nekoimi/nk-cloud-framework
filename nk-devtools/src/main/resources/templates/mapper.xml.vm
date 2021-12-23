@@ -31,6 +31,30 @@
 #end
     </resultMap>
 
+    <!--  通用返回字段列表  -->
+    <sql id="base_column_list" >
+## 生成主键
+#foreach($field in ${table.fields})
+        #if(${field.keyFlag})
+${field.name},
+        #end
+    #end
+## 生成公共字段
+#foreach($field in ${table.commonFields})
+${field.name},
+#end
+## 生成普通字段
+#foreach($field in ${table.fields})
+    #if(!${field.keyFlag})
+        #if($foreach.last)
+${field.name}
+        #else
+${field.name},
+        #end
+    #end
+#end
+    </sql>
+
     <!-- table fields
 
 ## 生成主键

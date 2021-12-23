@@ -47,7 +47,7 @@ public class UserController {
             @ApiImplicitParam(name = "p", value = "分页页码", required = false, defaultValue = "1", paramType = "query", dataType = "Integer"),
             @ApiImplicitParam(name = "ps", value = "每页显示条数", required = false, defaultValue = "10", paramType = "query", dataType = "Integer"),
             @ApiImplicitParam(name = "st", value = "排序字段", required = false, defaultValue = "", paramType = "query", dataType = "String",
-                    allowableValues = ",id,created_at,updated_at,deleted_at,username,password,mobile,email,tenant_id,enable,"),
+                    allowableValues = "id,created_at,updated_at,deleted_at,username,password,mobile,email,tenant_id,enable"),
             @ApiImplicitParam(name = "od", value = "排序规则", required = false, defaultValue = "", paramType = "query", dataType = "String", allowableValues = "asc,desc")
     })
     public Mono<JsonResp> list(@ApiIgnore ServerHttpRequest request) {

@@ -66,8 +66,9 @@ public class ${table.controllerName} {
             @ApiImplicitParam(name = "p", value = "分页页码", required = false, defaultValue = "1", paramType = "query", dataType = "Integer"),
             @ApiImplicitParam(name = "ps", value = "每页显示条数", required = false, defaultValue = "10", paramType = "query", dataType = "Integer"),
             @ApiImplicitParam(name = "st", value = "排序字段", required = false, defaultValue = "", paramType = "query", dataType = "String",
-                    allowableValues = "#foreach($field in ${table.fields})#if(${field.keyFlag})${field.name}#end#end,#foreach($field in ${table.commonFields})${field.name},#end#foreach($field in ${table.fields})#if(!${field.keyFlag})${field.name},#end#end"),
-            @ApiImplicitParam(name = "od", value = "排序规则", required = false, defaultValue = "", paramType = "query", dataType = "String", allowableValues = "asc,desc")
+                    allowableValues = "#foreach($field in ${table.fields})#if(${field.keyFlag})${field.name},#end#end#foreach($field in ${table.commonFields})${field.name},#end#foreach($field in ${table.fields})#if(!${field.keyFlag})#if($foreach.last)${field.name}#else${field.name},#end#end#end"),
+            @ApiImplicitParam(name = "od", value = "排序规则", required = false, defaultValue = "", paramType = "query", dataType = "String",
+                    allowableValues = "asc,desc")
     })
     public Mono<${cfg.jsonResp}> list(@ApiIgnore ServerHttpRequest request) {
         return service.page(PageReq.buildFromRequest(request)).map(JsonResp::ok);
