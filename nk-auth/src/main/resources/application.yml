@@ -20,15 +20,15 @@ spring:
   main:
     banner-mode: off
     web-application-type: reactive
-  sql:
-    init:
-      platform: mysql
-      mode: always
-      continue-on-error: false
-      separator: ;
-      encoding: UTF-8
-      schema-locations: classpath:sql/*.sql
-      # data-locations:
+  flyway:
+    enabled: true
+    table: migrations
+    baseline-version: 1
+    baseline-on-migrate: true
+    baseline-description: true
+    sql-migration-separator: _
+    sql-migration-prefix: v
+    repeatable-sql-migration-prefix: repeat
   datasource:
     driver-class-name: ${db.driver-class-name}
     type: com.zaxxer.hikari.HikariDataSource
