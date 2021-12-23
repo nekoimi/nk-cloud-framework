@@ -1,3 +1,1 @@
-# platform
-
-- 对外提供API接口的服务
+# nk-platform 平台微服务
