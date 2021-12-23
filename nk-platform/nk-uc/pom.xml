@@ -3,15 +3,16 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>nk-cloud-framework</artifactId>
+        <artifactId>nk-platform</artifactId>
         <groupId>com.nekoimi.nk</groupId>
         <version>1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
     <modules>
-        <module>nk-cloud-admin</module>
-        <module>nk-uc</module>
+        <module>nk-uc-client</module>
+        <module>nk-uc-service</module>
+        <module>nk-uc-model</module>
     </modules>
-    <artifactId>nk-platform</artifactId>
+    <artifactId>nk-uc</artifactId>
 </project>

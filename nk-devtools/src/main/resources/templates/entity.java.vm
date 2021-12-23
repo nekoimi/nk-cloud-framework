@@ -5,9 +5,7 @@ import ${pkg};
 #end
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 #if(${superEntityClass})
 #else
 import java.io.Serializable;
@@ -21,12 +19,14 @@ import java.io.Serializable;
  * This code is generated using nk-devtools.
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 #if(${superEntityClass})
 @EqualsAndHashCode(callSuper = true)
 #else
 @EqualsAndHashCode(callSuper = false)
 #end
-@NoArgsConstructor
 @ApiModel(description = "${cfg.route.info}", parent = BaseEntity.class)
 @TableName(value = "${table.name}", autoResultMap = true)
 #if(${superEntityClass})
@@ -38,7 +38,7 @@ public class ${entity} implements Serializable{
 #if(${entitySerialVersionUID})
     private static final long serialVersionUID = 1L;
 #end
-
+    public static final String TABLE_NAME = "${table.name}";
 #if(${entityColumnConstant})
 #foreach($field in ${table.fields})
     public static final String FILED_${field.name.toUpperCase()} = "${field.name}";

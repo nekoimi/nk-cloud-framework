@@ -18,7 +18,6 @@ package ${package.Controller};
     #set($routePathName = ${table.entityPath})
 #end
 
-import ${cfg.jsonRespClass};
 import ${package.Entity}.${entity};
 import ${package.Service}.${table.serviceName};
 import com.nekoimi.nk.framework.mybatis.page.PageReq;
@@ -70,8 +69,8 @@ public class ${table.controllerName} {
             @ApiImplicitParam(name = "od", value = "排序规则", required = false, defaultValue = "", paramType = "query", dataType = "String",
                     allowableValues = "asc,desc")
     })
-    public Mono<${cfg.jsonResp}> list(@ApiIgnore ServerHttpRequest request) {
-        return service.page(PageReq.buildFromRequest(request)).map(JsonResp::ok);
+    public Mono<PageResult<${entity}>> list(@ApiIgnore ServerHttpRequest request) {
+        return service.page(PageReq.buildFromRequest(request));
     }
 
     /**
@@ -82,8 +81,8 @@ public class ${table.controllerName} {
      */
     @GetMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}")
     @ApiOperation(value = "根据id获取${cfg.route.info}数据", response = ${entity}.class)
-    public Mono<${cfg.jsonResp}> get(@PathVariable("id") String id) {
-        return service.getByIdOrFail(id).map(JsonResp::ok);
+    public Mono<${entity}> get(@PathVariable("id") String id) {
+        return service.getByIdOrFail(id);
     }
 
     /**
@@ -93,8 +92,8 @@ public class ${table.controllerName} {
      */
     @PostMapping("${routePrefix}/${routeVersion}/${routePathName}")
     @ApiOperation(value = "添加${cfg.route.info}数据", response = ${entity}.class)
-    public Mono<${cfg.jsonResp}> save(@Validated @RequestBody ${entity} body) {
-        return service.save(body).flatMap(service::getByIdOrFail).map(JsonResp::ok);
+    public Mono<${entity}> save(@Validated @RequestBody ${entity} body) {
+        return service.save(body).flatMap(service::getByIdOrFail);
     }
 
     /**
@@ -104,9 +103,9 @@ public class ${table.controllerName} {
      * @return
      */
     @PutMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}/full")
-    @ApiOperation(value = "根据id更新${cfg.route.info}所有字段", response = ${cfg.jsonResp}.class)
-    public Mono<${cfg.jsonResp}> updateFull(@PathVariable("id") String id, @Validated @RequestBody ${entity} body) {
-        return service.updateById(id, body).map(JsonResp::ok);
+    @ApiOperation(value = "根据id更新${cfg.route.info}所有字段", response = Boolean.class)
+    public Mono<Boolean> updateFull(@PathVariable("id") String id, @Validated @RequestBody ${entity} body) {
+        return service.updateById(id, body);
     }
 
     /**
@@ -116,7 +115,7 @@ public class ${table.controllerName} {
      * @return
      */
     @PutMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}")
-    @ApiOperation(value = "根据id更新${cfg.route.info}部分字段", response = ${cfg.jsonResp}.class)
+    @ApiOperation(value = "根据id更新${cfg.route.info}部分字段", response = Boolean.class)
     @ApiImplicitParams({
         #foreach($field in ${table.fields})
             #if(!${field.keyFlag})
@@ -128,8 +127,8 @@ public class ${table.controllerName} {
             #end
         #end
     })
-    public Mono<${cfg.jsonResp}> updateFull(@PathVariable("id") String id, @ApiIgnore @RequestBody Map<String, Object> body) {
-        return service.updateById(id, body).map(JsonResp::ok);
+    public Mono<Boolean> updateFull(@PathVariable("id") String id, @ApiIgnore @RequestBody Map<String, Object> body) {
+        return service.updateById(id, body);
     }
 
     /**
@@ -139,7 +138,7 @@ public class ${table.controllerName} {
      * @return
      */
     @PutMapping("${routePrefix}/${routeVersion}/${routePathName}/batch")
-    @ApiOperation(value = "批量更新${cfg.route.info}数据", response = ${cfg.jsonResp}.class)
+    @ApiOperation(value = "批量更新${cfg.route.info}数据")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "ids", value = "id的列表，使用,分割", required = true, example = "1,2,3", paramType = "query", dataType = "String"),
         #foreach($field in ${table.fields})
@@ -152,8 +151,8 @@ public class ${table.controllerName} {
             #end
         #end
     })
-    public Mono<${cfg.jsonResp}> updateBatch(@RequestParam("ids") String ids, @ApiIgnore @RequestBody Map<String, Object> body) {
-        return service.updateBatch(ids, body).map(JsonResp::ok);
+    public Mono<Void> updateBatch(@RequestParam("ids") String ids, @ApiIgnore @RequestBody Map<String, Object> body) {
+        return service.updateBatch(ids, body);
     }
 
     /**
@@ -163,9 +162,9 @@ public class ${table.controllerName} {
      * @return
      */
     @DeleteMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}")
-    @ApiOperation(value = "根据id删除${cfg.route.info}数据", response = ${cfg.jsonResp}.class)
-    public Mono<${cfg.jsonResp}> remove(@PathVariable("id") String id) {
-        return service.removeById(id).map(JsonResp::ok);
+    @ApiOperation(value = "根据id删除${cfg.route.info}数据")
+    public Mono<Void> remove(@PathVariable("id") String id) {
+        return service.removeById(id);
     }
 
     /**
@@ -174,12 +173,12 @@ public class ${table.controllerName} {
      * @return
      */
     @DeleteMapping("${routePrefix}/${routeVersion}/${routePathName}/batch")
-    @ApiOperation(value = "批量删除${cfg.route.info}数据", response = ${cfg.jsonResp}.class)
+    @ApiOperation(value = "批量删除${cfg.route.info}数据")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "ids", value = "id的列表，使用,分割", required = true, example = "1,2,3", paramType = "query", dataType = "String")
     })
-    public Mono<${cfg.jsonResp}> removeBatch(@RequestParam(value = "ids") String ids) {
-        return service.removeBatch(ids).map(JsonResp::ok);
+    public Mono<Void> removeBatch(@RequestParam(value = "ids") String ids) {
+        return service.removeBatch(ids);
     }
 
 }
