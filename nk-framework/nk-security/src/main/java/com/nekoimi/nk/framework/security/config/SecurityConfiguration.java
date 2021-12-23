@@ -86,8 +86,8 @@ public class SecurityConfiguration {
                                                        ServerSecurityContextRepository securityContextRepository,
                                                        List<SecurityConfigCustomizer> configCustomizers,
                                                        List<SecurityAuthorizeExchangeCustomizer> authorizeExchangeCustomizers) {
-        ServerWebExchangeMatcher loginExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, properties.getLoginUrl());
-        ServerWebExchangeMatcher logoutExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, properties.getLogoutUrl());
+        ServerWebExchangeMatcher loginExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, SecurityConstants.LOGIN_PATH);
+        ServerWebExchangeMatcher logoutExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, SecurityConstants.LOGOUT_PATH);
         // 登录认证
         http.formLogin(login -> login.requiresAuthenticationMatcher(loginExchangeMatcher)
                 .authenticationSuccessHandler(authenticationSuccessHandler)
@@ -116,15 +116,12 @@ public class SecurityConfiguration {
                 )
                 // 配置请求过滤
                 .authorizeExchange(exchange -> {
-                    exchange.pathMatchers(properties.getLoginUrl()).permitAll()
-                            .pathMatchers(properties.getLogoutUrl()).permitAll();
                     SecurityConstants.getDefaultPermitAll().forEach(path -> exchange.pathMatchers(path).permitAll());
-                    SecurityProperties.PathMatcher pathMatcher = properties.getMatcher();
-                    if (!pathMatcher.getPermitAll().isEmpty()) {
-                        pathMatcher.getPermitAll().forEach(path -> exchange.pathMatchers(path).permitAll());
+                    if (!properties.getPermitAll().isEmpty()) {
+                        properties.getPermitAll().forEach(path -> exchange.pathMatchers(path).permitAll());
                     }
-                    if (!pathMatcher.getAuthenticated().isEmpty()) {
-                        pathMatcher.getAuthenticated().forEach(path -> exchange.pathMatchers(path).authenticated());
+                    if (!properties.getAuthenticated().isEmpty()) {
+                        properties.getAuthenticated().forEach(path -> exchange.pathMatchers(path).authenticated());
                     }
                     authorizeExchangeCustomizers.forEach(exchangeCustomizer -> exchangeCustomizer.customize(exchange));
                     exchange.anyExchange().authenticated();

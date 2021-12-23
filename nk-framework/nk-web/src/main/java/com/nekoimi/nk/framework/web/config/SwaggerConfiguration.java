@@ -1,10 +1,12 @@
 package com.nekoimi.nk.framework.web.config;
 
+import com.nekoimi.nk.framework.core.constant.SecurityConstants;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.context.request.async.DeferredResult;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -17,6 +19,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebFlux;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * nekoimi  2021/12/15 9:28
@@ -67,9 +70,15 @@ public class SwaggerConfiguration {
         List<SecurityContext> securityContexts = new ArrayList<>();
         securityContexts.add(SecurityContext.builder()
                 .securityReferences(defaultAuth())
-                .forPaths(PathSelectors.any())
+                .forPaths(this::pathSelect)
                 .build());
         return securityContexts;
+    }
+
+    private boolean pathSelect(String s) {
+        AntPathMatcher matcher = new AntPathMatcher();
+        return !matcher.match("/", s) &&
+                !matcher.match(SecurityConstants.LOGIN_PATH, s);
     }
 
     private List<SecurityReference> defaultAuth() {
