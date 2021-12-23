@@ -11,13 +11,13 @@
      -->
 
     <!--  通用返回结果映射  -->
-    <resultMap id="base_result_map" type="com.nekoimi.nk.platform.uc.service.entity.User">
-                            <result column="id" property="id"/>
-    <result column="created_at" property="createdAt"/>
+    <resultMap id="base_result_map" type="com.nekoimi.nk.platform.uc.model.entity.User">
+        <id column="id" property="id"/>
+                                <result column="created_at" property="createdAt"/>
     <result column="updated_at" property="updatedAt"/>
     <result column="deleted_at" property="deletedAt"/>
 
-        <result column="username" property="username"/>
+            <result column="username" property="username"/>
             <result column="password" property="password"/>
             <result column="mobile" property="mobile"/>
             <result column="email" property="email"/>
@@ -27,11 +27,11 @@
 
     <!--  通用返回字段列表  -->
     <sql id="base_column_list" >
-                                                                        id,
-created_at,
+        id,
+                                                                                    created_at,
 updated_at,
 deleted_at,
-            username,
+                username,
                         password,
                         mobile,
                         email,

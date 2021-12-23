@@ -18,11 +18,23 @@
         </dependency>
         <dependency>
             <groupId>com.nekoimi.nk</groupId>
+            <artifactId>nk-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nekoimi.nk</groupId>
+            <artifactId>nk-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nekoimi.nk</groupId>
             <artifactId>nk-mybatis</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nekoimi.nk</groupId>
+            <artifactId>nk-uc-model</artifactId>
         </dependency>
     </dependencies>
 

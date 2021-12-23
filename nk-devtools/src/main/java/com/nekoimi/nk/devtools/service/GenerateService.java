@@ -166,7 +166,7 @@ public class GenerateService {
         // 字段生成策略
         strategyConfig.setColumnNaming(NamingStrategy.underline_to_camel);
         // 父类公共字段
-        strategyConfig.setSuperEntityColumns("id", "created_at", "updated_at", "deleted_at");
+        strategyConfig.setSuperEntityColumns("created_at", "updated_at", "deleted_at");
         // controller 父类
 //        strategyConfig.setSuperControllerClass("com.nekoimi.nk.framework.mybatis.controller.BaseController");
         customMap.put("jsonResp", "JsonResp");
@@ -174,8 +174,8 @@ public class GenerateService {
         // mapper 父类
         strategyConfig.setSuperMapperClass("com.nekoimi.nk.framework.mybatis.mapper.BaseMapper");
         // 实体父类
-        strategyConfig.setSuperEntityClass(com.nekoimi.nk.framework.mybatis.entity.BaseEntity.class);
-        customMap.put("superEntityClassPackage", "com.nekoimi.nk.framework.mybatis.entity");
+//        strategyConfig.setSuperEntityClass(com.nekoimi.nk.framework.mybatis.entity.BaseEntity.class);
+//        customMap.put("superEntityClassPackage", "com.nekoimi.nk.framework.mybatis.entity");
         // 接口父类
         strategyConfig.setSuperServiceClass(com.nekoimi.nk.framework.mybatis.service.ReactiveCrudService.class);
         // 接口实现类父类

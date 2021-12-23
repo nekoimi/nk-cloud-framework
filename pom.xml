@@ -162,6 +162,12 @@
             </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-annotation</artifactId>
+                <version>${mybatis-plus.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-generator</artifactId>
                 <version>${mybatis-plus-generator.version}</version>
             </dependency>
@@ -225,6 +231,11 @@
             <dependency>
                 <groupId>com.nekoimi.nk</groupId>
                 <artifactId>nk-openfeign</artifactId>
+                <version>${nk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nekoimi.nk</groupId>
+                <artifactId>nk-uc-model</artifactId>
                 <version>${nk.version}</version>
             </dependency>
         </dependencies>

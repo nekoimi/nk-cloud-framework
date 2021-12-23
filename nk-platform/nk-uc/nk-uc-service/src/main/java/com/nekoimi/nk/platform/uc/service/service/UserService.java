@@ -1,7 +1,7 @@
 package com.nekoimi.nk.platform.uc.service.service;
 
 import com.nekoimi.nk.framework.mybatis.service.ReactiveCrudService;
-import com.nekoimi.nk.platform.uc.service.entity.User;
+import com.nekoimi.nk.platform.uc.model.entity.User;
 
 /**
  * User Service

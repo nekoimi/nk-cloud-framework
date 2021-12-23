@@ -1,7 +1,7 @@
 package com.nekoimi.nk.platform.uc.service.mapper;
 
 import com.nekoimi.nk.framework.mybatis.mapper.BaseMapper;
-import com.nekoimi.nk.platform.uc.service.entity.User;
+import com.nekoimi.nk.platform.uc.model.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Component;
 

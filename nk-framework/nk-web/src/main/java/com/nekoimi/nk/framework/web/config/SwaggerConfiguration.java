@@ -3,6 +3,7 @@ package com.nekoimi.nk.framework.web.config;
 import com.nekoimi.nk.framework.core.constant.SecurityConstants;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -19,13 +20,13 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebFlux;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * nekoimi  2021/12/15 9:28
  */
 @Configuration
 @EnableSwagger2WebFlux
+@ConditionalOnProperty(prefix = "app.web.swagger", name = "enabled", havingValue = "true")
 public class SwaggerConfiguration {
     @Value("${spring.application.name}")
     private String name;
@@ -90,3 +91,4 @@ public class SwaggerConfiguration {
         return securityReferences;
     }
 }
+

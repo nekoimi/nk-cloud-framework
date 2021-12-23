@@ -5,10 +5,12 @@ import com.nekoimi.nk.framework.core.constant.SecurityConstants;
 import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
 import com.nekoimi.nk.framework.security.contract.SecurityAuthorizeExchangeCustomizer;
 import com.nekoimi.nk.framework.security.contract.SecurityConfigCustomizer;
+import com.nekoimi.nk.framework.security.customizer.SwaggerSecurityAuthorizeExchangeCustomizer;
 import com.nekoimi.nk.framework.security.filter.RequestParseAuthTypeFilter;
 import com.nekoimi.nk.framework.security.repository.RedisServerSecurityContextRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -78,6 +80,12 @@ public class SecurityConfiguration {
     @ConditionalOnBean(value = CacheService.class, search = SearchStrategy.CURRENT)
     public ServerSecurityContextRepository securityContextRepository(CacheService cacheService) {
         return new RedisServerSecurityContextRepository(cacheService);
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "app.web.swagger", name = "enabled", havingValue = "true")
+    public SwaggerSecurityAuthorizeExchangeCustomizer swaggerSecurityAuthorizeExchangeCustomizer() {
+        return new SwaggerSecurityAuthorizeExchangeCustomizer();
     }
 
     @Bean

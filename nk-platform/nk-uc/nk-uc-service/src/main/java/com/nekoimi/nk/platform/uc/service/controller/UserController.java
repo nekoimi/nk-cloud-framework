@@ -1,15 +1,17 @@
 package com.nekoimi.nk.platform.uc.service.controller;
 
 
-import com.nekoimi.nk.framework.mybatis.page.PageReq;
-import com.nekoimi.nk.framework.mybatis.page.PageResult;
-import com.nekoimi.nk.platform.uc.service.entity.User;
+
+
+import com.nekoimi.nk.platform.uc.model.entity.User;
 import com.nekoimi.nk.platform.uc.service.service.UserService;
-import io.swagger.annotations.Api;
+import com.nekoimi.nk.framework.mybatis.page.PageReq;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import com.nekoimi.nk.framework.mybatis.page.PageResult;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.http.server.reactive.ServerHttpRequest;
+import io.swagger.annotations.Api;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -96,13 +98,13 @@ public class UserController {
     @PutMapping("/v1/user/{id}")
     @ApiOperation(value = "根据id更新用户信息部分字段", response = Boolean.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "username", value = "用户名", required = false, paramType = "body", dataType = "String"),
-            @ApiImplicitParam(name = "password", value = "密码", required = false, paramType = "body", dataType = "String"),
-            @ApiImplicitParam(name = "mobile", value = "手机号", required = false, paramType = "body", dataType = "String"),
-            @ApiImplicitParam(name = "email", value = "邮箱", required = false, paramType = "body", dataType = "String"),
-            @ApiImplicitParam(name = "tenantId", value = "租户ID", required = false, paramType = "body", dataType = "String"),
-            @ApiImplicitParam(name = "enable", value = "是否启用；1 - enable，0 - disable", required = false, paramType = "body", dataType = "Boolean")
-    })
+                                                                                @ApiImplicitParam(name = "username", value = "用户名", required = false, paramType = "body", dataType = "String"),
+                                                                                        @ApiImplicitParam(name = "password", value = "密码", required = false, paramType = "body", dataType = "String"),
+                                                                                        @ApiImplicitParam(name = "mobile", value = "手机号", required = false, paramType = "body", dataType = "String"),
+                                                                                        @ApiImplicitParam(name = "email", value = "邮箱", required = false, paramType = "body", dataType = "String"),
+                                                                                        @ApiImplicitParam(name = "tenantId", value = "租户ID", required = false, paramType = "body", dataType = "String"),
+                                                                                        @ApiImplicitParam(name = "enable", value = "是否启用；1 - enable，0 - disable", required = false, paramType = "body", dataType = "Boolean")
+                                        })
     public Mono<Boolean> updateFull(@PathVariable("id") String id, @ApiIgnore @RequestBody Map<String, Object> body) {
         return service.updateById(id, body);
     }
@@ -117,13 +119,13 @@ public class UserController {
     @ApiOperation(value = "批量更新用户信息数据")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "ids", value = "id的列表，使用,分割", required = true, example = "1,2,3", paramType = "query", dataType = "String"),
-            @ApiImplicitParam(name = "username", value = "用户名", required = false, paramType = "body", dataType = "String"),
-            @ApiImplicitParam(name = "password", value = "密码", required = false, paramType = "body", dataType = "String"),
-            @ApiImplicitParam(name = "mobile", value = "手机号", required = false, paramType = "body", dataType = "String"),
-            @ApiImplicitParam(name = "email", value = "邮箱", required = false, paramType = "body", dataType = "String"),
-            @ApiImplicitParam(name = "tenantId", value = "租户ID", required = false, paramType = "body", dataType = "String"),
-            @ApiImplicitParam(name = "enable", value = "是否启用；1 - enable，0 - disable", required = false, paramType = "body", dataType = "Boolean")
-    })
+                                                                                @ApiImplicitParam(name = "username", value = "用户名", required = false, paramType = "body", dataType = "String"),
+                                                                                        @ApiImplicitParam(name = "password", value = "密码", required = false, paramType = "body", dataType = "String"),
+                                                                                        @ApiImplicitParam(name = "mobile", value = "手机号", required = false, paramType = "body", dataType = "String"),
+                                                                                        @ApiImplicitParam(name = "email", value = "邮箱", required = false, paramType = "body", dataType = "String"),
+                                                                                        @ApiImplicitParam(name = "tenantId", value = "租户ID", required = false, paramType = "body", dataType = "String"),
+                                                                                        @ApiImplicitParam(name = "enable", value = "是否启用；1 - enable，0 - disable", required = false, paramType = "body", dataType = "Boolean")
+                                        })
     public Mono<Void> updateBatch(@RequestParam("ids") String ids, @ApiIgnore @RequestBody Map<String, Object> body) {
         return service.updateBatch(ids, body);
     }

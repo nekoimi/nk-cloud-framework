@@ -18,3 +18,5 @@ app:
     max-age: 3600
   web:
     scan-request-mapping: true
+    swagger:
+      enabled: true

@@ -15,4 +15,12 @@ import org.springframework.stereotype.Component;
 public class WebProperties {
     // 是否扫描全部接口
     private Boolean scanRequestMapping;
+    // swagger
+    private Swagger swagger = new Swagger();
+
+    @Getter
+    @Setter
+    public static class Swagger {
+        private Boolean enabled = false;
+    }
 }

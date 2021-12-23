@@ -1,15 +1,11 @@
 package ${package.Entity};
 
-#foreach($pkg in ${table.importPackages})
-import ${pkg};
-#end
+import com.baomidou.mybatisplus.annotation.*;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
-#if(${superEntityClass})
-#else
-import java.io.Serializable;
-#end
 
 /**
  * ${entity} Entity
@@ -22,12 +18,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-#if(${superEntityClass})
-@EqualsAndHashCode(callSuper = true)
-#else
-@EqualsAndHashCode(callSuper = false)
-#end
-@ApiModel(description = "${cfg.route.info}", parent = BaseEntity.class)
+@ApiModel(description = "${cfg.route.info}")
 @TableName(value = "${table.name}", autoResultMap = true)
 #if(${superEntityClass})
 public class ${entity} extends ${superEntityClass} {
@@ -47,10 +38,36 @@ public class ${entity} implements Serializable{
 
 ## ----------  BEGIN 字段循环遍历  ----------
 #foreach($field in ${table.fields})
+    #if(${field.keyFlag})
     // ${field.comment}
+    @TableId(type = IdType.ASSIGN_UUID)
     @ApiModelProperty(value = "${field.comment}")
-    @TableField
     private ${field.propertyType} ${field.propertyName};
+    #end
+#end
+#foreach($field in ${table.commonFields})
+    // ${field.comment}
+    #if(${field.propertyName} == "createdAt")
+    @OrderBy
+    @TableField(fill = FieldFill.INSERT)
+    #elseif(${field.propertyName} == "updatedAt")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    #elseif(${field.propertyName} == "deletedAt")
+    @TableLogic(value = "NULL", delval = "CURRENT_TIMESTAMP()")
+    #else
+    @TableField
+    #end
+    @ApiModelProperty(value = "${field.comment}")
+    private ${field.propertyType} ${field.propertyName};
+#end
+
+#foreach($field in ${table.fields})
+    #if(!${field.keyFlag})
+    // ${field.comment}
+    @TableField
+    @ApiModelProperty(value = "${field.comment}")
+    private ${field.propertyType} ${field.propertyName};
+    #end
 #end
 ## ----------  END 字段循环遍历  ----------
 
