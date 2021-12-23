@@ -37,15 +37,12 @@ app:
   web:
     scan-request-mapping: true
   security:
-    login-url: /auth/login
-    logout-url: /auth/logout
-    matcher:
-      permit-all:
-        - /home
-        - /exists/**
-        - /get/**
-        - /list
-        - /return/**
-        - /ua/**
-      authenticated:
-        - /user/me
+    permit-all:
+      - /home
+      - /exists/**
+      - /get/**
+      - /list
+      - /return/**
+      - /ua/**
+    authenticated:
+      - /user/me
