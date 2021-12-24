@@ -14,7 +14,7 @@ app:
     allowed-headers:
       - Authorization
     exposed-headers:
-    allow-credentials: true
+    allow-credentials: false
     max-age: 3600
   web:
     scan-request-mapping: true

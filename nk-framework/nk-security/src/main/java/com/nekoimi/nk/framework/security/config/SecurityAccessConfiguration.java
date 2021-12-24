@@ -13,11 +13,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
-import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
-import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -40,10 +37,7 @@ import java.util.List;
  * nekoimi  2021/12/16 17:50
  */
 @Slf4j
-@Configuration
-@EnableWebFluxSecurity
-@EnableReactiveMethodSecurity
-public class SecurityConfiguration {
+public class SecurityAccessConfiguration {
     private final SecurityProperties properties;
     private final ServerAccessDeniedHandler accessDeniedHandler;
     private final ServerAuthenticationEntryPoint authenticationExceptionHandler;
@@ -53,14 +47,14 @@ public class SecurityConfiguration {
     private final ReactiveAuthenticationManager integratedAuthenticationManager;
     private final ServerAuthenticationConverter integratedToAuthenticationTokenConverterManager;
 
-    public SecurityConfiguration(SecurityProperties properties,
-                                 ServerAccessDeniedHandler accessDeniedHandler,
-                                 ServerAuthenticationEntryPoint authenticationExceptionHandler,
-                                 ServerAuthenticationSuccessHandler authenticationSuccessHandler,
-                                 ServerAuthenticationFailureHandler authenticationFailureHandler,
-                                 ServerLogoutSuccessHandler logoutSuccessHandler,
-                                 ReactiveAuthenticationManager integratedAuthenticationManager,
-                                 ServerAuthenticationConverter integratedToAuthenticationTokenConverterManager) {
+    public SecurityAccessConfiguration(SecurityProperties properties,
+                                       ServerAccessDeniedHandler accessDeniedHandler,
+                                       ServerAuthenticationEntryPoint authenticationExceptionHandler,
+                                       ServerAuthenticationSuccessHandler authenticationSuccessHandler,
+                                       ServerAuthenticationFailureHandler authenticationFailureHandler,
+                                       ServerLogoutSuccessHandler logoutSuccessHandler,
+                                       ReactiveAuthenticationManager integratedAuthenticationManager,
+                                       ServerAuthenticationConverter integratedToAuthenticationTokenConverterManager) {
         this.properties = properties;
         this.accessDeniedHandler = accessDeniedHandler;
         this.authenticationExceptionHandler = authenticationExceptionHandler;
