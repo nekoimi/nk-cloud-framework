@@ -1,6 +1,6 @@
 debug: ${debug}
 server:
-  port: 10000
+  port: ${uc.port}
   address: 0.0.0.0
   http2:
     enabled: true

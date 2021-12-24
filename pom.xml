@@ -55,6 +55,11 @@
                 <!--具体环境变量配置-->
                 <debug>true</debug>
                 <profile.name>dev</profile.name>
+                <!--服务运行端口-->
+                <devtools.port>9999</devtools.port>
+                <gateway.port>10000</gateway.port>
+                <cloud-admin.port>9000</cloud-admin.port>
+                <uc.port>9001</uc.port>
                 <!--Consul配置-->
                 <consul.host>localhost</consul.host>
                 <consul.port>8500</consul.port>
@@ -79,6 +84,11 @@
                 <!--具体环境变量配置-->
                 <debug>false</debug>
                 <profile.name>test</profile.name>
+                <!--服务运行端口-->
+                <devtools.port>9999</devtools.port>
+                <gateway.port>10000</gateway.port>
+                <cloud-admin.port>9000</cloud-admin.port>
+                <uc.port>9001</uc.port>
                 <!--数据库环境配置-->
                 <db.driver-class-name>com.mysql.cj.jdbc.Driver</db.driver-class-name>
                 <db.url>jdbc:mysql://localhost:3306/nk_cloud?useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</db.url>
