@@ -9,13 +9,13 @@
     <name>root</name>
     <description>nk-cloud-framework-dependencies</description>
     <modules>
+        <module>nk-gateway</module>
         <module>nk-framework</module>
         <module>nk-services</module>
         <module>nk-devtools</module>
         <module>nk-auth</module>
         <module>nk-platform</module>
         <module>nk-test</module>
-        <module>nk-gateway</module>
     </modules>
     <version>1.0</version>
 
