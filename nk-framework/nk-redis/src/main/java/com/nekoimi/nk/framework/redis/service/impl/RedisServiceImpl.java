@@ -1,6 +1,6 @@
-package com.nekoimi.nk.framework.redis.service;
+package com.nekoimi.nk.framework.redis.service.impl;
 
-import com.nekoimi.nk.framework.cache.contract.CacheService;
+import com.nekoimi.nk.framework.redis.service.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -18,10 +18,10 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-public class RedisCacheService implements CacheService {
+public class RedisServiceImpl implements RedisService {
     private final ReactiveRedisTemplate<String, Object> template;
 
-    public RedisCacheService(ReactiveRedisTemplate<String, Object> template) {
+    public RedisServiceImpl(ReactiveRedisTemplate<String, Object> template) {
         this.template = template;
     }
 

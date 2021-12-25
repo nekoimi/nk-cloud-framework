@@ -25,6 +25,7 @@ spring:
       host: ${consul.host}
       port: ${consul.port}
       discovery:
+        prefer-ip-address: true
         service-name: ${spring.application.name}
         health-check-path: /
         health-check-interval: 60s

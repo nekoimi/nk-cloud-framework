@@ -18,6 +18,8 @@ public enum BaseErrors implements ErrorDetails {
     RESULT_CONVERTER_SUPPORTS_EXCEPTION(10502, "Authentication result converter support error"),
 
     SYSTEM_CLOCK_EXCEPTION(50000, "System clock error"),
+    CONNECT_EXCEPTION(50001, "Connection error"),
+
     // 客户端请求异常
     DEFAULT_CLIENT_ERROR(99400, "无效的请求！"),
     // 未捕获的异常，系统发生致命错误，提示系统维护更新!

@@ -56,13 +56,11 @@ spring:
         max-idle: 8    # 最大空闲时间
         min-idle: 0    # 最小空闲时间
   cloud:
-    inetutils:
-      default-ip-address: 192.168.2.175
-      default-hostname: localhost
     consul:
       host: ${consul.host}
       port: ${consul.port}
       discovery:
+        prefer-ip-address: true
         service-name: ${spring.application.name}
         health-check-path: /
         health-check-interval: 60s
