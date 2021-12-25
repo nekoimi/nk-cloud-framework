@@ -1,20 +1,32 @@
+debug: ${debug}
+server:
+  port: ${config.port}
+  address: 0.0.0.0
+  http2:
+    enabled: true
+  shutdown: graceful
+  error:
+    include-binding-errors: always
+    include-message: always
+    include-stacktrace: always
+    include-exception: true
+    whitelabel:
+      enabled: false
 spring:
   application:
     name: ${artifactId}
   profiles:
-    active: ${profile.name}
+    active: native
   main:
     banner-mode: off
     web-application-type: reactive
   cloud:
     config:
-      enabled: true
-      profile: ${profile.name}
-      allow-override: true
-      fail-fast: true
-      discovery:
+      server:
         enabled: true
-        service-id: nk-config
+        bootstrap: true
+        native:
+          search-locations: classpath:/config
     consul:
       host: ${consul.host}
       port: ${consul.port}
@@ -22,7 +34,7 @@ spring:
         prefer-ip-address: true
         service-name: ${spring.application.name}
         health-check-path: /
-        health-check-interval: 60s
+        health-check-interval: 5s
         metadata:
           name: ${spring.application.name}
           port: ${server.port}
