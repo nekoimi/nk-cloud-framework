@@ -6,17 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
-import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -32,17 +25,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class IntegratedAuthenticationManager implements ReactiveAuthenticationManager, BeanPostProcessor {
     private final static List<AuthenticationSupportManager> supportManagers = new CopyOnWriteArrayList<>();
 
-    static {
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("password")
-                .roles("USER")
-                .build();
-        supportManagers.add(new AuthenticationManagerAdapter(
-                UsernamePasswordAuthenticationToken.class,
-                new UserDetailsRepositoryReactiveAuthenticationManager(new MapReactiveUserDetailsService(user))
-        ));
-    }
+//    static {
+//        UserDetails user = User.withDefaultPasswordEncoder()
+//                .username("user")
+//                .password("password")
+//                .roles("USER")
+//                .build();
+//        supportManagers.add(new AuthenticationManagerAdapter(
+//                UsernamePasswordAuthenticationToken.class,
+//                new UserDetailsRepositoryReactiveAuthenticationManager(new MapReactiveUserDetailsService(user))
+//        ));
+//    }
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {

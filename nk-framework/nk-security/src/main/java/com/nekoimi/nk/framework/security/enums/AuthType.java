@@ -1,4 +1,4 @@
-package com.nekoimi.nk.framework.security.constant;
+package com.nekoimi.nk.framework.security.enums;
 
 import reactor.core.publisher.Mono;
 
@@ -8,7 +8,8 @@ import reactor.core.publisher.Mono;
  * 综合验证方式类型
  */
 public enum AuthType {
-    USERNAME_PASSWORD(0)
+    USERNAME_PASSWORD(0),
+    MOBILE(1)
     ;
 
     private final int id;

@@ -1,6 +1,6 @@
 package com.nekoimi.nk.framework.security.converter;
 
-import com.nekoimi.nk.framework.security.constant.AuthType;
+import com.nekoimi.nk.framework.security.enums.AuthType;
 import com.nekoimi.nk.framework.security.contract.RequestToAuthenticationTokenConverter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
@@ -28,7 +28,7 @@ public class AuthenticationConverterAdapter implements RequestToAuthenticationTo
     }
 
     @Override
-    public Mono<Authentication> convert(ServerWebExchange exchange) {
+    public Mono<? extends Authentication> convert(ServerWebExchange exchange) {
         return this.converter.convert(exchange);
     }
 }

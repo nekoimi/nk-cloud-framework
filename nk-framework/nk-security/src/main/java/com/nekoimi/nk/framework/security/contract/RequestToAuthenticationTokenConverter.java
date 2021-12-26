@@ -1,6 +1,6 @@
 package com.nekoimi.nk.framework.security.contract;
 
-import com.nekoimi.nk.framework.security.constant.AuthType;
+import com.nekoimi.nk.framework.security.enums.AuthType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -23,5 +23,5 @@ public interface RequestToAuthenticationTokenConverter {
      * @param exchange
      * @return
      */
-    Mono<Authentication> convert(ServerWebExchange exchange);
+    Mono<? extends Authentication> convert(ServerWebExchange exchange);
 }
