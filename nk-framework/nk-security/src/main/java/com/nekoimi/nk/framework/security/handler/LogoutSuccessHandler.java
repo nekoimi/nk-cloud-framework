@@ -30,7 +30,7 @@ public class LogoutSuccessHandler implements ServerLogoutSuccessHandler {
                     response.setStatusCode(HttpStatus.OK);
                     response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
                     DataBufferFactory dataBufferFactory = response.bufferFactory();
-                    DataBuffer buffer = dataBufferFactory.wrap(JsonUtils.writeAsBytes(resp));
+                    DataBuffer buffer = dataBufferFactory.wrap(JsonUtils.writeBytes(resp));
                     return response.writeWith(Mono.just(buffer))
                             .doOnError(error -> DataBufferUtils.release(buffer));
                 });

@@ -10,4 +10,15 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
     <artifactId>nk-uc-client</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nekoimi.nk</groupId>
+            <artifactId>nk-openfeign</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nekoimi.nk</groupId>
+            <artifactId>nk-uc-model</artifactId>
+        </dependency>
+    </dependencies>
 </project>

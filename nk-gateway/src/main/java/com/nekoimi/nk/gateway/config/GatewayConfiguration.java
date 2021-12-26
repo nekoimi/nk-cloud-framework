@@ -1,6 +1,11 @@
 package com.nekoimi.nk.gateway.config;
 
+import com.nekoimi.nk.framework.web.config.properties.WebProperties;
+import com.nekoimi.nk.gateway.filter.RewriteUpstreamResponseBodyGatewayFilter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.config.conditional.ConditionalOnEnabledGlobalFilter;
+import org.springframework.cloud.gateway.filter.factory.rewrite.ModifyResponseBodyGatewayFilterFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -9,4 +14,11 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 @Configuration
 public class GatewayConfiguration {
+
+    @Bean
+    @ConditionalOnEnabledGlobalFilter
+    public RewriteUpstreamResponseBodyGatewayFilter rewriteUpstreamResponseBodyGatewayFilter(WebProperties webProperties,
+                                                                                             ModifyResponseBodyGatewayFilterFactory filterFactory) {
+        return new RewriteUpstreamResponseBodyGatewayFilter(webProperties, filterFactory);
+    }
 }

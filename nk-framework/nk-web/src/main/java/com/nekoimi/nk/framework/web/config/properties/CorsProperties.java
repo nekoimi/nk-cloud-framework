@@ -15,6 +15,7 @@ import java.util.List;
 @Component
 @ConfigurationProperties(prefix = "app.cors")
 public class CorsProperties {
+    private Boolean enabled = false;
     private String pathPattern;
     private List<String> allowedOrigins;
     private List<String> allowedMethods;

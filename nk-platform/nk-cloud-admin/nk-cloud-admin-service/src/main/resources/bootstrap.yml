@@ -7,6 +7,9 @@ spring:
     banner-mode: off
     web-application-type: reactive
   cloud:
+    loadbalancer:
+      cache:
+        enabled: false
     config:
       enabled: true
       profile: ${profile.name}
@@ -26,18 +29,3 @@ spring:
         metadata:
           name: ${spring.application.name}
           port: ${server.port}
-    gateway:
-      routes:
-        - id: nk-cloud-admin-service
-          uri: lb://nk-cloud-admin-service
-          predicates:
-            - Path=/cloud-admin/**
-          filters:
-            - RewritePath=/cloud-admin/(?<target>.*), /$\{target}
-
-        - id: nk-uc-service
-          uri: lb://nk-uc-service
-          predicates:
-            - Path=/uc/**
-          filters:
-            - RewritePath=/uc/(?<target>.*), /$\{target}

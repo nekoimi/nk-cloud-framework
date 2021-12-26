@@ -1,9 +1,4 @@
-mybatis-plus:
-#  type-enums-package:
-#  mapper-locations:
-  check-config-location: true
-
-app:
+ app:
   id-gen:
     worker-id: 0
     data-center-id: 0

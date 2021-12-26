@@ -1,6 +1,6 @@
 debug: true
 server:
-  port: 10000
+  port: ${gateway.port}
   address: 0.0.0.0
   http2:
     enabled: true
@@ -18,7 +18,7 @@ spring:
     loadbalancer:
       use404: true
     httpclient:
-      connect-timeout: 30
+      connect-timeout: 45
     fail-on-route-definition-error: true
     discovery:
       locator:
@@ -46,7 +46,14 @@ app:
   id-gen:
     worker-id: 0
     data-center-id: 0
+  web:
+    response-forever-ok: true
+    scan-request-mapping: false
+    swagger:
+      enabled: false
   cors:
+    enabled: true
+    allow-credentials: false
     path-pattern: /**
     allowed-origins:
       - "*"
@@ -58,5 +65,4 @@ app:
     allowed-headers:
       - Authorization
     exposed-headers:
-    allow-credentials: true
     max-age: 3600

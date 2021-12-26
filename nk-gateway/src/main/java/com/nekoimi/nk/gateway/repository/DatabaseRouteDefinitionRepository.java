@@ -23,7 +23,7 @@ import java.util.Map;
  * 自定义路由操作，添加数据库持久化
  */
 @Slf4j
-@Repository
+//@Repository
 public class DatabaseRouteDefinitionRepository implements RouteDefinitionRepository {
 
     @Override

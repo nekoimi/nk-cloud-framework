@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "app.web")
 public class WebProperties {
+    // 接口永远返回200
+    private Boolean responseForeverOk = false;
     // 是否扫描全部接口
     private Boolean scanRequestMapping;
     // swagger

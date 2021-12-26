@@ -21,6 +21,9 @@ spring:
     banner-mode: off
     web-application-type: reactive
   cloud:
+    loadbalancer:
+      cache:
+        enabled: false
     config:
       server:
         enabled: true

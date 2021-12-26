@@ -60,8 +60,8 @@
                 <devtools.port>8888</devtools.port>
                 <config.port>9999</config.port>
                 <gateway.port>10000</gateway.port>
-                <cloud-admin.port>9000</cloud-admin.port>
-                <uc.port>9001</uc.port>
+                <nk-cloud-admin.port>9000</nk-cloud-admin.port>
+                <nk-uc.port>9001</nk-uc.port>
                 <!--Consul配置-->
                 <consul.host>localhost</consul.host>
                 <consul.port>8500</consul.port>
@@ -249,6 +249,11 @@
             <dependency>
                 <groupId>com.nekoimi.nk</groupId>
                 <artifactId>nk-uc-model</artifactId>
+                <version>${nk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nekoimi.nk</groupId>
+                <artifactId>nk-uc-client</artifactId>
                 <version>${nk.version}</version>
             </dependency>
         </dependencies>

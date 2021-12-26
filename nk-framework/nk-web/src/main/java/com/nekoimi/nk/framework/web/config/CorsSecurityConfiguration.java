@@ -1,6 +1,8 @@
 package com.nekoimi.nk.framework.web.config;
 
 import com.nekoimi.nk.framework.web.config.properties.CorsProperties;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -14,7 +16,9 @@ import org.springframework.web.server.WebFilter;
 /**
  * nekoimi  2021/12/16 17:54
  */
+@Slf4j
 @Configuration
+@ConditionalOnProperty(prefix = "app.cors", name = "enabled", havingValue = "true")
 public class CorsSecurityConfiguration {
 
     @Bean
@@ -39,6 +43,7 @@ public class CorsSecurityConfiguration {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public WebFilter corsWebFilter(CorsConfigurationSource source) {
+        log.debug("cors filter ...");
         return new CorsWebFilter(source);
     }
 }

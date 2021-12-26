@@ -1,6 +1,6 @@
 debug: ${debug}
 server:
-  port: ${devtools.port}
+  port: ${nk-uc.port}
   address: 0.0.0.0
   http2:
     enabled: true
@@ -13,13 +13,14 @@ server:
     whitelabel:
       enabled: false
 spring:
-  profiles:
-    active: ${profile.name}
-  main:
-    banner-mode: off
-    web-application-type: reactive
-  application:
-    name: ${artifactId}
+  flyway:
+    enabled: true
+    table: migrations
+    baseline-on-migrate: true
+    sql-migration-prefix: v
+    repeatable-sql-migration-prefix: repeat
+    clean-disabled: true
+    driver-class-name: ${db.driver-class-name}
   datasource:
     driver-class-name: ${db.driver-class-name}
     type: com.zaxxer.hikari.HikariDataSource
@@ -47,33 +48,9 @@ spring:
         max-wait: -1   # 最大阻塞等待时间
         max-idle: 8    # 最大空闲时间
         min-idle: 0    # 最小空闲时间
-
-mybatis-plus:
-  check-config-location: true
-  global-config:
-    banner: false
-    enable-sql-runner: true
-    db-config:
-      logic-delete-value: CURRENT_TIMESTAMP()
-      logic-not-delete-value: NULL
-  configuration:
-    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
-
 app:
-  id-gen:
-    worker-id: 0
-    data-center-id: 0
-  cors:
-    path-pattern: /**
-    allowed-origins:
-      - "*"
-    allowed-methods:
-      - GET
-      - POST
-      - PUT
-      - DELETE
-    allowed-headers:
-      - Authorization
-    exposed-headers:
-    allow-credentials: true
-    max-age: 3600
+  web:
+    response-forever-ok: false
+    scan-request-mapping: false
+    swagger:
+      enabled: true
