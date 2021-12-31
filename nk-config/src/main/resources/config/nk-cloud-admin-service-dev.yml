@@ -14,7 +14,7 @@ server:
       enabled: false
 spring:
   flyway:
-    enabled: false
+    enabled: true
     table: migrations
     baseline-on-migrate: true
     sql-migration-prefix: v

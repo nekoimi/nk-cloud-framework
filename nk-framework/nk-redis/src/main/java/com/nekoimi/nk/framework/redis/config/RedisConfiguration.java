@@ -13,7 +13,7 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
 /**
- * nekoimi  2021/12/19 19:54
+ * nekoimi 2021/12/19 19:54
  */
 @Slf4j
 @Configuration
@@ -21,12 +21,13 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 public class RedisConfiguration {
 
     @Bean
-    public ReactiveRedisTemplate<String, Object> reactiveRedisOperations(ReactiveRedisConnectionFactory connectionFactory,
-                                                                           ObjectMapper objectMapper) {
+    public ReactiveRedisTemplate<String, Object> reactiveRedisOperations(
+            ReactiveRedisConnectionFactory connectionFactory,
+            ObjectMapper objectMapper) {
         Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
         serializer.setObjectMapper(objectMapper);
-        RedisSerializationContext.RedisSerializationContextBuilder<String, Object>
-                builder = RedisSerializationContext.newSerializationContext();
+        RedisSerializationContext.RedisSerializationContextBuilder<String, Object> builder = RedisSerializationContext
+                .newSerializationContext();
         RedisSerializationContext<String, Object> context = builder
                 .string(RedisSerializer.string())
                 .key(RedisSerializer.string())
@@ -42,7 +43,8 @@ public class RedisConfiguration {
      */
     @Bean
     @ConditionalOnBean(value = ReactiveRedisTemplate.class)
-    public ReactiveHashOperations<String, String, Object> reactiveHashOperations(ReactiveRedisTemplate<String, Object> redisTemplate) {
+    public ReactiveHashOperations<String, String, Object> reactiveHashOperations(
+            ReactiveRedisTemplate<String, Object> redisTemplate) {
         return redisTemplate.opsForHash();
     }
 
@@ -51,7 +53,8 @@ public class RedisConfiguration {
      */
     @Bean
     @ConditionalOnBean(value = ReactiveRedisTemplate.class)
-    public ReactiveValueOperations<String, Object> reactiveValueOperations(ReactiveRedisTemplate<String, Object> redisTemplate) {
+    public ReactiveValueOperations<String, Object> reactiveValueOperations(
+            ReactiveRedisTemplate<String, Object> redisTemplate) {
         return redisTemplate.opsForValue();
     }
 
@@ -60,7 +63,8 @@ public class RedisConfiguration {
      */
     @Bean
     @ConditionalOnBean(value = ReactiveRedisTemplate.class)
-    public ReactiveListOperations<String, Object> reactiveListOperations(ReactiveRedisTemplate<String, Object> redisTemplate) {
+    public ReactiveListOperations<String, Object> reactiveListOperations(
+            ReactiveRedisTemplate<String, Object> redisTemplate) {
         return redisTemplate.opsForList();
     }
 
@@ -69,7 +73,8 @@ public class RedisConfiguration {
      */
     @Bean
     @ConditionalOnBean(value = ReactiveRedisTemplate.class)
-    public ReactiveSetOperations<String, Object> reactiveSetOperations(ReactiveRedisTemplate<String, Object> redisTemplate) {
+    public ReactiveSetOperations<String, Object> reactiveSetOperations(
+            ReactiveRedisTemplate<String, Object> redisTemplate) {
         return redisTemplate.opsForSet();
     }
 
@@ -78,7 +83,8 @@ public class RedisConfiguration {
      */
     @Bean
     @ConditionalOnBean(value = ReactiveRedisTemplate.class)
-    public ReactiveZSetOperations<String, Object> reactiveZSetOperations(ReactiveRedisTemplate<String, Object> redisTemplate) {
+    public ReactiveZSetOperations<String, Object> reactiveZSetOperations(
+            ReactiveRedisTemplate<String, Object> redisTemplate) {
         return redisTemplate.opsForZSet();
     }
 }
