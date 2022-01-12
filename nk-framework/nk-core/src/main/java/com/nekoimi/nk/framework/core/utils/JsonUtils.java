@@ -5,6 +5,7 @@ import com.nekoimi.nk.framework.core.holder.ObjectMapperHolder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * nekoimi  2021/12/14 10:55
@@ -13,6 +14,9 @@ import java.io.IOException;
 public class JsonUtils {
 
     public static String write(Object src) {
+        if (src instanceof String) {
+            return src.toString();
+        }
         try {
             return ObjectMapperHolder.getInstance().writeValueAsString(src);
         } catch (JsonProcessingException e) {
@@ -22,6 +26,9 @@ public class JsonUtils {
     }
 
     public static byte[] writeBytes(Object src) {
+        if (src instanceof String) {
+            return src.toString().getBytes(StandardCharsets.UTF_8);
+        }
         try {
             return ObjectMapperHolder.getInstance().writeValueAsBytes(src);
         } catch (JsonProcessingException e) {

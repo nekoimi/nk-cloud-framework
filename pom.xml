@@ -39,6 +39,7 @@
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <p6spy.version>3.9.1</p6spy.version>
+        <rocksdb.version>6.25.3</rocksdb.version>
         <swagger.version>2.10.5</swagger.version>
         <swagger-annotations.version>1.5.20</swagger-annotations.version>
         <swagger-knife4j-ui.version>2.0.9</swagger-knife4j-ui.version>
@@ -188,6 +189,11 @@
                 <groupId>p6spy</groupId>
                 <artifactId>p6spy</artifactId>
                 <version>${p6spy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.rocksdb</groupId>
+                <artifactId>rocksdbjni</artifactId>
+                <version>${rocksdb.version}</version>
             </dependency>
             <!-- swagger docs -->
             <dependency>

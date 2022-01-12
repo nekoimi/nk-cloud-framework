@@ -2,7 +2,7 @@ package com.nekoimi.nk.gateway.filter;
 
 import com.nekoimi.nk.framework.core.protocol.JsonResp;
 import com.nekoimi.nk.framework.core.utils.JsonUtils;
-import com.nekoimi.nk.framework.web.config.properties.WebProperties;
+import com.nekoimi.nk.framework.web.config.properties.AppWebProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -27,18 +27,18 @@ import java.util.Map;
  */
 public class RewriteUpstreamResponseBodyGatewayFilter implements GlobalFilter, Ordered {
     private final ModifyResponseBodyGatewayFilterFactory filterFactory;
-    private final WebProperties webProperties;
+    private final AppWebProperties appWebProperties;
     private GatewayFilter filter;
 
-    public RewriteUpstreamResponseBodyGatewayFilter(WebProperties webProperties,
+    public RewriteUpstreamResponseBodyGatewayFilter(AppWebProperties appWebProperties,
                                                     ModifyResponseBodyGatewayFilterFactory filterFactory) {
-        this.webProperties = webProperties;
+        this.appWebProperties = appWebProperties;
         this.filterFactory = filterFactory;
         initialization();
     }
 
     private void initialization() {
-        RewriteFunction<byte[], byte[]> rewriteFunction = new RewriteUpstreamResponseBodyFunction(webProperties);
+        RewriteFunction<byte[], byte[]> rewriteFunction = new RewriteUpstreamResponseBodyFunction(appWebProperties);
         ModifyResponseBodyGatewayFilterFactory.Config modifyConfig =
                 new ModifyResponseBodyGatewayFilterFactory.Config()
                         .setRewriteFunction(byte[].class, byte[].class, rewriteFunction);
@@ -61,9 +61,9 @@ public class RewriteUpstreamResponseBodyGatewayFilter implements GlobalFilter, O
      */
     @Slf4j
     public static class RewriteUpstreamResponseBodyFunction implements RewriteFunction<byte[], byte[]> {
-        private final WebProperties webProperties;
-        public RewriteUpstreamResponseBodyFunction(WebProperties webProperties) {
-            this.webProperties = webProperties;
+        private final AppWebProperties appWebProperties;
+        public RewriteUpstreamResponseBodyFunction(AppWebProperties appWebProperties) {
+            this.appWebProperties = appWebProperties;
         }
 
         @Override
@@ -73,7 +73,7 @@ public class RewriteUpstreamResponseBodyGatewayFilter implements GlobalFilter, O
                     exchange.getResponse().getHeaders().getContentType() == null ||
                     !exchange.getResponse().getStatusCode().is2xxSuccessful() ||
                     !exchange.getResponse().getHeaders().getContentType().isCompatibleWith(MediaType.APPLICATION_JSON)) {
-                if (webProperties.getResponseForeverOk()) {
+                if (appWebProperties.getResponseForeverOk()) {
                     exchange.getResponse().setStatusCode(HttpStatus.OK);
                 }
                 return Mono.justOrEmpty(bytes);

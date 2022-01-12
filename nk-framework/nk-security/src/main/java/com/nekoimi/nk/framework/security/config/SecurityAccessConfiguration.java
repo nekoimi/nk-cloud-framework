@@ -1,107 +1,43 @@
 package com.nekoimi.nk.framework.security.config;
 
-import com.nekoimi.nk.framework.cache.contract.CacheService;
-import com.nekoimi.nk.framework.core.constant.SecurityConstants;
 import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
 import com.nekoimi.nk.framework.security.contract.SecurityAuthorizeExchangeCustomizer;
 import com.nekoimi.nk.framework.security.contract.SecurityConfigCustomizer;
-import com.nekoimi.nk.framework.security.customizer.SwaggerSecurityAuthorizeExchangeCustomizer;
-import com.nekoimi.nk.framework.security.filter.RequestParseAuthTypeFilter;
-import com.nekoimi.nk.framework.security.repository.RedisServerSecurityContextRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.ReactiveAuthenticationManager;
-import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
-import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
-import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
-import org.springframework.security.web.server.authentication.ServerAuthenticationFailureHandler;
-import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
-import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
 import org.springframework.security.web.server.authorization.ServerAccessDeniedHandler;
-import org.springframework.security.web.server.context.ServerSecurityContextRepository;
-import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
-import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 
 import java.util.List;
 
 /**
  * nekoimi  2021/12/16 17:50
+ * <p>
+ * 安全访问配置
+ * 只提供权限验证功能，不提供登录、发token
  */
 @Slf4j
 public class SecurityAccessConfiguration {
     private final SecurityProperties properties;
     private final ServerAccessDeniedHandler accessDeniedHandler;
     private final ServerAuthenticationEntryPoint authenticationExceptionHandler;
-    private final ServerAuthenticationSuccessHandler authenticationSuccessHandler;
-    private final ServerAuthenticationFailureHandler authenticationFailureHandler;
-    private final ServerLogoutSuccessHandler logoutSuccessHandler;
-    private final ReactiveAuthenticationManager integratedAuthenticationManager;
-    private final ServerAuthenticationConverter integratedToAuthenticationTokenConverterManager;
 
     public SecurityAccessConfiguration(SecurityProperties properties,
                                        ServerAccessDeniedHandler accessDeniedHandler,
-                                       ServerAuthenticationEntryPoint authenticationExceptionHandler,
-                                       ServerAuthenticationSuccessHandler authenticationSuccessHandler,
-                                       ServerAuthenticationFailureHandler authenticationFailureHandler,
-                                       ServerLogoutSuccessHandler logoutSuccessHandler,
-                                       ReactiveAuthenticationManager integratedAuthenticationManager,
-                                       ServerAuthenticationConverter integratedToAuthenticationTokenConverterManager) {
+                                       ServerAuthenticationEntryPoint authenticationExceptionHandler) {
         this.properties = properties;
         this.accessDeniedHandler = accessDeniedHandler;
         this.authenticationExceptionHandler = authenticationExceptionHandler;
-        this.authenticationSuccessHandler = authenticationSuccessHandler;
-        this.authenticationFailureHandler = authenticationFailureHandler;
-        this.logoutSuccessHandler = logoutSuccessHandler;
-        this.integratedAuthenticationManager = integratedAuthenticationManager;
-        this.integratedToAuthenticationTokenConverterManager = integratedToAuthenticationTokenConverterManager;
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(30);
-    }
-
-    @Bean
-    @ConditionalOnBean(value = CacheService.class, search = SearchStrategy.CURRENT)
-    public ServerSecurityContextRepository securityContextRepository(CacheService cacheService) {
-        return new RedisServerSecurityContextRepository(cacheService);
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "app.web.swagger", name = "enabled", havingValue = "true")
-    public SwaggerSecurityAuthorizeExchangeCustomizer swaggerSecurityAuthorizeExchangeCustomizer() {
-        return new SwaggerSecurityAuthorizeExchangeCustomizer();
-    }
-
-    @Bean
-    @ConditionalOnBean(value = CacheService.class, search = SearchStrategy.CURRENT)
     public SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http,
-                                                       ServerSecurityContextRepository securityContextRepository,
                                                        List<SecurityConfigCustomizer> configCustomizers,
                                                        List<SecurityAuthorizeExchangeCustomizer> authorizeExchangeCustomizers) {
-        ServerWebExchangeMatcher loginExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, SecurityConstants.LOGIN_PATH);
-        ServerWebExchangeMatcher logoutExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, SecurityConstants.LOGOUT_PATH);
-        // 登录认证
-        http.formLogin(login -> login.requiresAuthenticationMatcher(loginExchangeMatcher)
-                .authenticationSuccessHandler(authenticationSuccessHandler)
-                .authenticationFailureHandler(authenticationFailureHandler)
-                .authenticationManager(integratedAuthenticationManager)
-                .securityContextRepository(securityContextRepository))
-                // 注销认证
-                .logout(logout -> logout.requiresLogout(logoutExchangeMatcher)
-                        .logoutSuccessHandler(logoutSuccessHandler)
-                )
-                // 关闭csrf
-                .csrf().disable()
+        // 关闭csrf
+        http.csrf().disable()
                 // 关闭匿名用户
                 .anonymous().disable()
                 // 关闭Basic基础认证
@@ -113,12 +49,9 @@ public class SecurityAccessConfiguration {
                 // disable cors
                 .cors().disable()
                 // 异常处理
-                .exceptionHandling(handler -> handler.accessDeniedHandler(accessDeniedHandler)
-                        .authenticationEntryPoint(authenticationExceptionHandler)
-                )
+                .exceptionHandling(handler -> handler.accessDeniedHandler(accessDeniedHandler).authenticationEntryPoint(authenticationExceptionHandler))
                 // 配置请求过滤
                 .authorizeExchange(exchange -> {
-                    SecurityConstants.getDefaultPermitAll().forEach(path -> exchange.pathMatchers(path).permitAll());
                     if (!properties.getPermitAll().isEmpty()) {
                         properties.getPermitAll().forEach(path -> exchange.pathMatchers(path).permitAll());
                     }
@@ -127,18 +60,9 @@ public class SecurityAccessConfiguration {
                     }
                     authorizeExchangeCustomizers.forEach(exchangeCustomizer -> exchangeCustomizer.customize(exchange));
                     exchange.anyExchange().authenticated();
-                })
-                // 插入认证类型解析filter
-                .addFilterBefore(new RequestParseAuthTypeFilter(loginExchangeMatcher), SecurityWebFiltersOrder.HTTP_BASIC);
+                });
         configCustomizers.forEach(configCustomizer -> configCustomizer.customize(http));
-        SecurityWebFilterChain filterChain = http.build();
-        // TODO 综合认证Token解析器
-        filterChain.getWebFilters()
-                .filter(webFilter -> webFilter instanceof AuthenticationWebFilter)
-                .cast(AuthenticationWebFilter.class)
-                .subscribe(filter -> filter.setServerAuthenticationConverter(integratedToAuthenticationTokenConverterManager));
-
-        return filterChain;
+        return http.build();
     }
 
 }

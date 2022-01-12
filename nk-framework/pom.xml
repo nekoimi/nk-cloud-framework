@@ -19,5 +19,6 @@
         <module>nk-redis</module>
         <module>nk-oauth2-server</module>
         <module>nk-cache</module>
+        <module>nk-rocksdb</module>
     </modules>
 </project>

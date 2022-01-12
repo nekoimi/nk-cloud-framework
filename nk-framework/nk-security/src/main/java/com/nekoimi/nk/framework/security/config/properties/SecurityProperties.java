@@ -16,6 +16,12 @@ import java.util.List;
 @Component
 @ConfigurationProperties(prefix = "app.security")
 public class SecurityProperties {
+    // 登录路由
+    private String loginPath;
+    // 退出登录路由
+    private String logoutPath;
+    // 不需要认证匹配列表
     private List<String> permitAll = new ArrayList<>();
+    // 需要认证匹配列表
     private List<String> authenticated = new ArrayList<>();
 }

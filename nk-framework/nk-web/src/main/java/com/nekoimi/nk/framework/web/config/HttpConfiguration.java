@@ -15,6 +15,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.WebFilter;
 
 /**
@@ -22,6 +24,11 @@ import org.springframework.web.server.WebFilter;
  */
 @Configuration
 public class HttpConfiguration {
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(30);
+    }
 
     @Bean
     @ConditionalOnMissingBean(name = "indexController", search = SearchStrategy.CURRENT)
@@ -36,6 +43,7 @@ public class HttpConfiguration {
     }
 
     @Bean
+    @ConditionalOnClass(value = CacheService.class)
     @ConditionalOnBean(value = CacheService.class, search = SearchStrategy.CURRENT)
     @ConditionalOnProperty(prefix = "app.web", name = "scan-request-mapping", havingValue = "true")
     public ScanRequestMappingListener scanRequestMappingListener(CacheService cacheService) {

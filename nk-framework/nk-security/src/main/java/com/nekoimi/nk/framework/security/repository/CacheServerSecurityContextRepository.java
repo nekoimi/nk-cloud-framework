@@ -26,11 +26,11 @@ import reactor.core.publisher.Mono;
  * 保存在redis中
  */
 @Slf4j
-public class RedisServerSecurityContextRepository implements ServerSecurityContextRepository {
+public class CacheServerSecurityContextRepository implements ServerSecurityContextRepository {
     private final static String SUB_KEY = "auth:sub:";
     private final CacheService cacheService;
 
-    public RedisServerSecurityContextRepository(CacheService cacheService) {
+    public CacheServerSecurityContextRepository(CacheService cacheService) {
         this.cacheService = cacheService;
     }
 

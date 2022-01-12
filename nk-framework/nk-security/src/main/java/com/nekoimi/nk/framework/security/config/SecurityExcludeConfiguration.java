@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * nekoimi  2021/12/24 15:22
  *
+ * 排除掉SecurityAutoConfiguration自动配置
  * 默认不启用SpringSecurity
  */
 @Configuration

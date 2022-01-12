@@ -1,7 +1,8 @@
 package com.nekoimi.nk.framework.web.config;
 
-import com.nekoimi.nk.framework.core.constant.SecurityConstants;
+import com.nekoimi.nk.framework.web.config.properties.AppWebProperties;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,8 @@ import java.util.List;
 public class SwaggerConfiguration {
     @Value("${spring.application.name}")
     private String name;
+    @Autowired
+    private AppWebProperties appWebProperties;
 
     @Bean
     public Docket docket() {
@@ -76,10 +79,13 @@ public class SwaggerConfiguration {
         return securityContexts;
     }
 
-    private boolean pathSelect(String s) {
+    private boolean pathSelect(String path) {
         AntPathMatcher matcher = new AntPathMatcher();
-        return !matcher.match("/", s) &&
-                !matcher.match(SecurityConstants.LOGIN_PATH, s);
+        boolean b = !matcher.match("/", path);
+        for (String s : appWebProperties.getSwagger().getPermitAll()) {
+            b = !matcher.match(s, path);
+        }
+        return b;
     }
 
     private List<SecurityReference> defaultAuth() {

@@ -12,6 +12,8 @@
     <modules>
         <module>nk-cloud-admin</module>
         <module>nk-uc</module>
+        <module>nk-storage</module>
+        <module>nk-online-preview</module>
     </modules>
     <artifactId>nk-platform</artifactId>
 </project>

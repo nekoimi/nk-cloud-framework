@@ -1,7 +1,7 @@
 package com.nekoimi.nk.framework.security.converter;
 
-import com.nekoimi.nk.framework.core.constant.CustomHeaderConstants;
 import com.nekoimi.nk.framework.core.exception.http.RequestValidationException;
+import com.nekoimi.nk.framework.security.constant.SecurityRequestHeaders;
 import com.nekoimi.nk.framework.security.contract.RequestToAuthenticationTokenConverter;
 import com.nekoimi.nk.framework.security.enums.AuthType;
 import lombok.extern.slf4j.Slf4j;
@@ -50,8 +50,8 @@ public class IntegratedToAuthenticationTokenConverterManager implements ServerAu
             return Mono.error(new RequestValidationException("The content type is not supported"));
         }
         return Mono.just(exchange.getRequest().getHeaders())
-                .flatMap(headers -> Mono.justOrEmpty(headers.getFirst(CustomHeaderConstants.AUTH_TYPE_REQUEST_HEADER)))
-                .switchIfEmpty(Mono.error(new RequestValidationException("Headers is missing `%s` parameter", CustomHeaderConstants.AUTH_TYPE_REQUEST_HEADER)))
+                .flatMap(headers -> Mono.justOrEmpty(headers.getFirst(SecurityRequestHeaders.AUTH_TYPE)))
+                .switchIfEmpty(Mono.error(new RequestValidationException("Headers is missing `%s` parameter", SecurityRequestHeaders.AUTH_TYPE)))
                 .map(Integer::parseInt)
                 .flatMap(AuthType::valueOf)
                 .switchIfEmpty(Mono.error(new RequestValidationException("Illegal authentication type")))

@@ -4,12 +4,8 @@ import com.nekoimi.nk.framework.core.protocol.JsonResp;
 import com.nekoimi.nk.framework.core.utils.JsonUtils;
 import com.nekoimi.nk.framework.security.contract.AuthenticationTokenToResultTransformer;
 import com.nekoimi.nk.framework.security.exception.ResultConverterSupportsException;
+import com.nekoimi.nk.framework.security.utils.SendUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferFactory;
-import org.springframework.core.io.buffer.DataBufferUtils;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
@@ -36,20 +32,12 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange exchange, Authentication authentication) {
         log.debug("登录成功 -- \n {}", JsonUtils.write(authentication));
-        return Mono.just(exchange.getExchange().getResponse())
-                .flatMap(response -> Flux.fromIterable(converters)
-                        .filter(c -> c.support(authentication))
-                        .switchIfEmpty(Flux.error(new ResultConverterSupportsException()))
-                        .last()
-                        .flatMap(c -> c.transform(authentication))
-                        .map(JsonResp::ok)
-                        .flatMap(result -> {
-                            response.setStatusCode(HttpStatus.OK);
-                            response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-                            DataBufferFactory dataBufferFactory = response.bufferFactory();
-                            DataBuffer buffer = dataBufferFactory.wrap(JsonUtils.writeBytes(result));
-                            return response.writeWith(Mono.just(buffer))
-                                    .doOnError(error -> DataBufferUtils.release(buffer));
-                        }));
+        return Flux.fromIterable(converters)
+                .filter(c -> c.support(authentication))
+                .switchIfEmpty(Flux.error(new ResultConverterSupportsException()))
+                .last()
+                .flatMap(c -> c.transform(authentication))
+                .map(JsonResp::ok)
+                .flatMap(result -> SendUtils.sendJson(exchange.getExchange().getResponse(), result));
     }
 }

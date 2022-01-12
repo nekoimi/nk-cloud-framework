@@ -1,7 +1,7 @@
 package com.nekoimi.nk.framework.security.filter;
 
-import com.nekoimi.nk.framework.core.constant.CustomHeaderConstants;
 import com.nekoimi.nk.framework.core.exception.http.RequestValidationException;
+import com.nekoimi.nk.framework.security.constant.SecurityRequestHeaders;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
@@ -17,15 +17,25 @@ import reactor.core.publisher.Mono;
  * 添加请求方式header
  */
 @Slf4j
-public class RequestParseAuthTypeFilter implements WebFilter {
+public class ResolverAuthTypeParameterFilter implements WebFilter {
     private static final String authTypeParameter = "auth_type";
-    private final ServerWebExchangeMatcher matcher;
+    private final ServerWebExchangeMatcher loginPathMatcher;
 
-    public RequestParseAuthTypeFilter(ServerWebExchangeMatcher matcher) {
-        this.matcher = matcher;
+    public ResolverAuthTypeParameterFilter(ServerWebExchangeMatcher matcher) {
+        this.loginPathMatcher = matcher;
     }
 
-    private Mono<String> parse(ServerWebExchange exchange) {
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        return loginPathMatcher.matches(exchange)
+                .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
+                .switchIfEmpty(chain.filter(exchange).then(Mono.empty()))
+                .flatMap(r -> doParse(exchange)
+                        .switchIfEmpty(Mono.error(new RequestValidationException("Query params is missing `auth_type` parameter")))
+                        .flatMap(s -> chain.filter(exchange)));
+    }
+
+    private Mono<String> doParse(ServerWebExchange exchange) {
         String authType = exchange.getRequest().getQueryParams().getFirst(authTypeParameter);
         if (StringUtils.isBlank(authType)) {
             return Mono.empty();
@@ -35,17 +45,7 @@ public class RequestParseAuthTypeFilter implements WebFilter {
         }
         log.debug("parse auth type: {}", authType);
         // 设置认证类型header
-        exchange.getRequest().mutate().header(CustomHeaderConstants.AUTH_TYPE_REQUEST_HEADER, authType);
+        exchange.getRequest().mutate().header(SecurityRequestHeaders.AUTH_TYPE, authType);
         return Mono.just(authType);
-    }
-
-    @Override
-    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        return matcher.matches(exchange)
-                .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
-                .switchIfEmpty(chain.filter(exchange).then(Mono.empty()))
-                .flatMap(r -> parse(exchange)
-                        .switchIfEmpty(Mono.error(new RequestValidationException("Query params is missing `auth_type` parameter")))
-                        .flatMap(s -> chain.filter(exchange)));
     }
 }
