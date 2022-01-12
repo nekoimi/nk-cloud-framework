@@ -1,7 +1,6 @@
 package com.nekoimi.nk.framework.core.protocol;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.nekoimi.nk.framework.core.utils.JsonUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -24,6 +23,7 @@ import java.util.Map;
 @ApiModel(description = "响应结构")
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class JsonResp implements Serializable {
     private final static String MESSAGE_OK = "ok";
     private final static Map<String, String> EMPTY_DATA = new HashMap<>();
@@ -33,7 +33,6 @@ public class JsonResp implements Serializable {
     @ApiModelProperty(value = "业务消息；当且仅当code不为0时有效")
     private String msg;
     @ApiModelProperty(value = "业务数据")
-    @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private Object data;
 
     public static JsonResp ok() {
