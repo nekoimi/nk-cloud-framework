@@ -16,7 +16,7 @@ import java.time.Duration;
 @Slf4j
 @Service
 public class RedisLockServiceImpl implements RedisLockService {
-    private static final String LOCK_KEY = "_rlock:";
+    private static final String LOCK_KEY = "redis_lock:";
     private static final String LUA_SCRIPT_LOCK = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
     private static final ByteBuffer LUA_SCRIPT_LOCK_BYTE_BUFFER = ByteBuffer.wrap(LUA_SCRIPT_LOCK.getBytes());
     private final ReactiveRedisTemplate<String, Object> template;

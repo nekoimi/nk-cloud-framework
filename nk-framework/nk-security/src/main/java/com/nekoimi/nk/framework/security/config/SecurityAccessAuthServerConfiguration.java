@@ -1,6 +1,6 @@
 package com.nekoimi.nk.framework.security.config;
 
-import com.nekoimi.nk.framework.cache.contract.CacheService;
+import com.nekoimi.nk.framework.redis.service.RedisService;
 import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
 import com.nekoimi.nk.framework.security.filter.ResolverAuthTypeParameterFilter;
 import lombok.extern.slf4j.Slf4j;
@@ -66,8 +66,8 @@ public class SecurityAccessAuthServerConfiguration {
     }
 
     @Bean
-    @ConditionalOnClass(value = CacheService.class)
-    @ConditionalOnBean(value = CacheService.class, search = SearchStrategy.CURRENT)
+    @ConditionalOnClass(value = RedisService.class)
+    @ConditionalOnBean(value = RedisService.class, search = SearchStrategy.CURRENT)
     public SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http,
                                                        ServerSecurityContextRepository securityContextRepository) {
         // 登录认证

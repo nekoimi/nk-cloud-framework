@@ -5,8 +5,6 @@ import org.rocksdb.RocksDB;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
-
 /**
  * nekoimi  2022/1/6 15:57
  */
@@ -27,16 +25,6 @@ public class RocksDBService implements CacheService {
     }
 
     @Override
-    public Mono<Boolean> expireSet(String key, long seconds) {
-        return null;
-    }
-
-    @Override
-    public Mono<Boolean> expireAt(String key, LocalDateTime expireAt) {
-        return null;
-    }
-
-    @Override
     public Mono<Object> get(String key) {
         return null;
     }
@@ -48,11 +36,6 @@ public class RocksDBService implements CacheService {
 
     @Override
     public Mono<Boolean> set(String key, Object value) {
-        return null;
-    }
-
-    @Override
-    public Mono<Boolean> set(String key, Object value, long seconds) {
         return null;
     }
 

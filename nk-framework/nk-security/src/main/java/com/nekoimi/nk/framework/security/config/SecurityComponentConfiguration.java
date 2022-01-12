@@ -1,6 +1,6 @@
 package com.nekoimi.nk.framework.security.config;
 
-import com.nekoimi.nk.framework.cache.contract.CacheService;
+import com.nekoimi.nk.framework.redis.service.RedisService;
 import com.nekoimi.nk.framework.security.customizer.SwaggerSecurityAuthorizeExchangeCustomizer;
 import com.nekoimi.nk.framework.security.repository.CacheServerSecurityContextRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -18,14 +18,14 @@ public class SecurityComponentConfiguration {
 
     /**
      * 安全上下文存储
-     * @param cacheService
+     * @param redisService
      * @return
      */
     @Bean
-    @ConditionalOnClass(value = CacheService.class)
-    @ConditionalOnBean(value = CacheService.class, search = SearchStrategy.CURRENT)
-    public ServerSecurityContextRepository securityContextRepository(CacheService cacheService) {
-        return new CacheServerSecurityContextRepository(cacheService);
+    @ConditionalOnClass(value = RedisService.class)
+    @ConditionalOnBean(value = RedisService.class, search = SearchStrategy.CURRENT)
+    public ServerSecurityContextRepository securityContextRepository(RedisService redisService) {
+        return new CacheServerSecurityContextRepository(redisService);
     }
 
     /**

@@ -3,8 +3,6 @@ package com.nekoimi.nk.framework.cache.contract;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
-
 /**
  * nekoimi  2021/12/21 14:03
  */
@@ -24,24 +22,6 @@ public interface CacheService {
      * @return
      */
     Mono<Boolean> exists(String key);
-
-    /**
-     * 设置缓存过期时间
-     *
-     * @param key
-     * @param seconds
-     * @return
-     */
-    Mono<Boolean> expireSet(String key, long seconds);
-
-    /**
-     * 设置缓存过期时间
-     *
-     * @param key
-     * @param expireAt
-     * @return
-     */
-    Mono<Boolean> expireAt(String key, LocalDateTime expireAt);
 
     /**
      * 获取缓存
@@ -67,16 +47,6 @@ public interface CacheService {
      * @return
      */
     Mono<Boolean> set(String key, Object value);
-
-    /**
-     * 设置缓存，并设置过期时间
-     *
-     * @param key
-     * @param value
-     * @param seconds
-     * @return
-     */
-    Mono<Boolean> set(String key, Object value, long seconds);
 
     /**
      * 对指定缓存加一
