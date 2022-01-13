@@ -2,7 +2,6 @@ package com.nekoimi.nk.framework.rocksdb.service.impl;
 
 import com.nekoimi.nk.framework.cache.contract.CacheService;
 import org.rocksdb.RocksDB;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -15,7 +14,7 @@ public class RocksDBService implements CacheService {
     }
 
     @Override
-    public Mono<Long> delete(Flux<String> keys) {
+    public Mono<Long> delete(String key) {
         return null;
     }
 

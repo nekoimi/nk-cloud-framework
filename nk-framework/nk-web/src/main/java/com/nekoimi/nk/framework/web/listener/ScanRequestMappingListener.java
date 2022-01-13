@@ -30,7 +30,7 @@ public class ScanRequestMappingListener implements ApplicationListener<Applicati
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        log.debug("------- request mapping scan -------");
+        log.debug("------- scan request mapping -------");
         ConfigurableApplicationContext context = event.getApplicationContext();
         ConfigurableEnvironment environment = context.getEnvironment();
         String microService = environment.getProperty("spring.application.name", "application");

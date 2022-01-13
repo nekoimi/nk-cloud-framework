@@ -10,8 +10,10 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,23 +34,34 @@ public class RequestLogFilter implements WebFilter, Ordered {
         StringBuilder beforeReqLog = new StringBuilder(300);
         // 日志参数
         List<Object> beforeReqArgs = new ArrayList<>();
-        beforeReqLog.append("\n\n================ Gateway Request Start  ================\n");
+        beforeReqLog.append("\n\n================ Request Start  ================\n");
         // 打印路由
-        beforeReqLog.append("===> {}: {}\n");
+        beforeReqLog.append("===> {}: {}\n\n");
         // 参数
         String requestMethod = request.getMethodValue();
-        String requestUrl = request.getURI().getRawPath();
+        URI requestUri = request.getURI();
+        StringBuilder requestUrlBuilder = new StringBuilder(requestUri.getPath());
+        String query = requestUri.getQuery();
+        if (StringUtils.isNotBlank(query)) {
+            requestUrlBuilder.append("?");
+            requestUrlBuilder.append(URLDecoder.decode(query, StandardCharsets.UTF_8));
+        }
+        String requestUrl = requestUrlBuilder.toString();
         beforeReqArgs.add(requestMethod);
         beforeReqArgs.add(requestUrl);
 
         // 打印请求头
         HttpHeaders headers = request.getHeaders();
         headers.forEach((headerName, headerValue) -> {
-            beforeReqLog.append("===Headers===  {}: {}\n");
+            beforeReqLog.append("Header {}: {}\n");
             beforeReqArgs.add(headerName);
-            beforeReqArgs.add(StringUtils.join(headerValue));
+            if (headerValue.size() == 1) {
+                beforeReqArgs.add(headerValue.get(0));
+            } else {
+                beforeReqArgs.add(StringUtils.join(headerValue));
+            }
         });
-        beforeReqLog.append("================ Gateway Request End =================\n");
+        beforeReqLog.append("================ Request End =================\n");
         // 打印
         log.info(beforeReqLog.toString(), beforeReqArgs.toArray());
 
@@ -65,9 +78,9 @@ public class RequestLogFilter implements WebFilter, Ordered {
             StringBuilder responseLog = new StringBuilder(300);
             // 日志参数
             List<Object> responseArgs = new ArrayList<>();
-            responseLog.append("\n\n================ Gateway Response Start  ================\n");
+            responseLog.append("\n\n================ Response Start  ================\n");
             // 打印路由 200 get: /mate*/xxx/xxx
-            responseLog.append("<=== {} {}: {}: {}\n");
+            responseLog.append("<=== {} {}: {}: {}\n\n");
             // 参数
             responseArgs.add(Objects.requireNonNull(response.getStatusCode()).value());
             responseArgs.add(requestMethod);
@@ -77,12 +90,16 @@ public class RequestLogFilter implements WebFilter, Ordered {
             // 打印请求头
             HttpHeaders httpHeaders = response.getHeaders();
             httpHeaders.forEach((headerName, headerValue) -> {
-                responseLog.append("===Headers===  {}: {}\n");
+                responseLog.append("Header  {}: {}\n");
                 responseArgs.add(headerName);
-                responseArgs.add(StringUtils.join(headerValue));
+                if (headerValue.size() == 1) {
+                    beforeReqArgs.add(headerValue.get(0));
+                } else {
+                    beforeReqArgs.add(StringUtils.join(headerValue));
+                }
             });
 
-            responseLog.append("================  Gateway Response End  =================\n");
+            responseLog.append("================  Response End  =================\n");
             // 打印执行时间
             log.info(responseLog.toString(), responseArgs.toArray());
         }));

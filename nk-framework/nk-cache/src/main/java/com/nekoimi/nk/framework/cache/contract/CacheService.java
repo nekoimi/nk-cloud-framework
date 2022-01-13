@@ -11,9 +11,9 @@ public interface CacheService {
     /**
      * 删除缓存
      *
-     * @param keys
+     * @param key
      */
-    Mono<Long> delete(Flux<String> keys);
+    Mono<Long> delete(String key);
 
     /**
      * 判断缓存是否存在

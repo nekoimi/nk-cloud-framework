@@ -23,7 +23,7 @@ public class BeforeRequestFilter implements WebFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
-        if ("/favicon.ico".equalsIgnoreCase(request.getPath().value())) {
+        if (request.getPath().value().contains("favicon.ico")) {
             ServerHttpResponse response = exchange.getResponse();
             response.setStatusCode(HttpStatus.NO_CONTENT);
             DataBuffer dataBuffer = response.bufferFactory().allocateBuffer();

@@ -6,6 +6,7 @@ import com.nekoimi.nk.framework.core.holder.ObjectMapperHolder;
 import com.nekoimi.nk.framework.web.controller.IndexController;
 import com.nekoimi.nk.framework.web.customizer.HttpJackson2ObjectMapperBuilderCustomizer;
 import com.nekoimi.nk.framework.web.filter.RequestLogFilter;
+import com.nekoimi.nk.framework.web.listener.CleanRequestMappingListener;
 import com.nekoimi.nk.framework.web.listener.ScanRequestMappingListener;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
@@ -23,7 +24,7 @@ import org.springframework.web.server.WebFilter;
  * nekoimi  2021/12/22 10:30
  */
 @Configuration
-public class HttpConfiguration {
+public class AppWebConfiguration {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -48,6 +49,14 @@ public class HttpConfiguration {
     @ConditionalOnProperty(prefix = "app.web", name = "scan-request-mapping", havingValue = "true")
     public ScanRequestMappingListener scanRequestMappingListener(CacheService cacheService) {
         return new ScanRequestMappingListener(cacheService);
+    }
+
+    @Bean
+    @ConditionalOnClass(value = CacheService.class)
+    @ConditionalOnBean(value = CacheService.class, search = SearchStrategy.CURRENT)
+    @ConditionalOnProperty(prefix = "app.web", name = "scan-request-mapping", havingValue = "true")
+    public CleanRequestMappingListener cleanRequestMappingListener(CacheService cacheService) {
+        return new CleanRequestMappingListener(cacheService);
     }
 
     @Bean
