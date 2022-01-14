@@ -62,6 +62,7 @@
                 <config.port>9999</config.port>
                 <gateway.port>10000</gateway.port>
                 <nk-cloud-admin.port>9000</nk-cloud-admin.port>
+                <nk-auth.port>9100</nk-auth.port>
                 <nk-uc.port>9001</nk-uc.port>
                 <!--Consul配置-->
                 <consul.host>localhost</consul.host>
@@ -92,6 +93,7 @@
                 <config.port>9999</config.port>
                 <gateway.port>10000</gateway.port>
                 <cloud-admin.port>9000</cloud-admin.port>
+                <nk-auth.port>9100</nk-auth.port>
                 <uc.port>9001</uc.port>
                 <!--数据库环境配置-->
                 <db.driver-class-name>com.mysql.cj.jdbc.Driver</db.driver-class-name>

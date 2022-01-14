@@ -46,7 +46,6 @@
     <logger name="com.nekoimi.nk" level="debug"/>
     <logger name="org.springframework.http" level="debug"/>
     <logger name="com.baomidou.mybatisplus" level="debug"/>
-    <logger name="org.flywaydb" level="debug"/>
 
     <logger name="org.springframework.boot" level="info"/>
     <logger name="org.springframework.beans" level="info"/>
@@ -66,6 +65,7 @@
     <logger name="io.lettuce" level="info"/>
     <logger name="springfox.documentation" level="info"/>
     <logger name="org.springframework.boot.autoconfigure.logging" level="info"/>
+    <logger name="org.apache.http" level="info"/>
 
     <!--开发环境:打印控制台-->
     <springProfile name="dev">

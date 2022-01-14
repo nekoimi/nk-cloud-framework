@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: ${artifactId}
+  profiles:
+    active: ${profile.name}
+  main:
+    banner-mode: off
+    web-application-type: reactive
+  cloud:
+    loadbalancer:
+      cache:
+        enabled: false
+    config:
+      enabled: true
+      profile: ${profile.name}
+      allow-override: true
+      fail-fast: true
+      discovery:
+        enabled: true
+        service-id: nk-config
+    consul:
+      host: ${consul.host}
+      port: ${consul.port}
+      discovery:
+        prefer-ip-address: true
+        service-name: ${spring.application.name}
+        health-check-path: /
+        health-check-interval: 60s
+        metadata:
+          name: ${spring.application.name}
+          port: ${server.port}

@@ -48,6 +48,7 @@ public class BasicSecurityConfigCustomizer implements SecurityConfigCustomizer {
                 .exceptionHandling(handler -> handler.accessDeniedHandler(accessDeniedHandler).authenticationEntryPoint(authenticationExceptionHandler))
                 // 配置请求过滤
                 .authorizeExchange(exchange -> {
+                    exchange.pathMatchers("/").permitAll();
                     if (!properties.getPermitAll().isEmpty()) {
                         properties.getPermitAll().forEach(path -> exchange.pathMatchers(path).permitAll());
                     }
