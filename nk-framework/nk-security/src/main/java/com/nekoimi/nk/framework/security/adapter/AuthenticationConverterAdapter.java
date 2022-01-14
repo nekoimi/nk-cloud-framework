@@ -1,6 +1,6 @@
-package com.nekoimi.nk.framework.security.converter;
+package com.nekoimi.nk.framework.security.adapter;
 
-import com.nekoimi.nk.framework.security.enums.AuthType;
+import com.nekoimi.nk.framework.security.contract.AuthenticationType;
 import com.nekoimi.nk.framework.security.contract.RequestToAuthenticationTokenConverter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
@@ -13,18 +13,17 @@ import reactor.core.publisher.Mono;
  * spring security 默认验证器包装类
  */
 public class AuthenticationConverterAdapter implements RequestToAuthenticationTokenConverter {
-    private final AuthType authType;
+    private final AuthenticationType authType;
     private final ServerAuthenticationConverter converter;
 
-    public AuthenticationConverterAdapter(AuthType authType,
-                                          ServerAuthenticationConverter converter) {
+    public AuthenticationConverterAdapter(AuthenticationType authType, ServerAuthenticationConverter converter) {
         this.authType = authType;
         this.converter = converter;
     }
 
     @Override
-    public boolean support(AuthType authType) {
-        return this.authType == authType;
+    public boolean support(AuthenticationType authType) {
+        return this.authType.matches(authType);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.nekoimi.nk.framework.security.authentication;
+package com.nekoimi.nk.framework.security.adapter;
 
 import com.nekoimi.nk.framework.security.contract.AuthenticationSupportManager;
 import com.nekoimi.nk.framework.security.token.SubjectAuthenticationToken;

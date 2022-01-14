@@ -1,4 +1,4 @@
-package com.nekoimi.nk.framework.security.authentication;
+package com.nekoimi.nk.framework.security.factory;
 
 import com.nekoimi.nk.framework.core.exception.http.RequestValidationException;
 import com.nekoimi.nk.framework.security.contract.AuthenticationSupportManager;
@@ -22,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @Slf4j
 @Component
-public class IntegratedAuthenticationManager implements ReactiveAuthenticationManager, BeanPostProcessor {
+public class AuthenticationManagerFactory implements ReactiveAuthenticationManager, BeanPostProcessor {
     private final static List<AuthenticationSupportManager> supportManagers = new CopyOnWriteArrayList<>();
 
 //    static {

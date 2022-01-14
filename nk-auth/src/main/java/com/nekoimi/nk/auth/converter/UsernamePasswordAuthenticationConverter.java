@@ -3,8 +3,8 @@ package com.nekoimi.nk.auth.converter;
 import com.nekoimi.nk.auth.token.UsernamePasswordAuthenticationToken;
 import com.nekoimi.nk.framework.core.exception.http.RequestValidationException;
 import com.nekoimi.nk.framework.core.utils.JsonUtils;
+import com.nekoimi.nk.framework.security.contract.AuthenticationType;
 import com.nekoimi.nk.framework.security.contract.RequestToAuthenticationTokenConverter;
-import com.nekoimi.nk.framework.security.enums.AuthType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.codec.ByteArrayDecoder;
@@ -27,8 +27,8 @@ public class UsernamePasswordAuthenticationConverter implements RequestToAuthent
     private final String passwordParameter = "password";
 
     @Override
-    public boolean support(AuthType authType) {
-        return AuthType.USERNAME_PASSWORD == authType;
+    public boolean support(AuthenticationType authType) {
+        return false;
     }
 
     @Override

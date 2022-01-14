@@ -1,9 +1,9 @@
-package com.nekoimi.nk.framework.security.converter;
+package com.nekoimi.nk.framework.security.factory;
 
 import com.nekoimi.nk.framework.core.exception.http.RequestValidationException;
 import com.nekoimi.nk.framework.security.constant.SecurityRequestHeaders;
 import com.nekoimi.nk.framework.security.contract.RequestToAuthenticationTokenConverter;
-import com.nekoimi.nk.framework.security.enums.AuthType;
+import com.nekoimi.nk.framework.security.factory.AuthenticationTypeFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -26,7 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @Slf4j
 @Component
-public class IntegratedToAuthenticationTokenConverterManager implements ServerAuthenticationConverter, BeanPostProcessor {
+public class AuthenticationTokenConverterFactory implements ServerAuthenticationConverter, BeanPostProcessor {
     private final static List<RequestToAuthenticationTokenConverter> converters = new CopyOnWriteArrayList<>();
 
 //    static {
@@ -53,7 +53,7 @@ public class IntegratedToAuthenticationTokenConverterManager implements ServerAu
                 .flatMap(headers -> Mono.justOrEmpty(headers.getFirst(SecurityRequestHeaders.AUTH_TYPE)))
                 .switchIfEmpty(Mono.error(new RequestValidationException("Headers is missing `%s` parameter", SecurityRequestHeaders.AUTH_TYPE)))
                 .map(Integer::parseInt)
-                .flatMap(AuthType::valueOf)
+                .flatMap(AuthenticationTypeFactory::make)
                 .switchIfEmpty(Mono.error(new RequestValidationException("Illegal authentication type")))
                 .flatMap(authType -> Flux.fromIterable(converters)
                         .filter(c -> c.support(authType))

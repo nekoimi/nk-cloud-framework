@@ -1,10 +1,10 @@
 package com.nekoimi.nk.framework.security.customizer;
 
+import com.nekoimi.nk.framework.security.factory.AuthenticationManagerFactory;
 import com.nekoimi.nk.framework.security.contract.SecurityConfigCustomizer;
 import com.nekoimi.nk.framework.security.filter.ResolverAuthTypeParameterFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.authentication.ServerAuthenticationFailureHandler;
@@ -28,7 +28,7 @@ public class LoginSecurityConfigCustomizer implements SecurityConfigCustomizer {
     private final ServerAuthenticationSuccessHandler authenticationSuccessHandler;
     private final ServerAuthenticationFailureHandler authenticationFailureHandler;
     private final ServerLogoutSuccessHandler logoutSuccessHandler;
-    private final ReactiveAuthenticationManager authenticationManager;
+    private final AuthenticationManagerFactory authenticationManagerFactory;
     private final ServerSecurityContextRepository securityContextRepository;
     private final WebFilter resolverAuthTypeParameterFilter;
 
@@ -37,13 +37,13 @@ public class LoginSecurityConfigCustomizer implements SecurityConfigCustomizer {
                                          ServerAuthenticationSuccessHandler authenticationSuccessHandler,
                                          ServerAuthenticationFailureHandler authenticationFailureHandler,
                                          ServerLogoutSuccessHandler logoutSuccessHandler,
-                                         ReactiveAuthenticationManager authenticationManager,
+                                         AuthenticationManagerFactory authenticationManagerFactory,
                                          ServerSecurityContextRepository securityContextRepository) {
         this.loginPath = loginPath;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.logoutSuccessHandler = logoutSuccessHandler;
-        this.authenticationManager = authenticationManager;
+        this.authenticationManagerFactory = authenticationManagerFactory;
         this.securityContextRepository = securityContextRepository;
         this.loginExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, loginPath);
         this.logoutExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, logoutPath);
@@ -57,7 +57,7 @@ public class LoginSecurityConfigCustomizer implements SecurityConfigCustomizer {
                 .formLogin(login -> login.requiresAuthenticationMatcher(loginExchangeMatcher)
                         .authenticationSuccessHandler(authenticationSuccessHandler)
                         .authenticationFailureHandler(authenticationFailureHandler)
-                        .authenticationManager(authenticationManager)
+                        .authenticationManager(authenticationManagerFactory)
                         .securityContextRepository(securityContextRepository))
                 // 注销认证
                 .logout(logout -> logout.requiresLogout(logoutExchangeMatcher).logoutSuccessHandler(logoutSuccessHandler))

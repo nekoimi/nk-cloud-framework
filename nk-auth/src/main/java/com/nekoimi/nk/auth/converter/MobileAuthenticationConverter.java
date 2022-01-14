@@ -1,7 +1,7 @@
 package com.nekoimi.nk.auth.converter;
 
+import com.nekoimi.nk.framework.security.contract.AuthenticationType;
 import com.nekoimi.nk.framework.security.contract.RequestToAuthenticationTokenConverter;
-import com.nekoimi.nk.framework.security.enums.AuthType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -11,8 +11,8 @@ import reactor.core.publisher.Mono;
  */
 public class MobileAuthenticationConverter implements RequestToAuthenticationTokenConverter {
     @Override
-    public boolean support(AuthType authType) {
-        return AuthType.MOBILE == authType;
+    public boolean support(AuthenticationType authType) {
+        return false;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.nekoimi.nk.framework.security.enums;
+package com.nekoimi.nk.auth.enums;
 
 import reactor.core.publisher.Mono;
 

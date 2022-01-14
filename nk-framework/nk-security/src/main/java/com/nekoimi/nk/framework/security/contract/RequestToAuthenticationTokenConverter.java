@@ -1,6 +1,5 @@
 package com.nekoimi.nk.framework.security.contract;
 
-import com.nekoimi.nk.framework.security.enums.AuthType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -16,7 +15,7 @@ public interface RequestToAuthenticationTokenConverter {
      * 支持的请求方式
      * @return
      */
-    boolean support(AuthType authType);
+    boolean support(AuthenticationType authType);
 
     /**
      * 封装

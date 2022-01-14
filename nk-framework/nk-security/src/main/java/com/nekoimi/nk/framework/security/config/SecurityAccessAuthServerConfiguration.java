@@ -1,18 +1,18 @@
 package com.nekoimi.nk.framework.security.config;
 
 import com.nekoimi.nk.framework.redis.service.RedisService;
+import com.nekoimi.nk.framework.security.factory.AuthenticationManagerFactory;
 import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
 import com.nekoimi.nk.framework.security.contract.SecurityConfigCustomizer;
+import com.nekoimi.nk.framework.security.factory.AuthenticationTokenConverterFactory;
 import com.nekoimi.nk.framework.security.customizer.LoginSecurityConfigCustomizer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
-import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
 import org.springframework.security.web.server.authentication.ServerAuthenticationFailureHandler;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
@@ -28,11 +28,12 @@ import java.util.List;
 @Slf4j
 public class SecurityAccessAuthServerConfiguration {
     private final SecurityProperties properties;
-    private final ServerAuthenticationConverter authenticationTokenConverterManager;
+    private final AuthenticationTokenConverterFactory authenticationTokenConverterFactory;
 
-    public SecurityAccessAuthServerConfiguration(SecurityProperties properties, ServerAuthenticationConverter authenticationTokenConverterManager) {
+    public SecurityAccessAuthServerConfiguration(SecurityProperties properties,
+                                                 AuthenticationTokenConverterFactory authenticationTokenConverterFactory) {
         this.properties = properties;
-        this.authenticationTokenConverterManager = authenticationTokenConverterManager;
+        this.authenticationTokenConverterFactory = authenticationTokenConverterFactory;
     }
 
     @Bean
@@ -40,7 +41,7 @@ public class SecurityAccessAuthServerConfiguration {
     public LoginSecurityConfigCustomizer loginSecurityConfigCustomizer(ServerAuthenticationSuccessHandler authenticationSuccessHandler,
                                                                        ServerAuthenticationFailureHandler authenticationFailureHandler,
                                                                        ServerLogoutSuccessHandler logoutSuccessHandler,
-                                                                       ReactiveAuthenticationManager integratedAuthenticationManager,
+                                                                       AuthenticationManagerFactory authenticationManagerFactory,
                                                                        ServerSecurityContextRepository securityContextRepository) {
         return new LoginSecurityConfigCustomizer(
                 properties.getLoginPath(),
@@ -48,7 +49,7 @@ public class SecurityAccessAuthServerConfiguration {
                 authenticationSuccessHandler,
                 authenticationFailureHandler,
                 logoutSuccessHandler,
-                integratedAuthenticationManager,
+                authenticationManagerFactory,
                 securityContextRepository
         );
     }
@@ -69,7 +70,7 @@ public class SecurityAccessAuthServerConfiguration {
         filterChain.getWebFilters()
                 .filter(webFilter -> webFilter instanceof AuthenticationWebFilter)
                 .cast(AuthenticationWebFilter.class)
-                .subscribe(filter -> filter.setServerAuthenticationConverter(authenticationTokenConverterManager));
+                .subscribe(filter -> filter.setServerAuthenticationConverter(authenticationTokenConverterFactory));
         return filterChain;
     }
 }
