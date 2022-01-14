@@ -2,6 +2,7 @@ package com.nekoimi.nk.framework.security.repository;
 
 import com.nekoimi.nk.framework.redis.service.RedisService;
 import com.nekoimi.nk.framework.security.exception.RequestAuthenticationException;
+import com.nekoimi.nk.framework.security.exception.RequestMissingAuthenticationParameterException;
 import com.nekoimi.nk.framework.security.token.SubjectAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -27,7 +28,7 @@ import reactor.core.publisher.Mono;
  */
 @Slf4j
 public class CacheServerSecurityContextRepository implements ServerSecurityContextRepository {
-    private final static String SUB_KEY = "auth:sub:";
+    private final static String AUTHENTICATION_KEY = "authentication:sub:";
     private final RedisService redisService;
 
     public CacheServerSecurityContextRepository(RedisService redisService) {
@@ -36,23 +37,25 @@ public class CacheServerSecurityContextRepository implements ServerSecurityConte
 
     @Override
     public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {
+        log.debug("security context save ...");
         return Mono.just(context.getAuthentication())
                 .cast(SubjectAuthenticationToken.class)
-                .flatMap(subjectToken -> redisService
-                        .set(SUB_KEY + subjectToken.getSub(), subjectToken.getDetails(), 10))
+                .flatMap(subjectToken -> redisService.set(
+                        AUTHENTICATION_KEY + subjectToken.getSub(), subjectToken.getDetails(), 10))
                 .then(Mono.empty());
     }
 
     @Override
     public Mono<SecurityContext> load(ServerWebExchange exchange) {
+        log.debug("security context load ...");
         return Mono.just(exchange.getRequest())
                 .map(HttpMessage::getHeaders)
                 .flatMap(headers -> Mono.justOrEmpty(headers.getFirst(HttpHeaders.AUTHORIZATION)))
-                .switchIfEmpty(Mono.error(new RequestAuthenticationException()))
+                .switchIfEmpty(Mono.error(new RequestMissingAuthenticationParameterException()))
                 .flatMap(token -> {
                     // TODO 解析Token，获取sub
                     return Mono.just("sub");
-                }).flatMap(sub -> redisService.get(SUB_KEY + sub))
+                }).flatMap(sub -> redisService.get(AUTHENTICATION_KEY + sub))
                 .switchIfEmpty(Mono.error(new RequestAuthenticationException("Authorization expired")))
                 .cast(UserDetails.class)
                 .flatMap(userDetails -> {

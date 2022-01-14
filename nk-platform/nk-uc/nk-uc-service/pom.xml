@@ -18,6 +18,10 @@
         </dependency>
         <dependency>
             <groupId>com.nekoimi.nk</groupId>
+            <artifactId>nk-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nekoimi.nk</groupId>
             <artifactId>nk-cache</artifactId>
         </dependency>
         <dependency>

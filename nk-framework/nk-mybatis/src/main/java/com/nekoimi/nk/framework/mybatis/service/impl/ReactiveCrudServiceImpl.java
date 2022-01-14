@@ -14,7 +14,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.nekoimi.nk.framework.core.contract.IdGenerator;
 import com.nekoimi.nk.framework.core.utils.ClazzUtils;
 import com.nekoimi.nk.framework.core.utils.JsonUtils;
-import com.nekoimi.nk.framework.mybatis.collect.QueryMap;
+import com.nekoimi.nk.framework.mybatis.collect.QMap;
 import com.nekoimi.nk.framework.mybatis.exception.*;
 import com.nekoimi.nk.framework.mybatis.mapper.BaseMapper;
 import com.nekoimi.nk.framework.mybatis.page.PageResult;
@@ -76,7 +76,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return query;
     }
 
-    protected LambdaQueryWrapper<E> acceptQueryMapConsumer(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
+    protected LambdaQueryWrapper<E> acceptQueryMapConsumer(Consumer<QMap<SFunction<E, Object>, Object>> consumer) {
         var query = lambdaQuery();
         var queryMap = queryMap();
         consumer.accept(queryMap);
@@ -85,7 +85,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return query;
     }
 
-    protected LambdaUpdateWrapper<E> acceptUpdateMapConsumer(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
+    protected LambdaUpdateWrapper<E> acceptUpdateMapConsumer(Consumer<QMap<SFunction<E, Object>, Object>> consumer) {
         var update = lambdaUpdate();
         var updateMap = queryMap();
         consumer.accept(updateMap);
@@ -151,8 +151,8 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     }
 
     @Override
-    public QueryMap<SFunction<E, Object>, Object> queryMap() {
-        return new QueryMap<>(new HashMap<>());
+    public QMap<SFunction<E, Object>, Object> queryMap() {
+        return new QMap<>(new HashMap<>());
     }
 
     @Override
@@ -185,7 +185,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
 
     @Transactional(readOnly = true)
     @Override
-    public Mono<E> getByMap(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
+    public Mono<E> getByMap(Consumer<QMap<SFunction<E, Object>, Object>> consumer) {
         return Mono.just(consumer)
                 .map(this::acceptQueryMapConsumer)
                 .publishOn(Schedulers.boundedElastic())
@@ -254,7 +254,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     }
 
     @Override
-    public Mono<E> getByMapOrFail(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
+    public Mono<E> getByMapOrFail(Consumer<QMap<SFunction<E, Object>, Object>> consumer) {
         return checkGetFail(getByMap(consumer));
     }
 
@@ -319,7 +319,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     }
 
     @Override
-    public Mono<Boolean> existsByMap(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
+    public Mono<Boolean> existsByMap(Consumer<QMap<SFunction<E, Object>, Object>> consumer) {
         return checkExists(getByMap(consumer));
     }
 
@@ -465,7 +465,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Mono<Boolean> updateByIdOfMap(Serializable id, Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
+    public Mono<Boolean> updateByIdOfMap(Serializable id, Consumer<QMap<SFunction<E, Object>, Object>> consumer) {
         return getByIdOrFail(id).flatMap(e -> Mono.just(consumer)
                 .map(this::acceptUpdateMapConsumer)
                 .publishOn(Schedulers.boundedElastic())
@@ -581,7 +581,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
 
     @Transactional(readOnly = true)
     @Override
-    public Mono<Long> countByMap(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
+    public Mono<Long> countByMap(Consumer<QMap<SFunction<E, Object>, Object>> consumer) {
         return Mono.just(consumer)
                 .map(this::acceptQueryMapConsumer)
                 .publishOn(Schedulers.boundedElastic())
@@ -623,7 +623,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     }
 
     @Override
-    public Flux<E> findByMap(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer) {
+    public Flux<E> findByMap(Consumer<QMap<SFunction<E, Object>, Object>> consumer) {
         return findAllFluxPushScheduler(Flux.push(fluxSink -> {
             mapper.selectListWithHandler(acceptQueryMapConsumer(consumer), ctx -> fluxSink.next(ctx.getResultObject()));
             fluxSink.complete();
@@ -650,7 +650,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
 
     @SafeVarargs
     @Override
-    public final Flux<E> findByMapSelectColumn(Consumer<QueryMap<SFunction<E, Object>, Object>> consumer, SFunction<E, Object>... columns) {
+    public final Flux<E> findByMapSelectColumn(Consumer<QMap<SFunction<E, Object>, Object>> consumer, SFunction<E, Object>... columns) {
         return findAllFluxPushScheduler(Flux.push(fluxSink -> {
             mapper.selectListWithHandler(acceptQueryMapConsumer(consumer).select(columns), ctx -> fluxSink.next(ctx.getResultObject()));
             fluxSink.complete();

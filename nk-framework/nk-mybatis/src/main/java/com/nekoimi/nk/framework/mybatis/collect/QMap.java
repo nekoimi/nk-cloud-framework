@@ -5,14 +5,14 @@ import java.util.Map;
 /**
  * nekoimi  2021/12/18 17:25
  */
-public class QueryMap<K, V> {
+public class QMap<K, V> {
     private final Map<K, V> data;
 
-    public QueryMap(Map<K, V> data) {
+    public QMap(Map<K, V> data) {
         this.data = data;
     }
 
-    public QueryMap<K, V> put(K k, V v) {
+    public QMap<K, V> put(K k, V v) {
         this.data.put(k, v);
         return this;
     }

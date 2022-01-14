@@ -1,9 +1,9 @@
 package com.nekoimi.nk.framework.security.annotations;
 
 import com.nekoimi.nk.framework.security.config.SecurityAccessAuthServerConfiguration;
-import com.nekoimi.nk.framework.security.config.SecurityAccessConfiguration;
 import com.nekoimi.nk.framework.security.config.SecurityComponentConfiguration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 
@@ -21,8 +21,8 @@ import java.lang.annotation.*;
 @EnableReactiveMethodSecurity
 @Import({
         SecurityComponentConfiguration.class,
-        SecurityAccessConfiguration.class,
         SecurityAccessAuthServerConfiguration.class
 })
+@Order
 public @interface EnableSecurityAccessAuthServer {
 }

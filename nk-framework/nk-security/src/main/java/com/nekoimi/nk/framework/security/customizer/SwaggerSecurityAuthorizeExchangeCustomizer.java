@@ -26,7 +26,7 @@ public class SwaggerSecurityAuthorizeExchangeCustomizer implements SecurityAutho
 
     @Override
     public void customize(ServerHttpSecurity.AuthorizeExchangeSpec exchange) {
-        log.debug("swagger security customizer ...");
         SWAGGER_RESOURCES_ALL.forEach(s -> exchange.pathMatchers(s).permitAll());
+        log.debug("swagger security config customizer done ...");
     }
 }
