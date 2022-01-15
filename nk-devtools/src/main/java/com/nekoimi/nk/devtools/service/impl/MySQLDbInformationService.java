@@ -3,7 +3,7 @@ package com.nekoimi.nk.devtools.service.impl;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.nekoimi.nk.devtools.dto.SchemaInfo;
 import com.nekoimi.nk.devtools.dto.TableInfo;
-import com.nekoimi.nk.framework.core.dto.MapGetter;
+import com.nekoimi.nk.framework.core.utils.MapGetter;
 
 import java.util.Collections;
 import java.util.List;

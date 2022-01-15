@@ -1,8 +1,9 @@
-package com.nekoimi.nk.framework.core.dto;
+package com.nekoimi.nk.framework.core.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections4.MapUtils;
 
 import java.util.Map;
 import java.util.Objects;
@@ -17,6 +18,7 @@ public class MapGetter {
     private final Map<String, Object> map;
 
     public String str(String key) {
+        MapUtils.getString(map, key);
         return Objects.toString(map.getOrDefault(key, ""));
     }
 }

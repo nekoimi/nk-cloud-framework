@@ -1,8 +1,8 @@
 package com.nekoimi.nk.framework.security.repository;
 
 import com.nekoimi.nk.framework.redis.service.RedisService;
+import com.nekoimi.nk.framework.security.exception.RequestAccessDeniedException;
 import com.nekoimi.nk.framework.security.exception.RequestAuthenticationException;
-import com.nekoimi.nk.framework.security.exception.RequestMissingAuthenticationParameterException;
 import com.nekoimi.nk.framework.security.token.SubjectAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -51,7 +51,7 @@ public class CacheServerSecurityContextRepository implements ServerSecurityConte
         return Mono.just(exchange.getRequest())
                 .map(HttpMessage::getHeaders)
                 .flatMap(headers -> Mono.justOrEmpty(headers.getFirst(HttpHeaders.AUTHORIZATION)))
-                .switchIfEmpty(Mono.error(new RequestMissingAuthenticationParameterException()))
+                .switchIfEmpty(Mono.error(new RequestAccessDeniedException()))
                 .flatMap(token -> {
                     // TODO 解析Token，获取sub
                     return Mono.just("sub");

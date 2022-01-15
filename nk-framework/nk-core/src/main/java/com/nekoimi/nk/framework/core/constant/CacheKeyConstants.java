@@ -14,4 +14,8 @@ public interface CacheKeyConstants {
      * 扫描路由黑名单缓存
      */
     String SCAN_REQUEST_MAPPING_BLACKLIST = "scan_request_mapping:blacklist";
+    /**
+     * 认证信息缓存
+     */
+    String AUTHENTICATION_SUBJECT = "authentication:sub";
 }

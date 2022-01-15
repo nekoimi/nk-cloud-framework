@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 /**
  * nekoimi  2021/12/24 15:06
  *
- * 启用安全控制
+ * 启用安全访问控制
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

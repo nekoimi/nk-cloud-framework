@@ -3,10 +3,10 @@ package com.nekoimi.nk.framework.security.customizer;
 import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
 import com.nekoimi.nk.framework.security.contract.SecurityAuthorizeExchangeCustomizer;
 import com.nekoimi.nk.framework.security.contract.SecurityConfigCustomizer;
+import com.nekoimi.nk.framework.security.handler.AccessDeniedExceptionHandler;
+import com.nekoimi.nk.framework.security.handler.AuthenticationExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
-import org.springframework.security.web.server.authorization.ServerAccessDeniedHandler;
 
 import java.util.List;
 
@@ -16,13 +16,13 @@ import java.util.List;
 @Slf4j
 public class BasicSecurityConfigCustomizer implements SecurityConfigCustomizer {
     private final SecurityProperties properties;
-    private final ServerAccessDeniedHandler accessDeniedHandler;
-    private final ServerAuthenticationEntryPoint authenticationExceptionHandler;
+    private final AccessDeniedExceptionHandler accessDeniedHandler;
+    private final AuthenticationExceptionHandler authenticationExceptionHandler;
     private final List<SecurityAuthorizeExchangeCustomizer> authorizeExchangeCustomizers;
 
     public BasicSecurityConfigCustomizer(SecurityProperties properties,
-                                         ServerAccessDeniedHandler accessDeniedHandler,
-                                         ServerAuthenticationEntryPoint authenticationExceptionHandler,
+                                         AccessDeniedExceptionHandler accessDeniedHandler,
+                                         AuthenticationExceptionHandler authenticationExceptionHandler,
                                          List<SecurityAuthorizeExchangeCustomizer> authorizeExchangeCustomizers) {
         this.properties = properties;
         this.accessDeniedHandler = accessDeniedHandler;

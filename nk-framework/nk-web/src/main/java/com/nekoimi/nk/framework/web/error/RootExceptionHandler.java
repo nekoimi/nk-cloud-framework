@@ -1,11 +1,11 @@
 package com.nekoimi.nk.framework.web.error;
 
-import com.nekoimi.nk.framework.web.contract.error.ErrorExceptionHandler;
 import com.nekoimi.nk.framework.core.contract.error.ErrorDetails;
 import com.nekoimi.nk.framework.core.error.BaseErrors;
 import com.nekoimi.nk.framework.core.protocol.ErrorDetailsImpl;
-import com.nekoimi.nk.framework.core.utils.ErrorUtils;
+import com.nekoimi.nk.framework.web.contract.error.ErrorExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -30,6 +30,6 @@ public class RootExceptionHandler implements ErrorExceptionHandler<Exception> {
         if (log.isDebugEnabled()) {
             e.printStackTrace();
         }
-        return Mono.fromCallable(() -> ErrorDetailsImpl.of(error.code(), error.message(), ErrorUtils.getStackTrace(e)));
+        return Mono.fromCallable(() -> ErrorDetailsImpl.of(error.code(), error.message(), ExceptionUtils.getStackTrace(e)));
     }
 }

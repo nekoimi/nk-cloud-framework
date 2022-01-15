@@ -5,13 +5,13 @@ import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
 import com.nekoimi.nk.framework.security.contract.SecurityAuthorizeExchangeCustomizer;
 import com.nekoimi.nk.framework.security.customizer.BasicSecurityConfigCustomizer;
 import com.nekoimi.nk.framework.security.customizer.SwaggerSecurityAuthorizeExchangeCustomizer;
+import com.nekoimi.nk.framework.security.handler.AccessDeniedExceptionHandler;
+import com.nekoimi.nk.framework.security.handler.AuthenticationExceptionHandler;
 import com.nekoimi.nk.framework.security.repository.CacheServerSecurityContextRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
-import org.springframework.security.web.server.authorization.ServerAccessDeniedHandler;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 
 import java.util.List;
@@ -54,8 +54,8 @@ public class SecurityComponentConfiguration {
      */
     @Bean
     public BasicSecurityConfigCustomizer basicSecurityConfigCustomizer(SecurityProperties properties,
-                                                                       ServerAccessDeniedHandler accessDeniedHandler,
-                                                                       ServerAuthenticationEntryPoint authenticationExceptionHandler,
+                                                                       AccessDeniedExceptionHandler accessDeniedHandler,
+                                                                       AuthenticationExceptionHandler authenticationExceptionHandler,
                                                                        List<SecurityAuthorizeExchangeCustomizer> authorizeExchangeCustomizers) {
         return new BasicSecurityConfigCustomizer(properties, accessDeniedHandler, authenticationExceptionHandler, authorizeExchangeCustomizers);
     }
