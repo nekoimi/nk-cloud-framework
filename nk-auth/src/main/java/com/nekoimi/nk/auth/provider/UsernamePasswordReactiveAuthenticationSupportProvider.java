@@ -22,13 +22,6 @@ public class UsernamePasswordReactiveAuthenticationSupportProvider extends Abstr
     private final String passwordParameter = "password";
 
     @Override
-    public Mono<SubjectAuthenticationToken> authenticate(Authentication authentication) {
-        return Mono.just(authentication)
-                .cast(UsernamePasswordAuthenticationToken.class)
-                .flatMap(token -> Mono.empty());
-    }
-
-    @Override
     protected Serializable authType() {
         return "1";
     }
@@ -51,5 +44,12 @@ public class UsernamePasswordReactiveAuthenticationSupportProvider extends Abstr
             }
             return Mono.just(new UsernamePasswordAuthenticationToken(username, password));
         });
+    }
+
+    @Override
+    protected Mono<SubjectAuthenticationToken> doAuthenticate(Authentication authentication) {
+        return Mono.just(authentication)
+                .cast(UsernamePasswordAuthenticationToken.class)
+                .flatMap(token -> Mono.empty());
     }
 }

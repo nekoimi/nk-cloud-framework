@@ -3,6 +3,7 @@ package com.nekoimi.nk.framework.security.provider;
 import com.nekoimi.nk.framework.core.exception.http.RequestValidationException;
 import com.nekoimi.nk.framework.core.utils.JsonUtils;
 import com.nekoimi.nk.framework.security.contract.ReactiveAuthenticationSupportProvider;
+import com.nekoimi.nk.framework.security.token.SubjectAuthenticationToken;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.codec.ByteArrayDecoder;
 import org.springframework.core.codec.Hints;
@@ -42,6 +43,13 @@ public abstract class AbstractReactiveAuthenticationSupportProvider implements R
      */
     abstract protected Mono<? extends Authentication> doConvert(Map<String, Object> requestParameters);
 
+    /**
+     * do authentication
+     * @param authentication
+     * @return
+     */
+    abstract protected Mono<SubjectAuthenticationToken> doAuthenticate(Authentication authentication);
+
     @Override
     public boolean support(Serializable authType) {
         if (authType == null || authType() == null)
@@ -64,5 +72,10 @@ public abstract class AbstractReactiveAuthenticationSupportProvider implements R
                 .switchIfEmpty(Mono.error(new RequestValidationException()))
                 .last()
                 .flatMap(this::doConvert);
+    }
+
+    @Override
+    public Mono<SubjectAuthenticationToken> authenticate(Authentication authentication) {
+        return doAuthenticate(authentication);
     }
 }
