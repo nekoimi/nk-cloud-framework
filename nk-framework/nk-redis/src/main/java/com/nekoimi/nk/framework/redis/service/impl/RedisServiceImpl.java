@@ -1,6 +1,6 @@
 package com.nekoimi.nk.framework.redis.service.impl;
 
-import com.nekoimi.nk.framework.redis.service.RedisService;
+import com.nekoimi.nk.framework.cache.contract.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Service;

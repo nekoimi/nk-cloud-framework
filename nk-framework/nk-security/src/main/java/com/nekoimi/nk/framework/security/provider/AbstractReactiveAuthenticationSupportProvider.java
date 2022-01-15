@@ -33,7 +33,7 @@ public abstract class AbstractReactiveAuthenticationSupportProvider implements R
      *
      * @return
      */
-    abstract protected Class<? extends Authentication> authenticationTokenClazz();
+    abstract protected Class<? extends Authentication> authenticationToken();
 
     /**
      * do convert
@@ -59,9 +59,9 @@ public abstract class AbstractReactiveAuthenticationSupportProvider implements R
 
     @Override
     public boolean support(Authentication authenticationToken) {
-        if (authenticationToken == null || authenticationTokenClazz() == null)
+        if (authenticationToken == null || authenticationToken() == null)
             return false;
-        return authenticationToken.getClass() == authenticationTokenClazz();
+        return authenticationToken.getClass() == authenticationToken();
     }
 
     @Override

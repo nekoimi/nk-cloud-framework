@@ -20,5 +20,6 @@
         <module>nk-oauth2-server</module>
         <module>nk-cache</module>
         <module>nk-rocksdb</module>
+        <module>nk-mq</module>
     </modules>
 </project>

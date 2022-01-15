@@ -1,6 +1,6 @@
 package com.nekoimi.nk.framework.security.repository;
 
-import com.nekoimi.nk.framework.redis.service.RedisService;
+import com.nekoimi.nk.framework.cache.contract.RedisService;
 import com.nekoimi.nk.framework.security.exception.RequestAccessDeniedException;
 import com.nekoimi.nk.framework.security.exception.RequestAuthenticationException;
 import com.nekoimi.nk.framework.security.token.SubjectAuthenticationToken;
@@ -27,11 +27,11 @@ import reactor.core.publisher.Mono;
  * 保存在redis中
  */
 @Slf4j
-public class CacheServerSecurityContextRepository implements ServerSecurityContextRepository {
+public class RedisServerSecurityContextRepository implements ServerSecurityContextRepository {
     private final static String AUTHENTICATION_KEY = "authentication:sub:";
     private final RedisService redisService;
 
-    public CacheServerSecurityContextRepository(RedisService redisService) {
+    public RedisServerSecurityContextRepository(RedisService redisService) {
         this.redisService = redisService;
     }
 

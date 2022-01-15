@@ -1,6 +1,5 @@
 package com.nekoimi.nk.framework.security.config;
 
-import com.nekoimi.nk.framework.redis.service.RedisService;
 import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
 import com.nekoimi.nk.framework.security.contract.SecurityConfigCustomizer;
 import com.nekoimi.nk.framework.security.customizer.LoginSecurityConfigCustomizer;
@@ -8,6 +7,7 @@ import com.nekoimi.nk.framework.security.factory.AuthenticationManagerFactory;
 import com.nekoimi.nk.framework.security.handler.AuthenticationFailureHandler;
 import com.nekoimi.nk.framework.security.handler.AuthenticationSuccessHandler;
 import com.nekoimi.nk.framework.security.handler.LogoutSuccessHandler;
+import com.nekoimi.nk.framework.security.repository.RedisServerSecurityContextRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
-import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 
 import java.util.List;
 
@@ -35,11 +34,11 @@ public class SecurityAccessAuthServerConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean(value = RedisService.class, search = SearchStrategy.CURRENT)
+    @ConditionalOnBean(value = RedisServerSecurityContextRepository.class, search = SearchStrategy.CURRENT)
     public LoginSecurityConfigCustomizer loginSecurityConfigCustomizer(AuthenticationSuccessHandler authenticationSuccessHandler,
                                                                        AuthenticationFailureHandler authenticationFailureHandler,
                                                                        LogoutSuccessHandler logoutSuccessHandler,
-                                                                       ServerSecurityContextRepository securityContextRepository) {
+                                                                       RedisServerSecurityContextRepository securityContextRepository) {
         return new LoginSecurityConfigCustomizer(
                 properties.getLoginPath(),
                 properties.getLogoutPath(),
@@ -52,10 +51,10 @@ public class SecurityAccessAuthServerConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean(value = RedisService.class, search = SearchStrategy.CURRENT)
+    @ConditionalOnBean(value = RedisServerSecurityContextRepository.class, search = SearchStrategy.CURRENT)
     public SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http,
                                                        List<SecurityConfigCustomizer> configCustomizers,
-                                                       ServerSecurityContextRepository securityContextRepository) {
+                                                       RedisServerSecurityContextRepository securityContextRepository) {
         http.securityContextRepository(securityContextRepository);
         configCustomizers.forEach(configCustomizer -> configCustomizer.customize(http));
         configCustomizers.forEach(configCustomizer -> configCustomizer.customize(http));

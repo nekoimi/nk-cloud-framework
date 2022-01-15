@@ -6,11 +6,11 @@ import com.nekoimi.nk.framework.security.filter.ResolverAuthTypeParameterFilter;
 import com.nekoimi.nk.framework.security.handler.AuthenticationFailureHandler;
 import com.nekoimi.nk.framework.security.handler.AuthenticationSuccessHandler;
 import com.nekoimi.nk.framework.security.handler.LogoutSuccessHandler;
+import com.nekoimi.nk.framework.security.repository.RedisServerSecurityContextRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.web.server.WebFilter;
@@ -29,7 +29,7 @@ public class LoginSecurityConfigCustomizer implements SecurityConfigCustomizer {
     private final AuthenticationFailureHandler authenticationFailureHandler;
     private final LogoutSuccessHandler logoutSuccessHandler;
     private final AuthenticationManagerFactory authenticationManagerFactory;
-    private final ServerSecurityContextRepository securityContextRepository;
+    private final RedisServerSecurityContextRepository securityContextRepository;
     private final WebFilter resolverAuthTypeParameterFilter;
 
     public LoginSecurityConfigCustomizer(String loginPath,
@@ -38,7 +38,7 @@ public class LoginSecurityConfigCustomizer implements SecurityConfigCustomizer {
                                          AuthenticationFailureHandler authenticationFailureHandler,
                                          LogoutSuccessHandler logoutSuccessHandler,
                                          AuthenticationManagerFactory authenticationManagerFactory,
-                                         ServerSecurityContextRepository securityContextRepository) {
+                                         RedisServerSecurityContextRepository securityContextRepository) {
         this.loginPath = loginPath;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.authenticationFailureHandler = authenticationFailureHandler;

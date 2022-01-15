@@ -13,13 +13,14 @@ import org.apache.ibatis.mapping.SqlSource;
  * @see com.baomidou.mybatisplus.core.enums.SqlMethod
  */
 public class SelectListWithHandler extends AbstractMethod {
+    private static final String METHOD_NAME = "selectListWithHandler";
+
     @Override
     public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {
-        String methodName = "selectListWithHandler";
         String methodSql = "<script>%s SELECT %s FROM %s %s %s\n</script>";
         String sql = String.format(methodSql, sqlFirst(), sqlSelectColumns(tableInfo, true), tableInfo.getTableName(),
                 sqlWhereEntityWrapper(true, tableInfo), sqlComment());
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
-        return this.addSelectMappedStatementForTable(mapperClass, methodName, sqlSource, tableInfo);
+        return this.addSelectMappedStatementForTable(mapperClass, METHOD_NAME, sqlSource, tableInfo);
     }
 }

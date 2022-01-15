@@ -27,7 +27,7 @@ public class UsernamePasswordReactiveAuthenticationSupportProvider extends Abstr
     }
 
     @Override
-    protected Class<? extends Authentication> authenticationTokenClazz() {
+    protected Class<? extends Authentication> authenticationToken() {
         return UsernamePasswordAuthenticationToken.class;
     }
 
@@ -48,8 +48,7 @@ public class UsernamePasswordReactiveAuthenticationSupportProvider extends Abstr
 
     @Override
     protected Mono<SubjectAuthenticationToken> doAuthenticate(Authentication authentication) {
-        return Mono.just(authentication)
-                .cast(UsernamePasswordAuthenticationToken.class)
+        return Mono.just(authentication).cast(UsernamePasswordAuthenticationToken.class)
                 .flatMap(token -> Mono.empty());
     }
 }

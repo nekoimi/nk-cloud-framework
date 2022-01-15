@@ -1,10 +1,8 @@
 package com.nekoimi.nk.devtools.service;
 
-import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.config.*;
 import com.baomidou.mybatisplus.generator.config.converts.MySqlTypeConvert;
-import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
@@ -14,8 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -117,7 +113,6 @@ public class GenerateService {
         if (dataSourceConfig == null) {
             dataSourceConfig = new DataSourceConfig();
         }
-        dataSourceConfig.setDbType(DbType.MYSQL);
         dataSourceConfig.setDriverName(properties.getDriverClassName());
         dataSourceConfig.setUrl(properties.getUrl());
         dataSourceConfig.setUsername(properties.getUsername());

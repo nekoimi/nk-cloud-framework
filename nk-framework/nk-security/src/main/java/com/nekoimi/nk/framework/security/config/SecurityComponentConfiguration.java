@@ -1,18 +1,17 @@
 package com.nekoimi.nk.framework.security.config;
 
-import com.nekoimi.nk.framework.redis.service.RedisService;
+import com.nekoimi.nk.framework.cache.contract.RedisService;
 import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
 import com.nekoimi.nk.framework.security.contract.SecurityAuthorizeExchangeCustomizer;
 import com.nekoimi.nk.framework.security.customizer.BasicSecurityConfigCustomizer;
 import com.nekoimi.nk.framework.security.customizer.SwaggerSecurityAuthorizeExchangeCustomizer;
 import com.nekoimi.nk.framework.security.handler.AccessDeniedExceptionHandler;
 import com.nekoimi.nk.framework.security.handler.AuthenticationExceptionHandler;
-import com.nekoimi.nk.framework.security.repository.CacheServerSecurityContextRepository;
+import com.nekoimi.nk.framework.security.repository.RedisServerSecurityContextRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 
 import java.util.List;
 
@@ -30,8 +29,8 @@ public class SecurityComponentConfiguration {
      */
     @Bean
     @ConditionalOnBean(value = RedisService.class, search = SearchStrategy.CURRENT)
-    public ServerSecurityContextRepository securityContextRepository(RedisService redisService) {
-        return new CacheServerSecurityContextRepository(redisService);
+    public RedisServerSecurityContextRepository securityContextRepository(RedisService redisService) {
+        return new RedisServerSecurityContextRepository(redisService);
     }
 
     /**

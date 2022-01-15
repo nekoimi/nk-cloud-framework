@@ -1,30 +1,27 @@
-create table if not exists ua_user (
-    `id` varchar(32) primary key not null comment '主键ID',
-    `created_at` datetime null comment '记录创建时间',
-    `updated_at` datetime null comment '记录更新时间',
-    `deleted_at` datetime null comment '逻辑删除字段',
+create table if not exists ua_user
+(
+    id         varchar(32) primary key not null,
+    created_at timestamp               null default current_timestamp::timestamp,
+    updated_at timestamp               null default current_timestamp::timestamp,
+    deleted_at timestamp               null,
 
-    `username` varchar(255) null default null comment '用户名',
-    `password` varchar(255) null default null comment '密码',
-    `mobile` varchar(255) null default null comment '手机号',
-    `email` varchar(255) null default null comment '邮箱',
-    `tenant_id` varchar(255) null default null comment '租户ID',
-    `enable` tinyint(1) null default 1 comment '是否启用；1 - enable，0 - disable'
-) ENGINE=InnoDB
-    character set utf8mb4
-    collate utf8mb4_unicode_ci
-    comment '用户信息表'
-;
+    username   varchar(255)            null default null,
+    password   varchar(255)            null default null,
+    mobile     varchar(255)            null default null,
+    email      varchar(255)            null default null,
+    tenant_id  varchar(255)            null default null,
+    enable     smallint                null default 1
+);
 
--- private Long id;
--- private String username;
--- private String password;
--- private String status;
--- private String type;
--- private String phoneNumber;
--- private String email;
--- private String name;
--- private Collection<String> resources = new ArrayList<>();
--- private Collection<String> roles = new ArrayList<>();
--- private Collection<GrantedAuthority> grantedAuthorities;
--- private Long tenantId;
+COMMENT ON TABLE ua_user IS '用户信息表';
+COMMENT ON COLUMN ua_user.id IS '主键';
+COMMENT ON COLUMN ua_user.created_at IS '记录创建时间';
+COMMENT ON COLUMN ua_user.updated_at IS '记录更新时间';
+COMMENT ON COLUMN ua_user.deleted_at IS '逻辑删除字段';
+
+COMMENT ON COLUMN ua_user.username IS '用户名';
+COMMENT ON COLUMN ua_user.password IS '密码';
+COMMENT ON COLUMN ua_user.mobile IS '手机号';
+COMMENT ON COLUMN ua_user.email IS '邮箱';
+COMMENT ON COLUMN ua_user.tenant_id IS '租户ID';
+COMMENT ON COLUMN ua_user.enable IS '是否启用；1 - enable，0 - disable';

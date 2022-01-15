@@ -1,7 +1,7 @@
 package com.nekoimi.nk.framework.web.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nekoimi.nk.framework.cache.contract.CacheService;
+import com.nekoimi.nk.framework.cache.contract.RedisService;
 import com.nekoimi.nk.framework.core.holder.ObjectMapperHolder;
 import com.nekoimi.nk.framework.web.controller.IndexController;
 import com.nekoimi.nk.framework.web.customizer.HttpJackson2ObjectMapperBuilderCustomizer;
@@ -44,19 +44,17 @@ public class AppWebConfiguration {
     }
 
     @Bean
-    @ConditionalOnClass(value = CacheService.class)
-    @ConditionalOnBean(value = CacheService.class, search = SearchStrategy.CURRENT)
+    @ConditionalOnBean(value = RedisService.class, search = SearchStrategy.CURRENT)
     @ConditionalOnProperty(prefix = "app.web", name = "scan-request-mapping", havingValue = "true")
-    public ScanRequestMappingListener scanRequestMappingListener(CacheService cacheService) {
-        return new ScanRequestMappingListener(cacheService);
+    public ScanRequestMappingListener scanRequestMappingListener(RedisService redisService) {
+        return new ScanRequestMappingListener(redisService);
     }
 
     @Bean
-    @ConditionalOnClass(value = CacheService.class)
-    @ConditionalOnBean(value = CacheService.class, search = SearchStrategy.CURRENT)
+    @ConditionalOnBean(value = RedisService.class, search = SearchStrategy.CURRENT)
     @ConditionalOnProperty(prefix = "app.web", name = "scan-request-mapping", havingValue = "true")
-    public CleanRequestMappingListener cleanRequestMappingListener(CacheService cacheService) {
-        return new CleanRequestMappingListener(cacheService);
+    public CleanRequestMappingListener cleanRequestMappingListener(RedisService redisService) {
+        return new CleanRequestMappingListener(redisService);
     }
 
     @Bean
