@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "app.cache")
 public class CacheProperties {
     // 使用缓存驱动
-    private Driver driver;
+    private Driver driver = Driver.rocksdb;
     // rocksdb配置
     private RocksDBOptions rocksdb = new RocksDBOptions();
 

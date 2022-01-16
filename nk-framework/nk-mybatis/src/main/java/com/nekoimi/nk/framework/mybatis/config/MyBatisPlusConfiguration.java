@@ -3,9 +3,9 @@ package com.nekoimi.nk.framework.mybatis.config;
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.nekoimi.nk.framework.core.contract.IdGenerator;
 import com.nekoimi.nk.framework.mybatis.injector.ExtensionSqlInjector;
+import com.nekoimi.nk.framework.mybatis.plugins.OverflowPaginationInnerInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,7 +42,38 @@ public class MyBatisPlusConfiguration {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-        interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
+//        /**
+//         * 多租户插件
+//         */
+//        interceptor.addInnerInterceptor(new TenantLineInnerInterceptor(new TenantLineHandler() {
+//            @Override
+//            public Expression getTenantId() {
+//                return null;
+//            }
+//        }));
+
+//        /**
+//         * 动态表名插件
+//         */
+//        interceptor.addInnerInterceptor(new DynamicTableNameInnerInterceptor(new TableNameHandler() {
+//            @Override
+//            public String dynamicTableName(String sql, String tableName) {
+//                return null;
+//            }
+//        }));
+
+        /**
+         * 分页插件
+         */
+        OverflowPaginationInnerInterceptor overflowPaginationInnerInterceptor = new OverflowPaginationInnerInterceptor();
+        overflowPaginationInnerInterceptor.setMaxLimit(500L);
+        overflowPaginationInnerInterceptor.setOverflow(true);
+        interceptor.addInnerInterceptor(overflowPaginationInnerInterceptor);
+
+//        /**
+//         * sql 性能规范插件
+//         */
+//        interceptor.addInnerInterceptor(new IllegalSQLInnerInterceptor());
         return interceptor;
     }
 }
