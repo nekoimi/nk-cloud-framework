@@ -1,16 +1,13 @@
 package com.nekoimi.nk.devtools.controller;
 
 import com.nekoimi.nk.devtools.request.GenReq;
-import com.nekoimi.nk.devtools.service.DbInformationService;
 import com.nekoimi.nk.devtools.service.GenerateService;
 import com.nekoimi.nk.framework.core.protocol.JsonResp;
+import com.nekoimi.nk.framework.mybatis.service.DbInforService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
@@ -23,7 +20,7 @@ import java.util.Map;
 @Api(tags = "代码生成器接口")
 public class GeneratorController {
     @Autowired
-    private DbInformationService dbInformationService;
+    private DbInforService dbInforService;
     @Autowired
     private GenerateService generateService;
 
@@ -31,16 +28,16 @@ public class GeneratorController {
     @GetMapping("generator/env")
     public Mono<JsonResp> env() {
         Map<String, Object> map = new HashMap<>();
-        map.put("database", dbInformationService.database());
-        map.put("schemas", dbInformationService.schemas());
+        map.put("database", dbInforService.name());
+        map.put("schemas", dbInforService.schemas());
         return Mono.just(JsonResp.ok(map));
     }
 
     @ApiOperation("获取数据表列表")
-    @GetMapping("generator/env/tables")
-    public Mono<JsonResp> tables(@RequestParam("schema") String schema) {
+    @GetMapping("generator/env/{schema}/tables")
+    public Mono<JsonResp> tables(@PathVariable("schema") String schema) {
         Map<String, Object> map = new HashMap<>();
-        map.put("tables", dbInformationService.allTables(schema));
+        map.put("tables", dbInforService.tables(schema));
         return Mono.just(JsonResp.ok(map));
     }
 

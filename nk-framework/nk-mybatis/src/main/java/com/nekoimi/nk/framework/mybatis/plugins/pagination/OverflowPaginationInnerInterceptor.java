@@ -1,4 +1,4 @@
-package com.nekoimi.nk.framework.mybatis.plugins;
+package com.nekoimi.nk.framework.mybatis.plugins.pagination;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;

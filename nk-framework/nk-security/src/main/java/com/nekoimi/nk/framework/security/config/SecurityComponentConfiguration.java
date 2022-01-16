@@ -8,6 +8,8 @@ import com.nekoimi.nk.framework.security.customizer.SwaggerSecurityAuthorizeExch
 import com.nekoimi.nk.framework.security.handler.AccessDeniedExceptionHandler;
 import com.nekoimi.nk.framework.security.handler.AuthenticationExceptionHandler;
 import com.nekoimi.nk.framework.security.repository.RedisServerSecurityContextRepository;
+import org.apache.commons.collections4.ListUtils;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
@@ -55,7 +57,7 @@ public class SecurityComponentConfiguration {
     public BasicSecurityConfigCustomizer basicSecurityConfigCustomizer(SecurityProperties properties,
                                                                        AccessDeniedExceptionHandler accessDeniedHandler,
                                                                        AuthenticationExceptionHandler authenticationExceptionHandler,
-                                                                       List<SecurityAuthorizeExchangeCustomizer> authorizeExchangeCustomizers) {
-        return new BasicSecurityConfigCustomizer(properties, accessDeniedHandler, authenticationExceptionHandler, authorizeExchangeCustomizers);
+                                                                       ObjectProvider<List<SecurityAuthorizeExchangeCustomizer>> authorizeExchangeCustomizers) {
+        return new BasicSecurityConfigCustomizer(properties, accessDeniedHandler, authenticationExceptionHandler, ListUtils.emptyIfNull(authorizeExchangeCustomizers.getIfAvailable()));
     }
 }

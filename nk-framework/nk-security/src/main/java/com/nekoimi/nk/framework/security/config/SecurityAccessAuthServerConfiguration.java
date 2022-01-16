@@ -9,6 +9,8 @@ import com.nekoimi.nk.framework.security.handler.AuthenticationSuccessHandler;
 import com.nekoimi.nk.framework.security.handler.LogoutSuccessHandler;
 import com.nekoimi.nk.framework.security.repository.RedisServerSecurityContextRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.ListUtils;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.context.annotation.Bean;
@@ -53,11 +55,10 @@ public class SecurityAccessAuthServerConfiguration {
     @Bean
     @ConditionalOnBean(value = RedisServerSecurityContextRepository.class, search = SearchStrategy.CURRENT)
     public SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http,
-                                                       List<SecurityConfigCustomizer> configCustomizers,
+                                                       ObjectProvider<List<SecurityConfigCustomizer>> configCustomizers,
                                                        RedisServerSecurityContextRepository securityContextRepository) {
         http.securityContextRepository(securityContextRepository);
-        configCustomizers.forEach(configCustomizer -> configCustomizer.customize(http));
-        configCustomizers.forEach(configCustomizer -> configCustomizer.customize(http));
+        ListUtils.emptyIfNull(configCustomizers.getIfAvailable()).forEach(configCustomizer -> configCustomizer.customize(http));
         // 使用综合认证Token解析器
         return replaceServerAuthenticationConverter(http.build());
     }

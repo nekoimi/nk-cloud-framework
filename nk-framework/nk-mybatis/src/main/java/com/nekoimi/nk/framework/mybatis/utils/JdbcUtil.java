@@ -1,4 +1,4 @@
-package com.nekoimi.nk.framework.core.utils;
+package com.nekoimi.nk.framework.mybatis.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -8,9 +8,9 @@ import java.util.regex.Pattern;
 /**
  * nekoimi  2021/12/14 15:44
  */
-public class DatabaseUtils {
+public class JdbcUtil {
 
-    public static String parseFromJdbcUrl(String url) {
+    public static String getDbName(String url) {
         // jdbc:mysql://localhost:3306/test?
         Pattern pattern = Pattern.compile("^jdbc:.*//.*:[0-9]*/(.*)");
         Matcher matcher = pattern.matcher(url);

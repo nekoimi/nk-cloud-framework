@@ -5,7 +5,8 @@ import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.nekoimi.nk.framework.core.contract.IdGenerator;
 import com.nekoimi.nk.framework.mybatis.injector.ExtensionSqlInjector;
-import com.nekoimi.nk.framework.mybatis.plugins.OverflowPaginationInnerInterceptor;
+import com.nekoimi.nk.framework.mybatis.plugins.desensitize.DesensitizeConfigurationCustomizer;
+import com.nekoimi.nk.framework.mybatis.plugins.pagination.OverflowPaginationInnerInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,15 @@ public class MyBatisPlusConfiguration {
     @Bean
     public ISqlInjector nkExtensionSqlInjector() {
         return new ExtensionSqlInjector();
+    }
+
+    /**
+     * 数据脱敏自定义插件
+     * @return
+     */
+    @Bean
+    public DesensitizeConfigurationCustomizer desensitizeConfigurationCustomizer() {
+        return new DesensitizeConfigurationCustomizer();
     }
 
     @Bean

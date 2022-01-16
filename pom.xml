@@ -40,6 +40,7 @@
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <p6spy.version>3.9.1</p6spy.version>
+        <hutool.varsion>5.7.19</hutool.varsion>
         <rocksdb.version>6.25.3</rocksdb.version>
         <swagger.version>2.10.5</swagger.version>
         <swagger-annotations.version>1.5.20</swagger-annotations.version>
@@ -171,6 +172,16 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
                 <version>${apache-commons-collections4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-core</artifactId>
+                <version>${hutool.varsion}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-captcha</artifactId>
+                <version>${hutool.varsion}</version>
             </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>

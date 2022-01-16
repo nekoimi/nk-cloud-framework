@@ -62,6 +62,8 @@ public class GenerateService {
         // 全局配置
         globalConfig.setOutputDir(outputDir);
         globalConfig.setAuthor(req.getAuthor());
+        // 添加schema
+        dataSourceConfig.setSchemaName(req.getSchemaName());
         // 此处可以修改为您的表前缀
         strategyConfig.setTablePrefix(req.getTablePrefix());
         strategyConfig.setFieldPrefix(req.getFieldPrefix());

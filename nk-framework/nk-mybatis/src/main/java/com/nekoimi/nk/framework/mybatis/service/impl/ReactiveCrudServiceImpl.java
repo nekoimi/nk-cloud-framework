@@ -1,5 +1,6 @@
 package com.nekoimi.nk.framework.mybatis.service.impl;
 
+import cn.hutool.core.lang.Console;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;

@@ -65,3 +65,6 @@ app:
     scan-request-mapping: false
     swagger:
       enabled: true
+  security:
+    permit-all:
+      - /test/**

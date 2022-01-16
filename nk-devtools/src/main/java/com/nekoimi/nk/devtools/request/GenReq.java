@@ -14,7 +14,7 @@ public class GenReq {
     private String packageName;
     private String moduleName;
 
-    private String schema;
+    private String schemaName;
     private String tableName;
     private String tablePrefix;
     private String fieldPrefix;

@@ -1,7 +1,6 @@
 package com.nekoimi.nk.framework.web.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nekoimi.nk.framework.web.config.properties.AppWebProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.WebProperties;
@@ -29,16 +28,12 @@ import java.time.Duration;
 @AllArgsConstructor
 public class WebFluxConfiguration implements WebFluxConfigurer {
     private final ObjectMapper objectMapper;
-    private final AppWebProperties appWebProperties;
     private final WebProperties.Resources resourceProperties;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         if (!this.resourceProperties.isAddMappings()) {
             log.debug("Default resource handling disabled");
-            return;
-        }
-        if (!appWebProperties.getSwagger().getEnabled()) {
             return;
         }
         if (!registry.hasMappingForPattern("/webjars/**")) {

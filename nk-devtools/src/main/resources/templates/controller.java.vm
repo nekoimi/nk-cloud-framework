@@ -1,13 +1,13 @@
 package ${package.Controller};
 
 #if(${cfg.route.prefix} != "")
-    #set($routePrefix = ${cfg.route.prefix})
+    #set($routePrefix = "${cfg.route.prefix}/")
 #else
     #set($routePrefix = "")
 #end
 
 #if(${cfg.route.version} != "")
-    #set($routeVersion = ${cfg.route.version})
+    #set($routeVersion = "${cfg.route.version}/")
 #else
     #set($routeVersion = "")
 #end
@@ -59,7 +59,7 @@ public class ${table.controllerName} {
      *
      * @return
      */
-    @GetMapping("${routePrefix}/${routeVersion}/${routePathName}/list")
+    @GetMapping("${routePrefix}${routeVersion}${routePathName}/list")
     @ApiOperation(value = "获取${cfg.route.info}分页列表", response = PageResult.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "p", value = "分页页码", required = false, defaultValue = "1", paramType = "query", dataType = "Integer"),
@@ -79,7 +79,7 @@ public class ${table.controllerName} {
      * @param id
      * @return
      */
-    @GetMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}")
+    @GetMapping("${routePrefix}${routeVersion}${routePathName}/{id}")
     @ApiOperation(value = "根据id获取${cfg.route.info}数据", response = ${entity}.class)
     public Mono<${entity}> get(@PathVariable("id") String id) {
         return service.getByIdOrFail(id);
@@ -90,7 +90,7 @@ public class ${table.controllerName} {
      *
      * @return
      */
-    @PostMapping("${routePrefix}/${routeVersion}/${routePathName}")
+    @PostMapping("${routePrefix}${routeVersion}${routePathName}")
     @ApiOperation(value = "添加${cfg.route.info}数据", response = ${entity}.class)
     public Mono<${entity}> save(@Validated @RequestBody ${entity} body) {
         return service.save(body).flatMap(service::getByIdOrFail);
@@ -102,7 +102,7 @@ public class ${table.controllerName} {
      * @param body
      * @return
      */
-    @PutMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}/full")
+    @PutMapping("${routePrefix}${routeVersion}${routePathName}/{id}/full")
     @ApiOperation(value = "根据id更新${cfg.route.info}所有字段", response = Boolean.class)
     public Mono<Boolean> updateFull(@PathVariable("id") String id, @Validated @RequestBody ${entity} body) {
         return service.updateById(id, body);
@@ -114,7 +114,7 @@ public class ${table.controllerName} {
      * @param body
      * @return
      */
-    @PutMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}")
+    @PutMapping("${routePrefix}${routeVersion}${routePathName}/{id}")
     @ApiOperation(value = "根据id更新${cfg.route.info}部分字段", response = Boolean.class)
     @ApiImplicitParams({
         #foreach($field in ${table.fields})
@@ -137,7 +137,7 @@ public class ${table.controllerName} {
      * @param body
      * @return
      */
-    @PutMapping("${routePrefix}/${routeVersion}/${routePathName}/batch")
+    @PutMapping("${routePrefix}${routeVersion}${routePathName}/batch")
     @ApiOperation(value = "批量更新${cfg.route.info}数据")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "ids", value = "id的列表，使用,分割", required = true, example = "1,2,3", paramType = "query", dataType = "String"),
@@ -161,7 +161,7 @@ public class ${table.controllerName} {
      * @param id
      * @return
      */
-    @DeleteMapping("${routePrefix}/${routeVersion}/${routePathName}/{id}")
+    @DeleteMapping("${routePrefix}${routeVersion}${routePathName}/{id}")
     @ApiOperation(value = "根据id删除${cfg.route.info}数据")
     public Mono<Void> remove(@PathVariable("id") String id) {
         return service.removeById(id);
@@ -172,7 +172,7 @@ public class ${table.controllerName} {
      *
      * @return
      */
-    @DeleteMapping("${routePrefix}/${routeVersion}/${routePathName}/batch")
+    @DeleteMapping("${routePrefix}${routeVersion}${routePathName}/batch")
     @ApiOperation(value = "批量删除${cfg.route.info}数据")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "ids", value = "id的列表，使用,分割", required = true, example = "1,2,3", paramType = "query", dataType = "String")

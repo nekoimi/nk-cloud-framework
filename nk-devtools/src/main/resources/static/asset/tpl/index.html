@@ -49,6 +49,37 @@
                     <div class='panel-body'>
                         <div class='line line-dashed b-b line-lg'></div>
                         <div class='form-group'>
+                            <label class='col-sm-2 control-label'>当前数据库</label>
+                            <div class='col-sm-10'>
+                                <input type='text' readonly ng-model='database' class='form-control'>
+                            </div>
+                        </div>
+                        <div class='line line-dashed b-b line-lg'></div>
+                        <div class='form-group'>
+                            <label class='col-sm-2 control-label'>选择表空间</label>
+                            <div class='col-sm-10'>
+                                <input type='text' readonly ng-model='data.schemaName' class='form-control'>
+                            </div>
+                        </div>
+                        <div class='form-group'>
+                            <div class='col-sm-12'>
+                                <ul class='list-group m-b-none '>
+                                    <li class='list-group-item'>
+                                        <input type='text' name='title' placeholder='过滤' ng-model='condition.name'
+                                               class='form-control'>
+                                    </li>
+                                </ul>
+                                <ul class='list-group' style="height: 100px;overflow-y: scroll">
+                                    <li ng-class="{'bg-primary':data.schemaName == schema}"
+                                        ng-repeat='schema in schemas | filter:{name:condition.name}'
+                                        ng-click='onSchemaClink(schema)' class='list-group-item'>
+                                        <span>{{schema}}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class='line line-dashed b-b line-lg'></div>
+                        <div class='form-group'>
                             <label class='col-sm-2 control-label'>选择数据表</label>
                             <div class='col-sm-10'>
                                 <input type='text' readonly ng-model='data.tableName' class='form-control'>

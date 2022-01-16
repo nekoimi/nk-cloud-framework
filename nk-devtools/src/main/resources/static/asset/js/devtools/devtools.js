@@ -5,6 +5,8 @@ app.controller('generatorController', [
     '$modal',
     function ($scope, $http, Messager, $modal) {
         let localStorageDataKey = '_nk_dt_d';
+        $scope.database = '';
+        $scope.schemas = [];
         $scope.tables = [];
         $scope.data = {
             location: '',
@@ -12,6 +14,7 @@ app.controller('generatorController', [
             packageName: '',
             moduleName: '',
 
+            schemaName: '',
             tableName: '',
             tablePrefix: '',
             fieldPrefix: '',
@@ -51,7 +54,8 @@ app.controller('generatorController', [
                 function (result, status, headers, config) {
                     $scope.loading = false;
                     if (result.code === 0) {
-                        $scope.tables = result.data.tables;
+                        $scope.database = result.data.database;
+                        $scope.schemas = result.data.schemas;
                     } else {
                         $scope.error = result.msg;
                     }
@@ -62,6 +66,22 @@ app.controller('generatorController', [
         }
 
         loadBootstrap();
+
+        $scope.onSchemaClink = function (schema) {
+            $scope.data.schemaName = schema;
+            $http.get(`generator/env/${schema}/tables`).success(
+                function (result, status, headers, config) {
+                    $scope.loading = false;
+                    if (result.code === 0) {
+                        $scope.tables = result.data.tables;
+                    } else {
+                        $scope.error = result.msg;
+                    }
+                }).error(function (result, status) {
+                $scope.loading = false;
+                $scope.error = result.msg || status;
+            });
+        }
 
         $scope.onTableClick = function (table) {
             $scope.data.tableName = table.name;

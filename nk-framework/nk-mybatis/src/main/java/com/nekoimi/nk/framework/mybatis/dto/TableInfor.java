@@ -1,4 +1,4 @@
-package com.nekoimi.nk.devtools.dto;
+package com.nekoimi.nk.framework.mybatis.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,12 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * nekoimi  2022/1/9 21:06
+ * nekoimi  2022/1/16 20:59
  */
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor(staticName = "of")
-public class SchemaInfo {
+@AllArgsConstructor
+public class TableInfor {
     private String name;
+    private String comment;
 }

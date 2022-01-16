@@ -1,5 +1,6 @@
 package com.nekoimi.nk.framework.security.provider;
 
+import cn.hutool.core.lang.Dict;
 import com.nekoimi.nk.framework.core.exception.http.RequestValidationException;
 import com.nekoimi.nk.framework.core.utils.JsonUtils;
 import com.nekoimi.nk.framework.security.contract.ReactiveAuthenticationSupportProvider;
@@ -41,7 +42,7 @@ public abstract class AbstractReactiveAuthenticationSupportProvider implements R
      * @param requestParameters 请求参数
      * @return
      */
-    abstract protected Mono<? extends Authentication> doConvert(Map<String, Object> requestParameters);
+    abstract protected Mono<? extends Authentication> doConvert(Dict requestParameters);
 
     /**
      * do authentication
@@ -71,6 +72,7 @@ public abstract class AbstractReactiveAuthenticationSupportProvider implements R
                 .filter(map -> !map.isEmpty())
                 .switchIfEmpty(Mono.error(new RequestValidationException()))
                 .last()
+                .map(Dict::new)
                 .flatMap(this::doConvert);
     }
 
