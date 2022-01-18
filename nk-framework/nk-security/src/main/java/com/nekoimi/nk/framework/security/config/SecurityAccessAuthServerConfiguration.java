@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -37,13 +38,13 @@ public class SecurityAccessAuthServerConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean(value = LoginMappingController.class, search = SearchStrategy.CURRENT)
+    @ConditionalOnMissingBean(value = LoginMappingController.class, search = SearchStrategy.CURRENT)
     public LoginMappingController SimpleLoginMappingController() {
         return () -> ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, "/login");
     }
 
     @Bean
-    @ConditionalOnBean(value = LogoutMappingController.class, search = SearchStrategy.CURRENT)
+    @ConditionalOnMissingBean(value = LogoutMappingController.class, search = SearchStrategy.CURRENT)
     public LogoutMappingController SimpleLogoutMappingController() {
         return () -> ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, "/logout");
     }

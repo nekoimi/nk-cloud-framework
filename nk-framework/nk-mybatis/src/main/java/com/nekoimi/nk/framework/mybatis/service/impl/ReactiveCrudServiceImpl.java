@@ -731,7 +731,8 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
                         result.getSize(),
                         result.getPages(),
                         result.getRecords())
-                )).subscribeOn(Schedulers.boundedElastic())
+                ))
+                .subscribeOn(Schedulers.boundedElastic())
                 .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 }
