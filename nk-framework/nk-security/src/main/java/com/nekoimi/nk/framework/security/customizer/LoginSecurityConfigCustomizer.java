@@ -1,5 +1,7 @@
 package com.nekoimi.nk.framework.security.customizer;
 
+import com.nekoimi.nk.framework.security.contract.LoginMappingController;
+import com.nekoimi.nk.framework.security.contract.LogoutMappingController;
 import com.nekoimi.nk.framework.security.contract.SecurityConfigCustomizer;
 import com.nekoimi.nk.framework.security.factory.AuthenticationManagerFactory;
 import com.nekoimi.nk.framework.security.filter.ResolverAuthTypeParameterFilter;
@@ -8,11 +10,9 @@ import com.nekoimi.nk.framework.security.handler.AuthenticationSuccessHandler;
 import com.nekoimi.nk.framework.security.handler.LogoutSuccessHandler;
 import com.nekoimi.nk.framework.security.repository.RedisServerSecurityContextRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
-import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.web.server.WebFilter;
 
 /**
@@ -22,7 +22,6 @@ import org.springframework.web.server.WebFilter;
  */
 @Slf4j
 public class LoginSecurityConfigCustomizer implements SecurityConfigCustomizer {
-    private final String loginPath;
     private final ServerWebExchangeMatcher loginExchangeMatcher;
     private final ServerWebExchangeMatcher logoutExchangeMatcher;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
@@ -32,21 +31,20 @@ public class LoginSecurityConfigCustomizer implements SecurityConfigCustomizer {
     private final RedisServerSecurityContextRepository securityContextRepository;
     private final WebFilter resolverAuthTypeParameterFilter;
 
-    public LoginSecurityConfigCustomizer(String loginPath,
-                                         String logoutPath,
+    public LoginSecurityConfigCustomizer(LoginMappingController loginMappingController,
+                                         LogoutMappingController logoutMappingController,
                                          AuthenticationSuccessHandler authenticationSuccessHandler,
                                          AuthenticationFailureHandler authenticationFailureHandler,
                                          LogoutSuccessHandler logoutSuccessHandler,
                                          AuthenticationManagerFactory authenticationManagerFactory,
                                          RedisServerSecurityContextRepository securityContextRepository) {
-        this.loginPath = loginPath;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.logoutSuccessHandler = logoutSuccessHandler;
         this.authenticationManagerFactory = authenticationManagerFactory;
         this.securityContextRepository = securityContextRepository;
-        this.loginExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, loginPath);
-        this.logoutExchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, logoutPath);
+        this.loginExchangeMatcher = loginMappingController.mapping();
+        this.logoutExchangeMatcher = logoutMappingController.mapping();
         this.resolverAuthTypeParameterFilter = new ResolverAuthTypeParameterFilter(loginExchangeMatcher);
     }
 
@@ -61,7 +59,7 @@ public class LoginSecurityConfigCustomizer implements SecurityConfigCustomizer {
                         .securityContextRepository(securityContextRepository))
                 // 注销认证
                 .logout(logout -> logout.requiresLogout(logoutExchangeMatcher).logoutSuccessHandler(logoutSuccessHandler))
-                .authorizeExchange(exchange -> exchange.pathMatchers(HttpMethod.POST, loginPath).permitAll())
+                .authorizeExchange(exchange -> exchange.matchers(logoutExchangeMatcher).permitAll())
         // 插入认证类型解析filter
         .addFilterBefore(resolverAuthTypeParameterFilter, SecurityWebFiltersOrder.HTTP_BASIC);
         log.debug("login security config customizer done ...");

@@ -1,6 +1,7 @@
 package com.nekoimi.nk.framework.security.config;
 
-import com.nekoimi.nk.framework.security.config.properties.SecurityProperties;
+import com.nekoimi.nk.framework.security.contract.LoginMappingController;
+import com.nekoimi.nk.framework.security.contract.LogoutMappingController;
 import com.nekoimi.nk.framework.security.contract.SecurityConfigCustomizer;
 import com.nekoimi.nk.framework.security.customizer.LoginSecurityConfigCustomizer;
 import com.nekoimi.nk.framework.security.factory.AuthenticationManagerFactory;
@@ -14,9 +15,11 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 
 import java.util.List;
 
@@ -27,23 +30,35 @@ import java.util.List;
  */
 @Slf4j
 public class SecurityAccessAuthServerConfiguration {
-    private final SecurityProperties properties;
     private final AuthenticationManagerFactory authenticationManagerFactory;
 
-    public SecurityAccessAuthServerConfiguration(SecurityProperties properties, AuthenticationManagerFactory authenticationManagerFactory) {
-        this.properties = properties;
+    public SecurityAccessAuthServerConfiguration(AuthenticationManagerFactory authenticationManagerFactory) {
         this.authenticationManagerFactory = authenticationManagerFactory;
     }
 
     @Bean
+    @ConditionalOnBean(value = LoginMappingController.class, search = SearchStrategy.CURRENT)
+    public LoginMappingController SimpleLoginMappingController() {
+        return () -> ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, "/login");
+    }
+
+    @Bean
+    @ConditionalOnBean(value = LogoutMappingController.class, search = SearchStrategy.CURRENT)
+    public LogoutMappingController SimpleLogoutMappingController() {
+        return () -> ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, "/logout");
+    }
+
+    @Bean
     @ConditionalOnBean(value = RedisServerSecurityContextRepository.class, search = SearchStrategy.CURRENT)
-    public LoginSecurityConfigCustomizer loginSecurityConfigCustomizer(AuthenticationSuccessHandler authenticationSuccessHandler,
+    public LoginSecurityConfigCustomizer loginSecurityConfigCustomizer(LoginMappingController loginMappingController,
+                                                                       LogoutMappingController logoutMappingController,
+                                                                       AuthenticationSuccessHandler authenticationSuccessHandler,
                                                                        AuthenticationFailureHandler authenticationFailureHandler,
                                                                        LogoutSuccessHandler logoutSuccessHandler,
                                                                        RedisServerSecurityContextRepository securityContextRepository) {
         return new LoginSecurityConfigCustomizer(
-                properties.getLoginPath(),
-                properties.getLogoutPath(),
+                loginMappingController,
+                logoutMappingController,
                 authenticationSuccessHandler,
                 authenticationFailureHandler,
                 logoutSuccessHandler,
