@@ -1,6 +1,7 @@
 package com.nekoimi.nk.framework.core.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.nekoimi.nk.framework.core.holder.ObjectMapperHolder;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,6 +39,15 @@ public class JsonUtils {
     }
 
     public static <T> T read(String json, Class<T> resultType) {
+        try {
+            return ObjectMapperHolder.getInstance().readValue(json, resultType);
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+    }
+
+    public static <T> T read(String json, TypeReference<T> resultType) {
         try {
             return ObjectMapperHolder.getInstance().readValue(json, resultType);
         } catch (JsonProcessingException e) {

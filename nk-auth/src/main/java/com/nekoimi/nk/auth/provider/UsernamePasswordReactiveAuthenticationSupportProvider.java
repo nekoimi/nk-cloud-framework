@@ -2,6 +2,7 @@ package com.nekoimi.nk.auth.provider;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Dict;
+import com.nekoimi.nk.auth.enums.AuthType;
 import com.nekoimi.nk.auth.token.UsernamePasswordAuthenticationToken;
 import com.nekoimi.nk.framework.core.exception.http.RequestValidationException;
 import com.nekoimi.nk.framework.security.provider.AbstractReactiveAuthenticationSupportProvider;
@@ -9,8 +10,6 @@ import com.nekoimi.nk.framework.security.token.SubjectAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
 
 /**
  * nekoimi  2021/12/26 23:03
@@ -21,8 +20,8 @@ public class UsernamePasswordReactiveAuthenticationSupportProvider extends Abstr
     private final String passwordParameter = "password";
 
     @Override
-    protected Serializable authType() {
-        return "1";
+    protected Integer authType() {
+        return AuthType.USERNAME_PASSWORD.code();
     }
 
     @Override

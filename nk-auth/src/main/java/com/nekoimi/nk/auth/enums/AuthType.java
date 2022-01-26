@@ -8,28 +8,28 @@ import reactor.core.publisher.Mono;
  * 综合验证方式类型
  */
 public enum AuthType {
-    USERNAME_PASSWORD(0),
-    MOBILE(1)
+    USERNAME_PASSWORD(1),
+    MOBILE(2)
     ;
 
-    private final int id;
+    private final Integer code;
 
     AuthType() {
-        this.id = ordinal() + 1;
+        this.code = ordinal() + 1;
     }
 
-    AuthType(int id) {
-        this.id = id;
+    AuthType(int code) {
+        this.code = code;
     }
 
-    public int getId() {
-        return id;
+    public Integer code() {
+        return code;
     }
 
-    public static Mono<AuthType> valueOf(Integer id) {
-        if (id == null) return Mono.empty();
+    public static Mono<AuthType> valueOf(Integer code) {
+        if (code == null) return Mono.empty();
         for (AuthType type : values()) {
-            if (type.id == id) {
+            if (type.code.equals(code)) {
                 return Mono.just(type);
             }
         }
@@ -38,6 +38,6 @@ public enum AuthType {
 
     @Override
     public String toString() {
-        return "" + id;
+        return "" + code;
     }
 }

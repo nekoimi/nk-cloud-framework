@@ -5,6 +5,7 @@ import com.nekoimi.nk.framework.core.exception.http.RequestValidationException;
 import com.nekoimi.nk.framework.core.utils.JsonUtils;
 import com.nekoimi.nk.framework.security.contract.ReactiveAuthenticationSupportProvider;
 import com.nekoimi.nk.framework.security.token.SubjectAuthenticationToken;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.codec.ByteArrayDecoder;
 import org.springframework.core.codec.Hints;
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * nekoimi  2022/1/15 10:44
@@ -27,7 +29,7 @@ public abstract class AbstractReactiveAuthenticationSupportProvider implements R
      *
      * @return
      */
-    abstract protected Serializable authType();
+    abstract protected Integer authType();
 
     /**
      * AuthenticationToken clazz
@@ -55,7 +57,7 @@ public abstract class AbstractReactiveAuthenticationSupportProvider implements R
     public boolean support(Serializable authType) {
         if (authType == null || authType() == null)
             return false;
-        return authType.equals(authType());
+        return authType.equals(NumberUtils.createInteger(Objects.toString(authType())));
     }
 
     @Override

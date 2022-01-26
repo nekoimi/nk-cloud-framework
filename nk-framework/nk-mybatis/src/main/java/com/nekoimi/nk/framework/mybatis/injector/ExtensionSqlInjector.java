@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.nekoimi.nk.framework.mybatis.injector.methods.SelectBatchIdsWithHandler;
 import com.nekoimi.nk.framework.mybatis.injector.methods.SelectListWithHandler;
+import com.nekoimi.nk.framework.mybatis.injector.methods.SelectPageWithHandler;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class ExtensionSqlInjector extends DefaultSqlInjector {
         List<AbstractMethod> methodList = super.getMethodList(mapperClass, tableInfo);
         methodList.add(new SelectListWithHandler());
         methodList.add(new SelectBatchIdsWithHandler());
+//        methodList.add(new SelectPageWithHandler());
         return methodList;
     }
 }

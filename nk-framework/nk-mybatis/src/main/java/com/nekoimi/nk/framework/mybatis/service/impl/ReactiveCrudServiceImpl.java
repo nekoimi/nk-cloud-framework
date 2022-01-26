@@ -1,6 +1,5 @@
 package com.nekoimi.nk.framework.mybatis.service.impl;
 
-import cn.hutool.core.lang.Console;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -65,19 +64,19 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return tableInfo.getFieldList();
     }
 
-    protected LambdaQueryWrapper<E> acceptQueryConsumer(Consumer<LambdaQueryWrapper<E>> consumer) {
+    protected LambdaQueryWrapper<E> applyQueryConsumer(Consumer<LambdaQueryWrapper<E>> consumer) {
         var query = lambdaQuery();
         consumer.accept(query);
         return query;
     }
 
-    protected LambdaUpdateWrapper<E> acceptUpdateConsumer(Consumer<LambdaUpdateWrapper<E>> consumer) {
+    protected LambdaUpdateWrapper<E> applyUpdateConsumer(Consumer<LambdaUpdateWrapper<E>> consumer) {
         var query = lambdaUpdate();
         consumer.accept(query);
         return query;
     }
 
-    protected LambdaQueryWrapper<E> acceptQueryMapConsumer(Consumer<QMap<SFunction<E, Object>, Object>> consumer) {
+    protected LambdaQueryWrapper<E> applyQueryMapConsumer(Consumer<QMap<SFunction<E, Object>, Object>> consumer) {
         var query = lambdaQuery();
         var queryMap = queryMap();
         consumer.accept(queryMap);
@@ -86,7 +85,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
         return query;
     }
 
-    protected LambdaUpdateWrapper<E> acceptUpdateMapConsumer(Consumer<QMap<SFunction<E, Object>, Object>> consumer) {
+    protected LambdaUpdateWrapper<E> applyUpdateMapConsumer(Consumer<QMap<SFunction<E, Object>, Object>> consumer) {
         var update = lambdaUpdate();
         var updateMap = queryMap();
         consumer.accept(updateMap);
@@ -178,7 +177,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Override
     public Mono<E> getByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
         return Mono.just(consumer)
-                .map(this::acceptQueryConsumer)
+                .map(this::applyQueryConsumer)
                 .publishOn(Schedulers.boundedElastic())
                 .map(eqw -> mapper.selectOne(eqw))
                 .flatMap(Mono::justOrEmpty);
@@ -188,7 +187,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Override
     public Mono<E> getByMap(Consumer<QMap<SFunction<E, Object>, Object>> consumer) {
         return Mono.just(consumer)
-                .map(this::acceptQueryMapConsumer)
+                .map(this::applyQueryMapConsumer)
                 .publishOn(Schedulers.boundedElastic())
                 .map(eqw -> mapper.selectOne(eqw))
                 .flatMap(Mono::justOrEmpty);
@@ -413,7 +412,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Override
     public Mono<Boolean> updateByQuery(E entity, Consumer<LambdaQueryWrapper<E>> consumer) {
         return Mono.just(consumer)
-                .map(this::acceptQueryConsumer)
+                .map(this::applyQueryConsumer)
                 .publishOn(Schedulers.boundedElastic())
                 .map(eqw -> mapper.update(entity, eqw))
                 .flatMap(this::dmlRowToBoolean)
@@ -457,7 +456,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Override
     public Mono<Boolean> updateById(Serializable id, Consumer<LambdaUpdateWrapper<E>> consumer) {
         return getByIdOrFail(id).flatMap(e -> Mono.just(consumer)
-                .map(this::acceptUpdateConsumer)
+                .map(this::applyUpdateConsumer)
                 .publishOn(Schedulers.boundedElastic())
                 .map(euw -> mapper.update(e, euw))
                 .flatMap(this::dmlRowToBoolean))
@@ -468,7 +467,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Override
     public Mono<Boolean> updateByIdOfMap(Serializable id, Consumer<QMap<SFunction<E, Object>, Object>> consumer) {
         return getByIdOrFail(id).flatMap(e -> Mono.just(consumer)
-                .map(this::acceptUpdateMapConsumer)
+                .map(this::applyUpdateMapConsumer)
                 .publishOn(Schedulers.boundedElastic())
                 .map(euw -> mapper.update(e, euw))
                 .flatMap(this::dmlRowToBoolean))
@@ -538,7 +537,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Override
     public Mono<Void> removeByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
         return Mono.just(consumer)
-                .map(this::acceptQueryConsumer)
+                .map(this::applyQueryConsumer)
                 .publishOn(Schedulers.boundedElastic())
                 .map(eqw -> mapper.delete(eqw))
                 .onErrorResume(t -> Mono.error(new FailedToResourceRemoveException(t.getMessage())))
@@ -574,7 +573,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Override
     public Mono<Long> countByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
         return Mono.just(consumer)
-                .map(this::acceptQueryConsumer)
+                .map(this::applyQueryConsumer)
                 .publishOn(Schedulers.boundedElastic())
                 .map(eqw -> mapper.selectCount(eqw))
                 .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
@@ -584,13 +583,13 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Override
     public Mono<Long> countByMap(Consumer<QMap<SFunction<E, Object>, Object>> consumer) {
         return Mono.just(consumer)
-                .map(this::acceptQueryMapConsumer)
+                .map(this::applyQueryMapConsumer)
                 .publishOn(Schedulers.boundedElastic())
                 .map(eqw -> mapper.selectCount(eqw))
                 .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
     }
 
-    private Flux<E> findAllFluxPushScheduler(Flux<E> push) {
+    private Flux<E> applyFluxPushScheduler(Flux<E> push) {
         return push.publishOn(Schedulers.boundedElastic())
                 .subscribeOn(Schedulers.boundedElastic())
                 .onErrorResume(t -> Mono.error(new FailedToResourceQueryException(t.getMessage())));
@@ -599,7 +598,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Transactional(readOnly = true)
     @Override
     public Flux<E> findAll() {
-        return findAllFluxPushScheduler(Flux.push(fluxSink -> {
+        return applyFluxPushScheduler(Flux.push(fluxSink -> {
             mapper.selectListWithHandler(Wrappers.lambdaQuery(currentModelClass()), ctx -> fluxSink.next(ctx.getResultObject()));
             fluxSink.complete();
         }));
@@ -608,7 +607,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Transactional(readOnly = true)
     @Override
     public Flux<E> findByIds(List<? extends Serializable> ids) {
-        return findAllFluxPushScheduler(Flux.push(fluxSink -> {
+        return applyFluxPushScheduler(Flux.push(fluxSink -> {
             mapper.selectBatchIdsWithHandler(ids, ctx -> fluxSink.next(ctx.getResultObject()));
             fluxSink.complete();
         }));
@@ -617,16 +616,16 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Transactional(readOnly = true)
     @Override
     public Flux<E> findByQuery(Consumer<LambdaQueryWrapper<E>> consumer) {
-        return findAllFluxPushScheduler(Flux.push(fluxSink -> {
-            mapper.selectListWithHandler(acceptQueryConsumer(consumer), ctx -> fluxSink.next(ctx.getResultObject()));
+        return applyFluxPushScheduler(Flux.push(fluxSink -> {
+            mapper.selectListWithHandler(applyQueryConsumer(consumer), ctx -> fluxSink.next(ctx.getResultObject()));
             fluxSink.complete();
         }));
     }
 
     @Override
     public Flux<E> findByMap(Consumer<QMap<SFunction<E, Object>, Object>> consumer) {
-        return findAllFluxPushScheduler(Flux.push(fluxSink -> {
-            mapper.selectListWithHandler(acceptQueryMapConsumer(consumer), ctx -> fluxSink.next(ctx.getResultObject()));
+        return applyFluxPushScheduler(Flux.push(fluxSink -> {
+            mapper.selectListWithHandler(applyQueryMapConsumer(consumer), ctx -> fluxSink.next(ctx.getResultObject()));
             fluxSink.complete();
         }));
     }
@@ -634,7 +633,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Override
     @SafeVarargs
     public final Flux<E> findAllSelectColumn(SFunction<E, Object>... columns) {
-        return findAllFluxPushScheduler(Flux.push(fluxSink -> {
+        return applyFluxPushScheduler(Flux.push(fluxSink -> {
             mapper.selectListWithHandler(Wrappers.lambdaQuery(currentModelClass()).select(columns), ctx -> fluxSink.next(ctx.getResultObject()));
             fluxSink.complete();
         }));
@@ -643,8 +642,8 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @SafeVarargs
     @Override
     public final Flux<E> findByQuerySelectColumn(Consumer<LambdaQueryWrapper<E>> consumer, SFunction<E, Object>... columns) {
-        return findAllFluxPushScheduler(Flux.push(fluxSink -> {
-            mapper.selectListWithHandler(acceptQueryConsumer(consumer).select(columns), ctx -> fluxSink.next(ctx.getResultObject()));
+        return applyFluxPushScheduler(Flux.push(fluxSink -> {
+            mapper.selectListWithHandler(applyQueryConsumer(consumer).select(columns), ctx -> fluxSink.next(ctx.getResultObject()));
             fluxSink.complete();
         }));
     }
@@ -652,8 +651,8 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @SafeVarargs
     @Override
     public final Flux<E> findByMapSelectColumn(Consumer<QMap<SFunction<E, Object>, Object>> consumer, SFunction<E, Object>... columns) {
-        return findAllFluxPushScheduler(Flux.push(fluxSink -> {
-            mapper.selectListWithHandler(acceptQueryMapConsumer(consumer).select(columns), ctx -> fluxSink.next(ctx.getResultObject()));
+        return applyFluxPushScheduler(Flux.push(fluxSink -> {
+            mapper.selectListWithHandler(applyQueryMapConsumer(consumer).select(columns), ctx -> fluxSink.next(ctx.getResultObject()));
             fluxSink.complete();
         }));
     }
@@ -722,7 +721,7 @@ public abstract class ReactiveCrudServiceImpl<M extends BaseMapper<E>, E> implem
     @Transactional(readOnly = true)
     @Override
     public Mono<PageResult<E>> page(IPage<E> page, Consumer<LambdaQueryWrapper<E>> consumer) {
-        return Mono.just(acceptQueryConsumer(consumer))
+        return Mono.just(applyQueryConsumer(consumer))
                 .publishOn(Schedulers.boundedElastic())
                 .map(eqw -> mapper.selectPage(page, eqw))
                 .flatMap(result -> Mono.just(PageResult.of(
