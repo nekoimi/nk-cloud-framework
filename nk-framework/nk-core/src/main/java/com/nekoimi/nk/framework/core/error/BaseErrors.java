@@ -25,8 +25,8 @@ public enum BaseErrors implements ErrorDetails {
     // 未捕获的异常，系统发生致命错误，提示系统维护更新!
     DEFAULT_SERVER_ERROR(99500, "系统更新中！请稍候再试～");
 
-    private Integer code;
-    private String message;
+    private final Integer code;
+    private final String message;
 
     BaseErrors(Integer code, String message) {
         this.code = code;

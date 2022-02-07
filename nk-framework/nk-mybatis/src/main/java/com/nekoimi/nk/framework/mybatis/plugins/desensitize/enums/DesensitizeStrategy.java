@@ -4,6 +4,7 @@ package com.nekoimi.nk.framework.mybatis.plugins.desensitize.enums;
  * nekoimi  2022/1/16 23:15
  *
  * 脱敏策略
+ * @see cn.hutool.core.util.DesensitizedUtil
  */
 public enum DesensitizeStrategy {
     //用户id
