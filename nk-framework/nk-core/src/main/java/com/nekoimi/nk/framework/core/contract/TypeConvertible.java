@@ -10,7 +10,7 @@ import java.lang.reflect.Type;
  * <p>
  * 类型转换接口
  */
-public interface TypeConvert {
+public interface TypeConvertible {
 
     /**
      * @param toType
