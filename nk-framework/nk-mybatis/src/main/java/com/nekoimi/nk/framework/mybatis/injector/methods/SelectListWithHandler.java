@@ -19,7 +19,7 @@ public class SelectListWithHandler extends AbstractMethod {
     public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {
         ExtendSqlMethod method = ExtendSqlMethod.SELECT_LIST_WITH_HANDLER;
         String sql = String.format(method.getSql(), sqlFirst(), sqlSelectColumns(tableInfo, true), tableInfo.getTableName(),
-                sqlWhereEntityWrapper(true, tableInfo), sqlComment());
+                sqlWhereEntityWrapper(true, tableInfo), sqlOrderBy(tableInfo), sqlComment());
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         return this.addSelectMappedStatementForTable(mapperClass, method.getMethod(), sqlSource, tableInfo);
     }

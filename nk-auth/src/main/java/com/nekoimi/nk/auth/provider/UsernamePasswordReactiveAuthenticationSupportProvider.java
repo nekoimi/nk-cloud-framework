@@ -43,7 +43,8 @@ public class UsernamePasswordReactiveAuthenticationSupportProvider extends Abstr
 
     @Override
     protected Mono<SubjectAuthenticationToken> doAuthenticate(Authentication authentication) {
-        return Mono.just(authentication).cast(UsernamePasswordAuthenticationToken.class)
+        return Mono.just(authentication)
+                .cast(UsernamePasswordAuthenticationToken.class)
                 .flatMap(token -> Mono.empty());
     }
 }

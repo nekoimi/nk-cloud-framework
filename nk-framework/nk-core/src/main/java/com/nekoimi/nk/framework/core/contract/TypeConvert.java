@@ -8,9 +8,9 @@ import java.lang.reflect.Type;
 /**
  * nekoimi  2022/2/8 9:50
  * <p>
- * 自动类型转换接口
+ * 类型转换接口
  */
-public interface AutoConvert {
+public interface TypeConvert {
 
     /**
      * @param toType
