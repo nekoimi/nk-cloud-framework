@@ -2,9 +2,10 @@ package com.nekoimi.nk.auth.provider;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Dict;
-import com.nekoimi.nk.auth.enums.AuthType;
+import com.nekoimi.nk.auth.enums.EAuthType;
 import com.nekoimi.nk.auth.token.UsernamePasswordAuthenticationToken;
 import com.nekoimi.nk.framework.core.exception.http.RequestValidationException;
+import com.nekoimi.nk.framework.security.contract.AuthType;
 import com.nekoimi.nk.framework.security.provider.AbstractReactiveAuthenticationSupportProvider;
 import com.nekoimi.nk.framework.security.token.SubjectAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,8 +21,8 @@ public class UsernamePasswordReactiveAuthenticationSupportProvider extends Abstr
     private final String passwordParameter = "password";
 
     @Override
-    protected Integer authType() {
-        return AuthType.USERNAME_PASSWORD.code();
+    protected AuthType authType() {
+        return EAuthType.USERNAME_PASSWORD;
     }
 
     @Override
@@ -31,14 +32,13 @@ public class UsernamePasswordReactiveAuthenticationSupportProvider extends Abstr
 
     @Override
     protected Mono<? extends Authentication> doConvert(Dict requestParameters) {
-        return Mono.just(requestParameters)
-                .flatMap(dict -> {
-                    String username = dict.getStr(usernameParameter);
-                    Assert.notBlank(username, "Username can not be empty");
-                    String password = dict.getStr(passwordParameter);
-                    Assert.notBlank(password, "Password can not be empty");
-                    return Mono.just(new UsernamePasswordAuthenticationToken(username, password));
-                }).onErrorResume(error -> Mono.error(new RequestValidationException(error.getMessage())));
+        return Mono.fromCallable(() -> {
+            String username = requestParameters.getStr(usernameParameter);
+            Assert.notBlank(username, "Username can not be empty");
+            String password = requestParameters.getStr(passwordParameter);
+            Assert.notBlank(password, "Password can not be empty");
+            return new UsernamePasswordAuthenticationToken(username, password);
+        }).onErrorResume(error -> Mono.error(new RequestValidationException(error.getMessage())));
     }
 
     @Override
