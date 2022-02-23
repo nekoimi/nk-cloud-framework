@@ -32,10 +32,11 @@ import java.util.Set;
  */
 @Slf4j
 public class RewriteResponseBodyResultHandler extends ResponseBodyResultHandler {
+    private static final String REWRITE_PARAMETER_METHOD_NAME = "methodParameterForRewrite";
     private static MethodParameter methodParameter;
     static {
         try {
-            methodParameter = new MethodParameter(RewriteResponseBodyResultHandler.class.getDeclaredMethod("methodForParams"), -1);
+            methodParameter = new MethodParameter(RewriteResponseBodyResultHandler.class.getDeclaredMethod(REWRITE_PARAMETER_METHOD_NAME), -1);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -51,7 +52,7 @@ public class RewriteResponseBodyResultHandler extends ResponseBodyResultHandler 
         super(writers, resolver, registry);
     }
 
-    private static Mono<JsonResp<?>> methodForParams() {
+    private static Mono<JsonResp<?>> methodParameterForRewrite() {
         return Mono.empty();
     }
 

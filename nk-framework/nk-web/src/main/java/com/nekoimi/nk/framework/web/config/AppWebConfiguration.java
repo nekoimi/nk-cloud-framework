@@ -86,6 +86,8 @@ public class AppWebConfiguration {
     }
 
     /**
+     * 统一返回值
+     *
      * @param configurer
      * @param registry
      * @param resolver
@@ -98,6 +100,8 @@ public class AppWebConfiguration {
     public ResponseBodyResultHandler rewriteResponseBodyResultHandler (ServerCodecConfigurer configurer,
                                                                        @Qualifier("webFluxAdapterRegistry") ReactiveAdapterRegistry registry,
                                                                        @Qualifier("webFluxContentTypeResolver") RequestedContentTypeResolver resolver) {
-        return new RewriteResponseBodyResultHandler(configurer.getWriters(), resolver, registry);
+        RewriteResponseBodyResultHandler resultHandler = new RewriteResponseBodyResultHandler(configurer.getWriters(), resolver, registry);
+        // resultHandler.setExcludes();
+        return resultHandler;
     }
 }
