@@ -3,7 +3,6 @@ package com.nekoimi.nk.framework.web.error;
 import com.nekoimi.nk.framework.core.contract.error.ErrorDetails;
 import com.nekoimi.nk.framework.core.protocol.JsonResp;
 import com.nekoimi.nk.framework.core.utils.JsonUtils;
-import com.nekoimi.nk.framework.web.config.properties.AppWebProperties;
 import com.nekoimi.nk.framework.web.contract.error.ErrorExceptionResultWriter;
 import com.nekoimi.nk.framework.web.contract.error.ErrorExceptionWriter;
 import lombok.AllArgsConstructor;
@@ -27,7 +26,6 @@ import java.util.List;
 @Component
 @AllArgsConstructor
 public class DefaultErrorExceptionResultWriter implements ErrorExceptionResultWriter {
-    private final AppWebProperties appWebProperties;
     private final List<ErrorExceptionWriter> writers;
 
     private void doWriter(ServerWebExchange exchange, ErrorDetails error) {
@@ -40,14 +38,10 @@ public class DefaultErrorExceptionResultWriter implements ErrorExceptionResultWr
     public Mono<Void> httpWriter(ServerWebExchange exchange, ErrorDetails error) {
         return Mono.defer(() -> {
             ServerHttpResponse response = exchange.getResponse();
+            response.setStatusCode(HttpStatus.OK);
             response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-            if (appWebProperties.getResponseForeverOk()) {
-                response.setStatusCode(HttpStatus.OK);
-            } else {
-                response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
 
-            JsonResp resp = JsonResp.error(error.code(), error.message());
+            JsonResp<Object> resp = JsonResp.error(error.code(), error.message());
             byte[] valueAsBytes = JsonUtils.writeBytes(resp);
             DataBuffer buffer = response.bufferFactory().wrap(valueAsBytes);
             return response.writeWith(Mono.just(buffer)).doOnError(e -> DataBufferUtils.release(buffer));

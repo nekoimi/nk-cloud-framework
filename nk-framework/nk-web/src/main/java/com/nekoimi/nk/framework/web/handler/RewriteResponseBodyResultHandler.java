@@ -1,26 +1,29 @@
 package com.nekoimi.nk.framework.web.handler;
 
 import com.nekoimi.nk.framework.core.protocol.JsonResp;
-import com.nekoimi.nk.framework.core.utils.ClazzUtils;
-import com.nekoimi.nk.framework.core.utils.JsonUtils;
-import lombok.SneakyThrows;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.context.annotation.Configuration;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.core.MethodParameter;
-import org.springframework.core.ResolvableType;
+import org.springframework.core.ReactiveAdapterRegistry;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.HttpMessageWriter;
+import org.springframework.util.MimeType;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.reactive.HandlerResult;
+import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
+import org.springframework.web.reactive.result.method.annotation.ResponseBodyResultHandler;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.CorePublisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import springfox.documentation.service.ResponseMessage;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * nekoimi  2021/12/19 0:33
@@ -28,48 +31,83 @@ import java.util.Arrays;
  * @see org.springframework.web.reactive.result.method.annotation.ResponseBodyResultHandler
  */
 @Slf4j
-//@Aspect
-//@Configuration
-//@ConditionalOnClass(value = org.springframework.web.reactive.result.method.annotation.ResponseBodyResultHandler.class)
-public class RewriteResponseBodyResultHandler {
-
-    @SneakyThrows
-    @Around(value = "execution(* org.springframework.web.reactive.result.method.annotation.ResponseBodyResultHandler.handleResult(..)) && args(exchange, result)", argNames = "joinPoint,exchange,result")
-    public Mono<Void> aroundHandleResult(ProceedingJoinPoint joinPoint, ServerWebExchange exchange, HandlerResult result) {
-        Object returnValue = result.getReturnValue();
-        Object sendReturnValue = Mono.empty();
-        ResolvableType returnType = result.getReturnType();
-
-        ParameterizedType parameterType = (ParameterizedType) result.getReturnTypeSource().getGenericParameterType();
-        log.debug("returnTypeName: {}", parameterType.getTypeName());
-        Type[] typeArguments = parameterType.getActualTypeArguments();
-
-        if (returnValue != null) {
-            log.debug("ValueRowClass: {}", returnValue.getClass().toString());
+public class RewriteResponseBodyResultHandler extends ResponseBodyResultHandler {
+    private static MethodParameter methodParameter;
+    static {
+        try {
+            methodParameter = new MethodParameter(RewriteResponseBodyResultHandler.class.getDeclaredMethod("methodForParams"), -1);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
         }
-        log.debug("TypeRowClass: {}", returnType.getRawClass());
+    }
 
-        if (ClazzUtils.instanceOf(returnType.getRawClass(), CorePublisher.class)) {
-            if (ClazzUtils.instanceOf(returnType.getRawClass(), Mono.class)) {
-                log.debug("Mono.class");
-                Mono<Object> objectMono = (Mono<Object>) returnValue;
-                sendReturnValue = objectMono.map(JsonResp::ok);
+    @Setter
+    @Getter
+    private Set<String> excludes = new HashSet<>();
+
+    public RewriteResponseBodyResultHandler(List<HttpMessageWriter<?>> writers,
+                                            RequestedContentTypeResolver resolver,
+                                            ReactiveAdapterRegistry registry) {
+        super(writers, resolver, registry);
+    }
+
+    private static Mono<JsonResp<?>> methodForParams() {
+        return Mono.empty();
+    }
+
+    @Override
+    public boolean supports(HandlerResult result) {
+        if (!CollectionUtils.isEmpty(excludes) && result.getHandler() instanceof HandlerMethod) {
+            HandlerMethod method = (HandlerMethod) result.getHandler();
+            String typeName = method.getMethod().getDeclaringClass().getName() + "." + method.getMethod().getName();
+            for (String exclude : excludes) {
+                if (typeName.startsWith(exclude)) {
+                    return false;
+                }
             }
-            if (ClazzUtils.instanceOf(returnType.getRawClass(), Flux.class)) {
-                log.debug("Flux.class");
-                Flux<Object> objectFlux = (Flux<Object>) returnValue;
-                sendReturnValue = objectFlux.collectList().map(JsonResp::ok);
-            }
-        } else {
-            log.debug("Object.class");
         }
 
-        HandlerResult handlerResult = new HandlerResult(result.getHandler(), sendReturnValue, result.getReturnTypeSource());
-        return (Mono<Void>) joinPoint.proceed(Arrays.asList(exchange, handlerResult).toArray());
-//        final Mono responseMono = ((Mono) result.getReturnValue()).map(responseValue -> responseValue instanceof ResponseInfo ? responseValue : ResponseInfo.ok(responseValue));
-//        return joinPoint.proceed(Arrays.asList(
-//                exchange,
-//                new HandlerResult(result.getHandler(), responseMono, result.getReturnTypeSource())
-//        ).toArray());
+        Class<?> gen = result.getReturnType().resolveGeneric(0);
+        boolean isAlreadyResponse = (gen == ResponseMessage.class || gen == ResponseEntity.class);
+        boolean isStream = result.getReturnType().resolve() == Mono.class
+                || result.getReturnType().resolve() == Flux.class;
+
+        RequestMapping mapping = result.getReturnTypeSource().getMethodAnnotation(RequestMapping.class);
+        if (mapping == null) {
+            return false;
+        }
+
+        for (String produce : mapping.produces()) {
+            MimeType mimeType = MimeType.valueOf(produce);
+            if (MediaType.TEXT_EVENT_STREAM.includes(mimeType) || MediaType.APPLICATION_STREAM_JSON.includes(mimeType)) {
+                return false;
+            }
+        }
+
+        return isStream && !isAlreadyResponse && super.supports(result);
+    }
+
+    @Override
+    @SuppressWarnings("all")
+    public Mono<Void> handleResult(ServerWebExchange exchange, HandlerResult result) {
+        Object body = result.getReturnValue();
+
+        if (exchange.getRequest().getHeaders().getAccept().contains(MediaType.TEXT_EVENT_STREAM)) {
+            return writeBody(body, methodParameter, exchange);
+        }
+
+        if (body instanceof Mono) {
+            body = ((Mono) body).map(JsonResp::ok).switchIfEmpty(Mono.just(JsonResp.ok()));
+        }
+
+        if (body instanceof Flux) {
+            body = ((Flux) body).collectList().map(JsonResp::ok).switchIfEmpty(Mono.just(JsonResp.ok()));
+        }
+
+        if (body == null) {
+            body = Mono.just(JsonResp.ok());
+        }
+
+        return writeBody(body, methodParameter, exchange);
     }
 }

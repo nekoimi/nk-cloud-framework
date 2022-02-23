@@ -16,8 +16,6 @@ import java.util.List;
 @Component
 @ConfigurationProperties(prefix = "app.web")
 public class AppWebProperties {
-    // 接口永远返回200
-    private Boolean responseForeverOk = false;
     // 是否扫描全部接口
     private Boolean scanRequestMapping;
     // swagger

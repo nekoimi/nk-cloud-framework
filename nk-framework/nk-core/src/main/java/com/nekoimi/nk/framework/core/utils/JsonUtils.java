@@ -64,4 +64,13 @@ public class JsonUtils {
             return null;
         }
     }
+
+    public static <T> T readBytes(byte[] json, TypeReference<T> resultType) {
+        try {
+            return ObjectMapperHolder.getInstance().readValue(json, resultType);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+    }
 }

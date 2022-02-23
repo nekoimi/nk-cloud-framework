@@ -1,8 +1,8 @@
 package com.nekoimi.nk.gateway.filter;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.nekoimi.nk.framework.core.protocol.JsonResp;
 import com.nekoimi.nk.framework.core.utils.JsonUtils;
-import com.nekoimi.nk.framework.web.config.properties.AppWebProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -13,12 +13,9 @@ import org.springframework.cloud.gateway.filter.factory.rewrite.ModifyResponseBo
 import org.springframework.cloud.gateway.filter.factory.rewrite.RewriteFunction;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.core.Ordered;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 /**
  * nekoimi  2021/12/26 16:13
@@ -27,18 +24,15 @@ import java.util.Map;
  */
 public class RewriteUpstreamResponseBodyGatewayFilter implements GlobalFilter, Ordered {
     private final ModifyResponseBodyGatewayFilterFactory filterFactory;
-    private final AppWebProperties appWebProperties;
     private GatewayFilter filter;
 
-    public RewriteUpstreamResponseBodyGatewayFilter(AppWebProperties appWebProperties,
-                                                    ModifyResponseBodyGatewayFilterFactory filterFactory) {
-        this.appWebProperties = appWebProperties;
+    public RewriteUpstreamResponseBodyGatewayFilter(ModifyResponseBodyGatewayFilterFactory filterFactory) {
         this.filterFactory = filterFactory;
         initialization();
     }
 
     private void initialization() {
-        RewriteFunction<byte[], byte[]> rewriteFunction = new RewriteUpstreamResponseBodyFunction(appWebProperties);
+        RewriteFunction<byte[], byte[]> rewriteFunction = new RewriteUpstreamResponseBodyFunction();
         ModifyResponseBodyGatewayFilterFactory.Config modifyConfig =
                 new ModifyResponseBodyGatewayFilterFactory.Config()
                         .setRewriteFunction(byte[].class, byte[].class, rewriteFunction);
@@ -61,25 +55,32 @@ public class RewriteUpstreamResponseBodyGatewayFilter implements GlobalFilter, O
      */
     @Slf4j
     public static class RewriteUpstreamResponseBodyFunction implements RewriteFunction<byte[], byte[]> {
-        private final AppWebProperties appWebProperties;
-        public RewriteUpstreamResponseBodyFunction(AppWebProperties appWebProperties) {
-            this.appWebProperties = appWebProperties;
-        }
-
         @Override
         public Publisher<byte[]> apply(ServerWebExchange exchange, byte[] bytes) {
-            if (!ServerWebExchangeUtils.isAlreadyRouted(exchange) ||
+            boolean isAnythingTodo = !ServerWebExchangeUtils.isAlreadyRouted(exchange) ||
                     exchange.getResponse().getStatusCode() == null ||
                     exchange.getResponse().getHeaders().getContentType() == null ||
                     !exchange.getResponse().getStatusCode().is2xxSuccessful() ||
-                    !exchange.getResponse().getHeaders().getContentType().isCompatibleWith(MediaType.APPLICATION_JSON)) {
-                if (appWebProperties.getResponseForeverOk()) {
-                    exchange.getResponse().setStatusCode(HttpStatus.OK);
-                }
+                    !exchange.getResponse().getHeaders().getContentType().isCompatibleWith(MediaType.APPLICATION_JSON);
+
+            if (isAnythingTodo) {
                 return Mono.justOrEmpty(bytes);
             }
+
             log.debug("rewrite response ...");
-            return Mono.justOrEmpty(JsonUtils.readBytes(bytes, Map.class)).map(JsonResp::ok).map(JsonUtils::writeBytes);
+            JsonResp<?> resp = JsonUtils.readBytes(bytes, new TypeReference<JsonResp<?>>() {});
+            if (resp == null) {
+                log.error("read response null");
+                return Mono.justOrEmpty(bytes);
+            }
+
+            if (resp.isOk()) {
+                return Mono.justOrEmpty(bytes);
+            }
+
+            // TODO
+            // todo something, write error log...
+            return Mono.justOrEmpty(bytes);
         }
     }
 

@@ -6,8 +6,10 @@ import com.nekoimi.nk.framework.core.holder.ObjectMapperHolder;
 import com.nekoimi.nk.framework.web.controller.IndexController;
 import com.nekoimi.nk.framework.web.customizer.HttpJackson2ObjectMapperBuilderCustomizer;
 import com.nekoimi.nk.framework.web.filter.RequestLogFilter;
+import com.nekoimi.nk.framework.web.handler.RewriteResponseBodyResultHandler;
 import com.nekoimi.nk.framework.web.listener.CleanRequestMappingListener;
 import com.nekoimi.nk.framework.web.listener.ScanRequestMappingListener;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
@@ -15,9 +17,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.ReactiveAdapterRegistry;
+import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
+import org.springframework.web.reactive.result.method.annotation.ResponseBodyResultHandler;
 import org.springframework.web.server.WebFilter;
 
 /**
@@ -77,5 +83,21 @@ public class AppWebConfiguration {
         ObjectMapper objectMapper = builder.createXmlMapper(false).build();
         ObjectMapperHolder.setInstance(objectMapper);
         return objectMapper;
+    }
+
+    /**
+     * @param configurer
+     * @param registry
+     * @param resolver
+     * @return
+     *
+     * @see org.springframework.web.reactive.config.WebFluxConfigurationSupport#responseBodyResultHandler(org.springframework.core.ReactiveAdapterRegistry, org.springframework.http.codec.ServerCodecConfigurer, org.springframework.web.reactive.accept.RequestedContentTypeResolver)
+     */
+    @Bean
+    @Primary
+    public ResponseBodyResultHandler rewriteResponseBodyResultHandler (ServerCodecConfigurer configurer,
+                                                                       @Qualifier("webFluxAdapterRegistry") ReactiveAdapterRegistry registry,
+                                                                       @Qualifier("webFluxContentTypeResolver") RequestedContentTypeResolver resolver) {
+        return new RewriteResponseBodyResultHandler(configurer.getWriters(), resolver, registry);
     }
 }
