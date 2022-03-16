@@ -32,6 +32,9 @@ import java.util.Set;
  */
 @Slf4j
 public class RewriteResponseBodyResultHandler extends ResponseBodyResultHandler {
+    /**
+     * @see RewriteResponseBodyResultHandler#methodParameterForRewrite()
+     */
     private static final String REWRITE_PARAMETER_METHOD_NAME = "methodParameterForRewrite";
     private static MethodParameter methodParameter;
     static {
