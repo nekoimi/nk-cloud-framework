@@ -72,7 +72,10 @@ public class RewriteResponseBodyResultHandler extends ResponseBodyResultHandler 
         }
 
         Class<?> gen = result.getReturnType().resolveGeneric(0);
-        boolean isAlreadyResponse = (gen == ResponseMessage.class || gen == ResponseEntity.class);
+        boolean isAlreadyResponse = (gen == ResponseMessage.class || gen == ResponseEntity.class
+                || gen == JsonResp.class
+                || gen == String.class
+                || gen == Byte.class);
         boolean isStream = result.getReturnType().resolve() == Mono.class
                 || result.getReturnType().resolve() == Flux.class;
 
