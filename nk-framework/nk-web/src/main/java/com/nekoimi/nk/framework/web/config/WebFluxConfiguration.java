@@ -28,11 +28,11 @@ import java.time.Duration;
 @AllArgsConstructor
 public class WebFluxConfiguration implements WebFluxConfigurer {
     private final ObjectMapper objectMapper;
-    private final WebProperties.Resources resourceProperties;
+    private final WebProperties webProperties;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        if (!this.resourceProperties.isAddMappings()) {
+        if (!this.webProperties.getResources().isAddMappings()) {
             log.debug("Default resource handling disabled");
             return;
         }
@@ -43,14 +43,14 @@ public class WebFluxConfiguration implements WebFluxConfigurer {
         }
         if (!registry.hasMappingForPattern("/**")) {
             ResourceHandlerRegistration registration = registry.addResourceHandler("/**")
-                    .addResourceLocations(this.resourceProperties.getStaticLocations());
+                    .addResourceLocations(this.webProperties.getResources().getStaticLocations());
             configureResourceCaching(registration);
         }
     }
 
     private void configureResourceCaching(ResourceHandlerRegistration registration) {
-        Duration cachePeriod = this.resourceProperties.getCache().getPeriod();
-        WebProperties.Resources.Cache.Cachecontrol cacheControl = this.resourceProperties.getCache().getCachecontrol();
+        Duration cachePeriod = this.webProperties.getResources().getCache().getPeriod();
+        WebProperties.Resources.Cache.Cachecontrol cacheControl = this.webProperties.getResources().getCache().getCachecontrol();
         if (cachePeriod != null && cacheControl.getMaxAge() == null) {
             cacheControl.setMaxAge(cachePeriod);
         }

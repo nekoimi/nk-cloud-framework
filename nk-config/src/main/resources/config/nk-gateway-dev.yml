@@ -1,6 +1,6 @@
 debug: true
 server:
-  port: ${gateway.port}
+  port: 10000
   address: 0.0.0.0
   http2:
     enabled: true
@@ -13,6 +13,9 @@ server:
     whitelabel:
       enabled: false
 spring:
+  main:
+    banner-mode: off
+    web-application-type: reactive
   gateway:
     enabled: true
     loadbalancer:

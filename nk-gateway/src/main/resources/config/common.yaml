@@ -1,0 +1,12 @@
+debug: true
+server:
+  forward-headers-strategy: native
+  shutdown: graceful
+  error:
+    include-exception: true
+    include-stacktrace: always
+    include-message: always
+    include-binding-errors: always
+    path: /error
+    whitelabel:
+      enabled: true

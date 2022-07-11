@@ -67,7 +67,7 @@ public class RewriteUpstreamResponseBodyGatewayFilter implements GlobalFilter, O
                 return Mono.justOrEmpty(bytes);
             }
 
-            log.debug("rewrite response ...");
+            log.debug("rewrite response");
             JsonResp<?> resp = JsonUtils.readBytes(bytes, new TypeReference<JsonResp<?>>() {});
             if (resp == null) {
                 log.error("read response null");

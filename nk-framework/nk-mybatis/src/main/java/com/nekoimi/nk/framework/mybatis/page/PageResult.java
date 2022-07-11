@@ -4,29 +4,33 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 /**
  * nekoimi  2021/12/18 16:29
  */
+@Setter
 @Getter
 @ApiModel(description = "分页数据结构")
+@NoArgsConstructor
 @AllArgsConstructor(staticName = "of")
 public class PageResult<T> {
     // 总条数
     @ApiModelProperty("总条数")
-    private final long total;
+    private long total;
     // 当前页数
     @ApiModelProperty("当前页数")
-    private final long page;
+    private long page;
     // 每页显示数量
     @ApiModelProperty("每页显示数量")
-    private final long pageSize;
+    private long pageSize;
     // 最后一页页码
     @ApiModelProperty("最后一页页码")
-    private final long lastPage;
+    private long lastPage;
     // 数据列表
     @ApiModelProperty("数据列表")
-    private final List<T> list;
+    private List<T> list;
 }

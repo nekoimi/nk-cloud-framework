@@ -1,43 +1,18 @@
 spring:
-  application:
-    name: ${artifactId}
   profiles:
     active: ${profile.name}
-  main:
-    banner-mode: off
-    web-application-type: reactive
+  application:
+    name: ${artifactId}
   cloud:
-    config:
-      enabled: true
-      profile: ${profile.name}
-      allow-override: true
-      fail-fast: true
-      discovery:
-        enabled: true
-        service-id: nk-config
-    consul:
-      host: ${consul.host}
-      port: ${consul.port}
-      discovery:
-        prefer-ip-address: true
-        service-name: ${spring.application.name}
-        health-check-path: /
-        health-check-interval: 60s
-        metadata:
-          name: ${spring.application.name}
-          port: ${server.port}
-    gateway:
-      routes:
-        - id: nk-cloud-admin-service
-          uri: lb://nk-cloud-admin-service
-          predicates:
-            - Path=/cloud-admin/**
-          filters:
-            - RewritePath=/cloud-admin/(?<target>.*), /$\{target}
+    nacos:
+      server-addr: ${nacos.host}:${nacos.port}
+      config:
+        file-extension: yaml
+        extension-configs:
+          - data-id: common.yaml
+            group: DEFAULT_GROUP
+            refresh: true
 
-        - id: nk-uc-service
-          uri: lb://nk-uc-service
-          predicates:
-            - Path=/uc/**
-          filters:
-            - RewritePath=/uc/(?<target>.*), /$\{target}
+          - data-id: consul.yaml
+            group: DEFAULT_GROUP
+            refresh: true

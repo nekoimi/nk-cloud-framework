@@ -39,4 +39,5 @@ public interface BaseMapper<E> extends com.baomidou.mybatisplus.core.mapper.Base
      * @param <P>
      */
     <P extends IPage<E>> void selectPageWithHandler(P page, @Param(Constants.WRAPPER) Wrapper<E> queryWrapper, ResultHandler<E> handler);
+
 }

@@ -44,37 +44,21 @@
     </appender>
 
     <logger name="com.nekoimi.nk" level="debug"/>
-    <logger name="org.springframework.http" level="debug"/>
-    <logger name="com.baomidou.mybatisplus" level="debug"/>
-
-    <logger name="org.springframework.boot" level="info"/>
-    <logger name="org.springframework.beans" level="info"/>
-    <logger name="org.springframework.core" level="info"/>
-    <logger name="org.springframework.data" level="info"/>
-    <logger name="org.springframework.context" level="info"/>
-    <logger name="org.springframework.cloud" level="info"/>
-    <logger name="org.springframework.web" level="info"/>
-    <logger name="org.springframework.jmx" level="info"/>
+    <logger name="org.jboss" level="warn"/>
     <logger name="org.hibernate.validator" level="info"/>
-    <logger name="org.jboss" level="info"/>
-    <logger name="org.mybatis" level="info"/>
-    <logger name="org.apache.ibatis" level="info"/>
-    <logger name="com.zaxxer.hikari" level="info"/>
-    <logger name="reactor" level="info"/>
     <logger name="io.netty" level="info"/>
-    <logger name="io.lettuce" level="info"/>
-    <logger name="springfox.documentation" level="info"/>
-    <logger name="org.springframework.boot.autoconfigure.logging" level="info"/>
     <logger name="org.apache.http" level="info"/>
+    <logger name="org.springframework.beans" level="info"/>
+    <logger name="org.springframework.jmx" level="info"/>
+    <logger name="org.springframework.boot.autoconfigure.logging" level="info"/>
+    <logger name="org.springframework.cloud" level="info"/>
+    <logger name="org.springframework.context.annotation" level="info"/>
+    <logger name="org.springframework.data.convert" level="info"/>
 
     <!--开发环境:打印控制台-->
-    <springProfile name="dev">
-        <root level="debug">
-            <appender-ref ref="console"/>
-            <appender-ref ref="info"/>
-            <appender-ref ref="error"/>
-        </root>
-    </springProfile>
+    <root level="debug">
+        <appender-ref ref="console"/>
+    </root>
 
     <springProfile name="pro">
         <root level="info">

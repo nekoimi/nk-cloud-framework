@@ -1,0 +1,13 @@
+spring:
+  cloud:
+    consul:
+      host: 192.168.2.202
+      port: 30500
+      discovery:
+        prefer-ip-address: true
+        service-name: ${spring.application.name}
+        health-check-path: /
+        health-check-interval: 60s
+        metadata:
+          name: ${spring.application.name}
+          port: ${server.port}
