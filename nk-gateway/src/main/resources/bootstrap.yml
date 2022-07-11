@@ -8,11 +8,10 @@ spring:
       server-addr: ${nacos.host}:${nacos.port}
       config:
         file-extension: yaml
-        extension-configs:
+        shared-configs:
           - data-id: common.yaml
             group: DEFAULT_GROUP
             refresh: true
-
           - data-id: consul.yaml
             group: DEFAULT_GROUP
             refresh: true
